@@ -17,8 +17,8 @@ def getting_soup(html=html):
 def getting_sq(soup):
     """Получаем список площади и этажей"""
     list_of_sq = []
-    text = soup.find_all('a',
-                         class_="link-link-MbQDP link-design-default-_nSbv title-root-zZCwT iva-item-title-py3i_ title-listRedesign-_rejR title-root_maxHeight-X6PsH")
+    text = soup.find_all('a', class_="link-link-MbQDP link-design-default-_nSbv title-root-zZCwT iva-item-title-py3i_ "
+                                     "title-listRedesign-_rejR title-root_maxHeight-X6PsH")
     for t in text:
         list_of_sq.append(t.text)
     return list_of_sq
@@ -53,7 +53,7 @@ def getting_area(soup):
 soup = getting_soup(html)
 
 
-def main(address=getting_address(soup), area=getting_area(soup), price=getting_price(soup), sq=getting_sq(soup)):
+def main(address, area, price, sq):
     """Отправляем данные в базу"""
     index = 0
     while len(address) > index:
@@ -61,10 +61,10 @@ def main(address=getting_address(soup), area=getting_area(soup), price=getting_p
         try:
             # Подключиться к существующей базе данных
             connection = psycopg2.connect(user=user_DB,
-                                      password=password_DB,
-                                      host="127.0.0.1",
-                                      port="5432",
-                                      database="avito_db")
+                                          password=password_DB,
+                                          host="127.0.0.1",
+                                          port="5432",
+                                          database="avito_db")
             cursor = connection.cursor()
             # Выполнение SQL-запроса для вставки данных в таблицу
             cursor.execute(
@@ -75,5 +75,6 @@ def main(address=getting_address(soup), area=getting_area(soup), price=getting_p
             print("Ошибка при работе с PostgreSQL", error)
 
 
-soup = getting_soup(html=html)
-main(getting_address(soup), getting_area(soup), getting_price(soup), getting_sq(soup))
+if '__main__' == '__name__':
+    soup = getting_soup(html=html)
+    main(getting_address(soup), getting_area(soup), getting_price(soup), getting_sq(soup))
