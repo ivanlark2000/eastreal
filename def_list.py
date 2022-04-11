@@ -9,8 +9,6 @@ from selenium import webdriver
 from urllib import request
 
 
-
-
 def getting_url():
     """Генератор стартовых ссылок"""
     list120 = list(range(1, 21))
@@ -32,14 +30,14 @@ def getting_total_html(url):
     try:
         while True:
             driver = webdriver.Chrome()
-            time.sleep(3)
             driver.get(url)
-            time.sleep(3)
+            time.sleep(2)
+            driver.refresh()
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
             # прокручиваем вниз страницы
-            driver.refresh()
+            time.sleep(3)
             html = driver.page_source  # получаем html страницы
-            if len(html) == 0:
+            if html is None:
                 continue
             driver.quit()
             return html
@@ -66,15 +64,18 @@ def getting_rendom_link(list_links):
 
 
 def getting_html_flat(url):
-    """Получем суп для дома и квартиры квартиры"""
-    response = request.urlopen(url)
-    html_flat = response.read().decode("utf-8")
-    time.sleep(5)
-    return html_flat
+    """Получим html для дома и квартиры"""
+    try:
+        response = request.urlopen(url)
+        html_flat = response.read().decode("utf-8")
+        time.sleep(5)
+        return html_flat
+    except (Exception, Error) as error:
+        print('Ошибка при получении HTML стартовой страницы', error)
 
 
 def checking_flat(id):
-    """Проверяем есть ли обьявление по квартире в базе"""
+    """Проверяем есть ли объявление по квартире в базе"""
     try:
         connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
         cursor = connection.cursor()
@@ -82,12 +83,12 @@ def checking_flat(id):
         result = cursor.fetchone()
         return result
     except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL", error)
+        print("Ошибка при работе с PostgresSQL", error)
 
 
 def sanding_add_in_base(
         id, address, price, distr, number, square, space, floor, fur, tech, balc, room, ceil, bath, win,
-        repair, seil, trans, dec, total
+        repair, seil, trans, dec, total, pag
 ):
     """Отправляем данные в базу"""
     try:
@@ -104,13 +105,13 @@ def sanding_add_in_base(
             f"'{total}');"
         )
         connection.commit()
-        print(f'Объявление № {id} успешно вставлено')
+        print(f'Запись № {pag} c объявлением {id} успешно вставлена.')
     except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL", error)
+        print("Ошибка при работе с PostgresSQL", error)
 
 
 def checking_build(addr):
-    """Проверяем есть ли обьявление дома в базе"""
+    """Проверяем есть ли объявление дома в базе"""
     try:
         connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
         cursor = connection.cursor()
@@ -118,7 +119,7 @@ def checking_build(addr):
         result = cursor.fetchone()
         return result
     except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL", error)
+        print("Ошибка при работе с PostgresSQL", error)
 
 
 def sending_build(
@@ -140,4 +141,30 @@ def sending_build(
         connection.commit()
         print(f'Дом на {addr} улице успешно вставлен')
     except (Exception, Error) as error:
-        print("Ошибка при работе с PostgreSQL", error)
+        print("Ошибка при работе с PostgresSQL", error)
+
+
+def clearing_none():
+    """Очищаем None"""
+    try:
+        connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
+        cursor = connection.cursor()
+        cursor.execute(f"DELETE FROM flats WHERE address = 'None';")
+        connection.commit()
+        print('Non - ы успешно удалены')
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgresSQL", error)
+
+
+def adding_price(id_flat, price):
+    """Вносим историю цен"""
+    try:
+        connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
+        cursor = connection.cursor()
+        cursor.execute(f"INSERT INTO public.history_of_price (id_flat, price)"
+                       f"VALUES ({id_flat}, {price});")
+        connection.commit()
+        print(f'В объявление № {id_flat} вставили цену {price} руб.')
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgresSQL", error)
+

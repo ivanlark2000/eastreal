@@ -35,7 +35,10 @@ class Flats:
         self.decorating = self.decorating()
 
     def flat_id(self):
-        flat_id = self.s_flat.find('span', attrs={'data-marker':'item-view/item-id'})
+        flat_id = self.s_flat.find('span', attrs={'data-marker': 'item-view/item-id'})
+        if flat_id is None:
+            res = 0
+            return res
         return [int(res) for res in re.findall(r'-?\d+\.?\d*', flat_id.text)][0]  # выбираем только
 
     def address(self):
@@ -198,7 +201,7 @@ class Flats:
 
 
 class Buildings:
-    """Создается обьект класса сдание"""
+    """Создается объект класса здание"""
     def __init__(self, html_flat):
         self.s_flat = pars_flat(html_flat)
         self.new_building_name = self.new_building_name()
