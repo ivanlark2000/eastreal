@@ -49,6 +49,8 @@ class Flats:
 
     def price(self):
         price = self.s_flat.find('span', class_="js-item-price")
+        if price is None:
+            return 0
         price = price.contents[0].text
         return int(re.sub(r'\s+', '', price))  # C помошью регулярного выражения убираем все пробелы из строки
 

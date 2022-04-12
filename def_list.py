@@ -31,6 +31,7 @@ def getting_total_html(url):
         while True:
             driver = webdriver.Chrome()
             driver.get(url)
+            driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
             time.sleep(2)
             driver.refresh()
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
@@ -59,7 +60,7 @@ def getting_rendom_link(list_links):
     """Получаем рандомную ссылку и фильтруем список"""
     link = random.choice(list_links)
     list_links.remove(link)  # Удаляем из списка выбраную ссылку.
-    time.sleep(5)
+    time.sleep(4)
     yield list_links
 
 
@@ -165,6 +166,45 @@ def adding_price(id_flat, price):
                        f"VALUES ({id_flat}, {price});")
         connection.commit()
         print(f'В объявление № {id_flat} вставили цену {price} руб.')
+    except (Exception, Error) as error:
+        print("Ошибка при работе с PostgresSQL", error)
+
+
+def checking_status():
+    """Функция по сверке айдишников в базе и установке статуса 'продана'"""
+    list_old_id, list_new_id = [], []
+    try:
+        connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
+        cursor = connection.cursor()
+        cursor.execute(f"SELECT flat_id FROM flats WHERE status = 'active';")
+        result = cursor.fetchall()
+        for res in result:
+            for id in res:
+                list_old_id.append(int(id))
+        del result
+        cursor.close()
+        file = open('temp.txt', 'r')
+        number = file.readline()
+        while number != '':  # Считываем фаил
+            list_new_id.append(int(number.rstrip('\n')))
+            number = file.readline()
+        file.close()
+        for new_id in list_new_id:  # сравниваем два списка
+            if new_id in list_old_id:
+                list_old_id.remove(new_id)
+        count = 1
+        for old_id in list_old_id:  # отправляем статут sail для старых айдишников
+            try:
+                connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
+                cursor = connection.cursor()
+                cursor.execute(f"UPDATE flats SET status = 'sales' WHERE flat_id = '{old_id}'")
+                connection.commit()
+                print(f'{count}. Квартира № {old_id} продана.')
+                count += 1
+            except (Exception, Error) as error:
+                print("Ошибка при работе с PostgresSQL", error)
+            finally:
+                cursor.close()
     except (Exception, Error) as error:
         print("Ошибка при работе с PostgresSQL", error)
 
