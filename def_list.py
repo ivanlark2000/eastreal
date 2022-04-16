@@ -21,29 +21,32 @@ def getting_url():
         random.shuffle(list_)
         for number in list_:
             start_site = f'https://www.avito.ru/kaliningrad/kvartiry/prodam-ASgBAgICAUSSA8YQ?cd=1&p={number}'
-            print(start_site)
             yield start_site
 
 
 def getting_total_html(url):
     """Получим стартовый HTML"""
-    try:
-        while True:
+    while True:
+        try:
             driver = webdriver.Chrome()
+            driver.refresh()
+            driver.set_page_load_timeout(30)  # Устанавливаем тайм аут в 30 сек
             driver.get(url)
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
             time.sleep(2)
-            driver.refresh()
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
             # прокручиваем вниз страницы
             time.sleep(3)
             html = driver.page_source  # получаем html страницы
             if html is None:
+                driver.quit()
+                time.sleep(20)
                 continue
             driver.quit()
             return html
-    except (Exception, Error) as error:
-        print('Ошибка при работе с Селениумом', error)
+        except (Exception, Error) as error:
+            print('Ошибка при работе с Селениумом', error)
+            time.sleep(20)
 
 
 def getting_links(html):
@@ -72,7 +75,8 @@ def getting_html_flat(url):
         time.sleep(5)
         return html_flat
     except (Exception, Error) as error:
-        print('Ошибка при получении HTML стартовой страницы', error)
+        print('Ошибка при получении HTML страницы c квартирой', error)
+        time.sleep(10)
 
 
 def checking_flat(id):
