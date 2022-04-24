@@ -1,4 +1,6 @@
-!/urllib_reqvest_start.py
-!/html.txt
-!/geckodriver.log
-!/config.py
+/urllib_reqvest_start.py
+/html.txt
+/config.py
+/temp.txt
+/geckodriver.log
+/flat.html
