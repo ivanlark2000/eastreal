@@ -269,9 +269,12 @@ class Buildings:
         return new_building_name.text.strip()
 
     def address(self):
-        address = self.s_flat.find('div', itemprop="address")
-        address = address.contents[0].text.replace('Калининградская область, Калининград, ', '')
-        return address.strip()
+        try:
+            address = self.s_flat.find('div', itemprop="address")
+            address = address.contents[0].text.replace('Калининградская область, Калининград, ', '')
+            return address.strip()
+        except:
+            return 'No address'
 
     def structure(self):
         data = self.s_flat.find_all('li', attrs={'class': ['item-params-list-item']})
