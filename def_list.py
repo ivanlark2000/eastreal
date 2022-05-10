@@ -1,12 +1,14 @@
 # coding=utf-8
+import os
+import sys
 import time
 import random
 import psycopg2
 from bs4 import BeautifulSoup
 from psycopg2 import Error
-from config import user_DB, password_DB, host, port, db
 from selenium import webdriver
 from urllib import request
+from class_list import user_DB, password_DB, host, port, db
 
 
 def getting_url():
@@ -28,25 +30,26 @@ def getting_total_html(url):
     """Получим стартовый HTML"""
     while True:
         try:
-            driver = webdriver.Firefox()
+            driver = webdriver.Firefox(executable_path='sys/geckodriver', service_log_path='sys/geckodriver.log')
             driver.refresh()
-            driver.set_page_load_timeout(30)  # Устанавливаем тайм-аут в 30 сек
             driver.get(url)
+            driver.set_page_load_timeout(30)  # Устанавливаем тайм-аут в 30 сек
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
             time.sleep(2)
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
             # прокручиваем вниз страницы
             time.sleep(3)
             html = driver.page_source  # получаем html страницы
-            if html is None:
-                driver.quit()
+            if html is None or sys.getsizeof(html) < 25000:
                 time.sleep(20)
+                driver.quit()
                 continue
             driver.quit()
             return html
         except (Exception, Error) as error:
             print('Ошибка при работе с Селениумом', error)
             time.sleep(20)
+            driver.quit()
 
 
 def getting_links(html):
@@ -105,7 +108,7 @@ def checking_status():
                 list_old_id.append(int(id))
         del result
         cursor.close()
-        file = open('temp.txt', 'r')
+        file = open('sys/temp.txt', 'r')
         number = file.readline()
         while number != '':  # Считываем файл
             list_new_id.append(int(number.rstrip('\n')))

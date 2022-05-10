@@ -1,21 +1,14 @@
 # coding=utf-8
 import time
 import os
-from def_list import (
-    getting_total_html,
-    getting_links,
-    getting_rendom_link,
-    getting_html_flat,
-    getting_url,
-    checking_status,
-    clearing_none,
-)
 from class_list import Flats, Buildings
+from def_list import getting_total_html, getting_links, getting_rendom_link
+from def_list import getting_url, checking_status, getting_html_flat
 
 
 def main(page=1):
     # создаем временный файл
-    file = open("temp.txt", "w")
+    file = open("sys/temp.txt", "w")
     file.close()
     # clearing_none()
     # генерируем рандомную стартовую ссылку
@@ -44,11 +37,11 @@ def main(page=1):
             else:  # Если есть квартира в базе меняем статус обновляем цену
                 fl.adding_price()
 
-            with open("temp.txt", "a") as file:
+            with open("sys/temp.txt", "a") as file:
                 file.write(str(fl.flat_id) + "\n")
 
     checking_status()
-    os.remove("temp.txt")
+    os.remove("sys/temp.txt")
     print("Operation completed!")
 
 

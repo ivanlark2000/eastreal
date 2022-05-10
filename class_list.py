@@ -1,9 +1,17 @@
 # coding=utf-8
+import os
 import re
 import psycopg2
 from bs4 import BeautifulSoup
 from psycopg2 import Error
-from config import user_DB, password_DB, host, port, db
+from dotenv import load_dotenv
+
+load_dotenv(override=True)
+user_DB = os.environ.get('user_DB')
+password_DB = os.environ.get('password_DB')
+port = os.environ.get('port')
+host = os.environ.get('host')
+db = os.environ.get('db')
 
 
 class Flats:

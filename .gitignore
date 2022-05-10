@@ -1,6 +1,11 @@
+/sys/os
+/sys/time
+.idea
+.env
 /urllib_reqvest_start.py
 /html.txt
 /config.py
-/temp.txt
-/geckodriver.log
-/flat.html
+/sys/temp.txt
+/sys/geckodriver.log
+/sys/flat.html
+/sys/geckodriver
