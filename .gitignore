@@ -9,3 +9,5 @@
 /sys/geckodriver.log
 /sys/flat.html
 /sys/geckodriver
+/sys/chromedriver
+geckodriver.log

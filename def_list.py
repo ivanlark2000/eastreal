@@ -1,6 +1,4 @@
 # coding=utf-8
-import os
-import sys
 import time
 import random
 import psycopg2
@@ -9,6 +7,10 @@ from psycopg2 import Error
 from selenium import webdriver
 from urllib import request
 from class_list import user_DB, password_DB, host, port, db
+import useragent as UserAgent
+from fake_useragent import UserAgent
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 
 def getting_url():
@@ -30,17 +32,28 @@ def getting_total_html(url):
     """Получим стартовый HTML"""
     while True:
         try:
-            driver = webdriver.Firefox(executable_path='sys/geckodriver', service_log_path='sys/geckodriver.log')
-            driver.refresh()
+            options = webdriver.ChromeOptions()
+            ua = UserAgent()
+            userAgent = ua.random
+            options.add_argument("--disable-extensions")
+            options.add_argument("--disable-gpu")
+            options.add_argument("--headless")
+            options.add_argument("--disable-blink-features")
+            options.add_argument("--disable-blink-features=AutomationControlled")
+            options.add_experimental_option("excludeSwitches", ["enable-automation"])
+            options.add_experimental_option('useAutomationExtension', False)
+            options.add_argument(f'user-agent={userAgent}')
+            options.add_argument("start-maximized")
+            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
             driver.get(url)
+            driver.refresh()
             driver.set_page_load_timeout(30)  # Устанавливаем тайм-аут в 30 сек
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
             time.sleep(2)
-            driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
-            # прокручиваем вниз страницы
+            driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка прокручиваем вниз страницы
             time.sleep(3)
             html = driver.page_source  # получаем html страницы
-            if html is None or sys.getsizeof(html) < 25000:
+            if html is None:  # or sys.getsizeof(html) < 25000:
                 time.sleep(20)
                 driver.quit()
                 continue

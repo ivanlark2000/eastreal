@@ -26,7 +26,7 @@ $ sudo apt install -y python3-pip
 
 3. Дальше для успешной работы вам понадобится следующие пакеты из библиотеки pip:
 ```
-$ pip install psycopg2 bs4 selenium
+$ pip install psycopg2 bs4 selenium fake-useragent webdriver-manager python-dotenv 
 ```
 
 4. Установите базу данных:
@@ -34,12 +34,12 @@ $ pip install psycopg2 bs4 selenium
 $ psql -h localhost -U postgres -p 5432 avito_db < avito_db.sql
 ```
 
-5. :
+5. запустите скрипт 
 ```
-$ 
-```
-
-This server will start on port 5000 by default. You can change this in `main.py` by changing the following line to this:
+$ chmod +x .sh
 ```
 
+6. Запуск основной программы.
+```
+$ python3 main.py
 ```
