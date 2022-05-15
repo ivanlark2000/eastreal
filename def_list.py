@@ -87,7 +87,7 @@ def getting_html_flat(url):
     """Получим html для дома и квартиры"""
     while True:
         try:
-            response = request.urlopen(url)
+            response = request.urlopen(url, timeout=30.0)
             html_flat = response.read().decode("utf-8")
             time.sleep(3)
             return html_flat

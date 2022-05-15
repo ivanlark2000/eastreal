@@ -26,11 +26,18 @@ def main(page=1):
                 continue
 
             time.sleep(2)
-            build = Buildings(html_flat)  # Cоздаем объект с данными по дому
+            try:
+                build = Buildings(html_flat)  # Cоздаем объект с данными по дому
+                fl = Flats(html_flat)  # Создаем объект с данными по квартире
+            except Exception as error:
+                print('Не удалось создать объекты', error)
+                with open('sys/flat.html', 'w') as file:
+                    file.write(html_flat)
+                continue
+
             if build.checking() is None:  # Проверяем есть ли дом в базе
                 build.save()
 
-            fl = Flats(html_flat)  # Создаем объект с данными по квартире
             if fl.checking() is None:  # Проверяем существует ли квартира в базе
                 page = fl.save(page)
 
