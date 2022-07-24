@@ -10,4 +10,4 @@
 /sys/flat.html
 /sys/geckodriver
 /sys/chromedriver
-geckodriver.log
+geckodriver.log!/alembic.ini
