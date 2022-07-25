@@ -6,8 +6,7 @@ from bs4 import BeautifulSoup
 from psycopg2 import Error
 from selenium import webdriver
 from urllib import request
-from class_list import user_DB, password_DB, host, port, db
-import useragent as UserAgent
+from app.class_list import user_DB, password_DB, host, port, db
 from fake_useragent import UserAgent
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -124,7 +123,7 @@ def checking_status():
                 list_old_id.append(int(id))
         del result
         cursor.close()
-        file = open('sys/temp.txt', 'r')
+        file = open('../sys/temp.txt', 'r')
         number = file.readline()
         while number != '':  # Считываем файл
             list_new_id.append(int(number.rstrip('\n')))

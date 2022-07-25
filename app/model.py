@@ -37,8 +37,11 @@ class Flat(Base):
     seilling_method = Column(String(120))
     transaction_type = Column(String(120))
     decorating = Column(String(120))
+    time_of_add = Column(TIMESTAMP, nullable=False)
+    status = Column(Boolean, nullable=False)
     district_id = Column(Integer, ForeignKey('district.id'), nullable=False)
     house_id = Column(Integer, ForeignKey('house.id'), nullable=False)
+    site_id = Column(Integer, ForeignKey('where_download.id'), nullable=False)
 
 
 class House(Base):
@@ -67,4 +70,20 @@ class District(Base):
     __tablename__ = 'district'
 
     id = Column(Integer, primary_key=True)
-    name_area = Column(String(255), nullable=True)
+    name_area = Column(String(255), nullable=False)
+
+
+class Active_flat(Base):
+    __tablename__ = 'active_flat'
+
+    id = Column(Integer, primary_key=True)
+    number_author = Column(Integer)
+    id_in_site = Column(Integer)
+    site_id = Column(Integer, ForeignKey('where_download.id'), nullable=False)
+
+
+class Site(Base):
+    __tablename__ = 'where_download'
+
+    id = Column(Integer, primary_key=True)
+    site = Column(String(100), nullable=False)
