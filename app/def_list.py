@@ -11,6 +11,8 @@ from fake_useragent import UserAgent
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
+userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36'
+
 
 def getting_url():
     """Генератор стартовых ссылок"""
@@ -32,8 +34,6 @@ def getting_total_html(url):
     while True:
         try:
             options = webdriver.ChromeOptions()
-            ua = UserAgent()
-            userAgent = ua.random
             options.add_argument("--disable-extensions")
             options.add_argument("--disable-gpu")
             options.add_argument("--headless")
@@ -45,14 +45,15 @@ def getting_total_html(url):
             options.add_argument("start-maximized")
             driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
             driver.get(url)
+            driver.set_page_load_timeout(20)  # Устанавливаем тайм-аут в 30 сек
             driver.refresh()
-            driver.set_page_load_timeout(30)  # Устанавливаем тайм-аут в 30 сек
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
             time.sleep(2)
             driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка прокручиваем вниз страницы
             time.sleep(3)
             html = driver.page_source  # получаем html страницы
-            if html is None:  # or sys.getsizeof(html) < 25000:
+            if html is None:  # or sys.get-sizeof(html) < 25000:
+                print('Штмл пуст')
                 time.sleep(20)
                 driver.quit()
                 continue
@@ -82,7 +83,7 @@ def getting_rendom_link(list_links):
         time.sleep(3)
         yield list_links
     except Exception as e:
-        print('Ошибка при создании рандомные cсылок' + str(e))
+        print('Ошибка при создании рандомных cсылок' + str(e))
 
 
 def getting_html_flat(url):

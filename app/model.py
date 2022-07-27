@@ -37,8 +37,9 @@ class Flat(Base):
     seilling_method = Column(String(120))
     transaction_type = Column(String(120))
     decorating = Column(String(120))
+    warm_floor = Column(Boolean)
     time_of_add = Column(TIMESTAMP, nullable=False)
-    status = Column(Boolean, nullable=False)
+    status = Column(Integer, ForeignKey('sailing_status.id'), nullable=False)
     district_id = Column(Integer, ForeignKey('district.id'), nullable=False)
     house_id = Column(Integer, ForeignKey('house.id'), nullable=False)
     site_id = Column(Integer, ForeignKey('where_download.id'), nullable=False)
@@ -87,3 +88,11 @@ class Site(Base):
 
     id = Column(Integer, primary_key=True)
     site = Column(String(100), nullable=False)
+
+
+class Status(Base):
+    __tablename__ = 'sailing_status'
+
+    id = Column(Integer, primary_key=True)
+    status = Column(String(100), nullable=False)
+
