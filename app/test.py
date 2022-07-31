@@ -20,8 +20,7 @@ file = open('../sys/flat.html', 'r')
 html = file.read()
 file.close()
 
-
-def getInfoFlat(html):
+def parsAvito(html):
     soup = Bs(html, 'html.parser')
     flat_id = soup.find('span', attrs={'data-marker': 'item-view/item-id'})
     flat_id = int(flat_id.contents[0][-10:])
@@ -170,6 +169,137 @@ def getInfoFlat(html):
         finally:
             return warm_floor
 
+    def description(soup):
+        try:
+            descriptions = soup.find('div', itemprop='description')
+            descriptions = descriptions.contents
+            lst = [desc.getText() for desc in descriptions]
+            description = ' '.join(lst)
+        except:
+            description = None
+        finally:
+            return description
+
+    def seller(soup):
+        try:
+            sell = soup.find('a', attrs={'data-marker': 'seller-link/link'}).next
+            seller = sell.getText()
+            type_seller = sell.next.next.getText()
+        except:
+            seller = None
+            type_seller = None
+        finally:
+            return {
+                'seller': seller,
+                'type_seller': type_seller
+            }
+
+    address = soup.find('div', itemprop="address")
+    lst = address.next.getText().split(',')
+    if len(lst) == 4:
+        number_of_house = lst[-1]
+        street = lst[-2]
+        city = lst[-3]
+        obl = lst[-4]
+    elif len(lst) == 5:
+        number_of_house = lst[-1]
+        street = lst[-2]
+        city = lst[2] + ' ' + lst[3]
+        obl = lst[1]
+    else:
+        number_of_house = lst[-1]
+        street = lst[-2]
+        city = None
+        obl = None
+
+    def type_of_home(soup):
+        try:
+            type_of_home = soup.find(text='Тип дома').next.next.next
+        except:
+            type_of_home = None
+        finally:
+            return type_of_home
+
+    def passenger_bodice(soup):
+        try:
+            passenger_bodice = soup.find(text='Пассажирский лифт').next.next.next
+        except:
+            passenger_bodice = None
+        finally:
+            return passenger_bodice
+
+    def service_lift(soup):
+        try:
+            service_lift = soup.find(text='Грузовой лифт').next.next.next
+        except:
+            service_lift = None
+        finally:
+            return service_lift
+
+    def year_of_construction(soup):
+        try:
+            year_of_construction = soup.find(text='Год постройки').next.next.next
+        except:
+            year_of_construction = None
+        finally:
+            return year_of_construction
+
+    def floors_in_the_house(soup):
+        try:
+            floors_in_the_house = soup.find(text='Этажей в доме').next.next.next
+        except:
+            floors_in_the_house = None
+        finally:
+            return floors_in_the_house
+
+    def in_home(soup):
+        try:
+            in_home = soup.find(text='В доме').next.next.next
+        except:
+            in_home = None
+        finally:
+            return in_home
+
+    def yard(soup):
+        try:
+            yard = soup.find(text='Двор').next.next.next
+        except:
+            yard = None
+        finally:
+            return yard
+
+    def parking(soup):
+        try:
+            parking = soup.find(text='Парковка').next.next.next
+        except:
+            parking = None
+        finally:
+            return parking
+
+    def offical_builder(soup):
+        try:
+            offical_builder = soup.find(text='Официальный застройщик').next.next.next
+        except:
+            offical_builder = None
+        finally:
+            return offical_builder
+
+    def deadline(soup):
+        try:
+            deadline = soup.find(text='Срок сдачи').next.next.next
+        except:
+            deadline = None
+        finally:
+            return deadline
+
+    def new_building_name(soup):
+        try:
+            new_building_name = soup.find(text='Название новостройки').next.next.next
+        except:
+            new_building_name = None
+        finally:
+            return new_building_name
+
     return {
         "flat_id": flat_id,
         'price': price,
@@ -190,8 +320,27 @@ def getInfoFlat(html):
         'transaction_type': transaction_type(soup),
         'decorating': decorating(soup),
         'warm_floor': warm_floor(soup),
+        **seller(soup),
+        'description': description(soup),
+        'obl': obl,
+        'street': street,
+        'city': city,
+        'number_of_house': int(number_of_house),
+        'new_building_name': new_building_name(soup),
+        'offical_builder': offical_builder(soup),
+        'year_of_construction': year_of_construction(soup),
+        'floors_in_the_house': floors_in_the_house(soup),
+        'type_of_home': type_of_home(soup),
+        'passenger_bodice': passenger_bodice(soup),
+        'service_lift': service_lift(soup),
+        'in_home': in_home(soup),
+        'yard': yard(soup),
+        'parking': parking(soup),
+        'deadline': deadline(soup),
+        'district': address.next.next.next.next.getText(),
         }
 
 
-print(getInfoFlat(html))
+print(parsAvito(html))
+
 
