@@ -11,8 +11,6 @@ from fake_useragent import UserAgent
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
 
-userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36'
-
 
 def getting_url():
     """Генератор стартовых ссылок"""

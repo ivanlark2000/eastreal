@@ -1,38 +1,31 @@
-import os
+from app.config import config
 from sqlalchemy import create_engine
-from sqlalchemy.ext.declarative import declarative_base
+from sqlalchemy import BIGINT, DECIMAL
 from sqlalchemy import Column, Integer, String, Sequence, TIMESTAMP, VARCHAR, ForeignKey, Text, Numeric, Boolean
 from sqlalchemy.orm import relation
-from dotenv import load_dotenv
 
-
-load_dotenv(override=True)
-USERNAME_DB = os.environ.get('user_DB')
-PASSWORD_DB = os.environ.get('password_DB')
-
-engine = create_engine(f'postgresql://{USERNAME_DB}:{PASSWORD_DB}@localhost/flats', echo=False)
-Base = declarative_base()
+Base = config.Base
 
 
 class Flat(Base):
     __tablename__ = "flat"
 
-    id = Column(Integer, primary_key=True)
-    id_avito = Column(Integer)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    id_avito = Column(BIGINT)
     number = Column(Integer)
-    price = Column(Numeric(15, 2), nullable=False)
+    price = Column(Numeric(12, 1), nullable=False)
     qty_of_rooms = Column(Integer)
-    total_space = Column(Numeric(3, 2), nullable=False)
-    square_of_kitchen = Column(Numeric(3, 2), nullable=False)
-    living_space = Column(Numeric(3, 2), nullable=False)
+    total_space = Column(Numeric(3, 1), nullable=False)
+    square_of_kitchen = Column(Numeric(3, 1), nullable=False)
+    living_space = Column(Numeric(3, 1), nullable=False)
     floor = Column(Integer, nullable=False)
     furniture = Column(String(200))
     technics = Column(String(200))
-    balcony_or_loggia = Column(Boolean, nullable=False)
+    balcony_or_loggia = Column(String(120))
     room_type = Column(String(120))
-    ceiling_height = Column(Numeric(3, 2))
+    ceiling_height = Column(Numeric(3, 1))
     bathroom = Column(String(120))
-    widow = Column(String(120))
+    window = Column(String(120))
     repair = Column(String(120))
     seilling_method = Column(String(120))
     transaction_type = Column(String(120))
@@ -51,7 +44,7 @@ class Flat(Base):
 class House(Base):
     __tablename__ = 'house'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     obl = Column(String(150))
     street = Column(String(200), nullable=False)
     city = Column(String(150))
@@ -61,8 +54,8 @@ class House(Base):
     year_of_construction = Column(Integer)
     floors_in_the_house = Column(Integer)
     type_of_home = Column(String(150))
-    passenger_bodice = Column(Boolean, nullable=False)
-    service_lift = Column(Boolean, nullable=False)
+    passenger_bodice = Column(String(100), nullable=False)
+    service_lift = Column(String(100), nullable=False)
     in_home = Column(String(200))
     yard = Column(Text)
     parking = Column(Text)
@@ -73,14 +66,14 @@ class House(Base):
 class District(Base):
     __tablename__ = 'district'
 
-    id = Column(Integer, primary_key=True)
-    name_area = Column(String(255), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    district = Column(String(255), nullable=False)
 
 
 class Active_flat(Base):
     __tablename__ = 'active_flat'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     number_author = Column(Integer)
     id_in_site = Column(Integer)
     site_id = Column(Integer, ForeignKey('where_download.id'), nullable=False)
@@ -89,13 +82,13 @@ class Active_flat(Base):
 class Site(Base):
     __tablename__ = 'where_download'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     site = Column(String(100), nullable=False)
 
 
 class Status(Base):
     __tablename__ = 'sailing_status'
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     status = Column(String(100), nullable=False)
 
