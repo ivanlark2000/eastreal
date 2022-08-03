@@ -1,10 +1,50 @@
 import os
 from datetime import datetime
 from app.config import config
-from app.model import Flat, House, District, Active_flat, Site, Status
+from app.model import *
 from app.def_list import getting_total_html, getting_links, getting_rendom_link
 from app.def_list import getting_url, checking_status, getting_html_flat
 from app.avito_pars import parsAvitoFlat, parsAvitoHouse
+
+
+def add_and_commit(obj: object) -> None:
+    config.session.add(obj)
+    config.session.commit()
+
+
+def check_obl(house: dict) -> int:
+    """Функция проверяет в какой области находится квартира и
+    возрашает ID области"""
+    seach = house['obl']
+    if seach:
+        while True:
+            obl = config.session.query(Obl).filter(Obl.obl.like(f'%{seach}')).first()
+            if obl:
+                return obl.id
+            else:
+                obl_load = Obl(obl=seach)
+                add_and_commit(obl_load)
+    else:
+        try:
+            obl_load = Obl(obl='Район не определен')
+            add_and_commit(obl_load)
+        except:
+            print('Запись попала в неопределенный район')
+        finally:
+            obl = config.session.query(Obl).filter(Obl.obl.like(f'%неопределенный район')).first()
+            return obl.id
+
+
+def check_city(house: dict) -> int:
+    """Функция, которая возращает ID города"""
+    seach = house['city']
+    while True:
+        city = config.session.query(City).filter(City.city.ilike(f'%{seach}')).first()
+        if city:
+            return city.id
+        else:
+            city_load = City(city=seach)
+            add_and_commit(city_load)
 
 
 def check_district(house: dict) -> int:
@@ -36,27 +76,10 @@ def check_house(house: dict, id: int) -> int:
             config.session.add(district_load)
             config.session.commit()
 
-    '''info_avito_flat = parsAvitoFlat(html)
-    info_avito_house = parsAvitoHouse(html)
-    district = info_avito_house['district']
-    del info_avito_house['district']
-    district_in_base = District(district=district)
-    house = House(district_id=4, **info_avito_house)
-    flat = Flat(
-        site_id=1, house_id=5, district_id=4, status=1, time_of_add=datetime.now(),
-        **info_avito_flat
-                )
-    with config.Session() as session:
-        session.add(district_in_base)
-        session.commit()
-        session.add(house)
-        session.commit()
-        session.add(flat)
-        session.commit()'''
-
 
 def load_in_base(flat: dict, house: dict):
     """Функция для загрузки данных о квартирах в базу"""
-    id_house = check_house(house, check_district(house))
+    id_obl = check_obl(house)
+    #id_house = check_house(house, check_district(house))
 
-    print(id_house)
+    print(id_obl)
