@@ -36,9 +36,7 @@ class Flat(Base):
     description = Column(Text)
     time_of_add = Column(TIMESTAMP, nullable=False)
     status = Column(Integer, ForeignKey('sailing_status.id'), nullable=False)
-    district_id = Column(Integer, ForeignKey('district.id'), nullable=False)
     house_id = Column(Integer, ForeignKey('house.id'), nullable=False)
-    site_id = Column(Integer, ForeignKey('where_download.id'), nullable=False)
 
 
 class House(Base):
@@ -60,6 +58,14 @@ class House(Base):
     yard = Column(Text)
     parking = Column(Text)
     deadline = Column(String(150))
+    street_id = Column(Integer, ForeignKey('street.id'), nullable=False)
+
+
+class Street(Base):
+    __tablename__ = 'street'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    street = Column(String(155), nullable=False)
     district_id = Column(Integer, ForeignKey('district.id'), nullable=False)
 
 
@@ -68,6 +74,22 @@ class District(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     district = Column(String(255), nullable=False)
+    city_id = Column(Integer, ForeignKey('city.id'), nullable=False)
+
+
+class City(Base):
+    __tablename__ = 'city'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    city = Column(String(155), nullable=False)
+    obl_id = Column(Integer, ForeignKey('obl.id'), nullable=False)
+
+
+class Obl(Base):
+    __tablename__ = 'obl'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    obl = Column(String(155), nullable=False)
 
 
 class Active_flat(Base):
