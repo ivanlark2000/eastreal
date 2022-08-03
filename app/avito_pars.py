@@ -313,7 +313,7 @@ def parsAvitoHouse(html):
             'obl': obl,
             'street': street,
             'city': city,
-            'number_of_house': int(number_of_house),
+            'number_of_house': number_of_house,
             'new_building_name': new_building_name(soup),
             'offical_builder': offical_builder(soup),
             'year_of_construction': year_of_construction(soup),

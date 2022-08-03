@@ -11,3 +11,4 @@
 /sys/geckodriver
 /sys/chromedriver
 geckodriver.log!/alembic.ini
+/__pycache__

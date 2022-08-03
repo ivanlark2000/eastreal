@@ -18,6 +18,24 @@ def check_district(house: dict) -> int:
             district_load = District(district=house['district'])
             config.session.add(district_load)
             config.session.commit()
+
+
+def check_house(house: dict, id: int) -> int:
+    street = house['street']
+    number_of_house = house['number_of_house']
+    del house['district']
+    while True:
+        house_in_base = config.session.query(House).filter(House.street.like(f'%{street}'),
+                                            House.number_of_house.like(f'%{number_of_house}')).first()
+        if house_in_base:
+            return house_in_base.id
+        else:
+            district_load = House(
+                district_id=id, **house
+            )
+            config.session.add(district_load)
+            config.session.commit()
+
     '''info_avito_flat = parsAvitoFlat(html)
     info_avito_house = parsAvitoHouse(html)
     district = info_avito_house['district']
@@ -39,5 +57,6 @@ def check_district(house: dict) -> int:
 
 def load_in_base(flat: dict, house: dict):
     """Функция для загрузки данных о квартирах в базу"""
-    id_district = check_district(house)
-    print(id_district)
+    id_house = check_house(house, check_district(house))
+
+    print(id_house)

@@ -48,7 +48,7 @@ class House(Base):
     obl = Column(String(150))
     street = Column(String(200), nullable=False)
     city = Column(String(150))
-    number_of_house = Column(Integer)
+    number_of_house = Column(String(50))
     new_building_name = Column(String(200))
     offical_builder = Column(String(200))
     year_of_construction = Column(Integer)
