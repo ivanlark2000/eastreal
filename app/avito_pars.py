@@ -8,7 +8,7 @@ def parsAvitoFlat(html):
     flat_id = soup.find('span', attrs={'data-marker': 'item-view/item-id'})
     flat_id = int(flat_id.contents[0][-10:])
     price = soup.find('span', itemprop="price")
-    price = float(price['content'])
+    price = int(price['content'])
 
     def qty_of_rooms(soup):
         try:
@@ -179,6 +179,7 @@ def parsAvitoFlat(html):
 
     return {
         "id_avito": flat_id,
+        'number_of_tel': 'без номера',
         'price': price,
         'qty_of_rooms': qty_of_rooms(soup),
         'total_space': total_space(soup),
@@ -326,6 +327,7 @@ def parsAvitoHouse(html):
             'parking': parking(soup),
             'deadline': deadline(soup),
             'district': address.next.next.next.next.getText(),
+            'site': 'AVITO'
         }
 
 

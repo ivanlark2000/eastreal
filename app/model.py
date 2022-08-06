@@ -12,18 +12,18 @@ class Flat(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     id_avito = Column(BIGINT)
-    number = Column(Integer)
-    price = Column(Numeric(12, 1), nullable=False)
-    qty_of_rooms = Column(Integer)
-    total_space = Column(Numeric(3, 1), nullable=False)
-    square_of_kitchen = Column(Numeric(3, 1), nullable=False)
-    living_space = Column(Numeric(3, 1), nullable=False)
+    number_of_tel = Column(String(120))
+    price = Column(BIGINT, nullable=False)
+    qty_of_rooms = Column(Integer, nullable=False)
+    total_space = Column(Numeric(4, 1), nullable=False)
+    square_of_kitchen = Column(Numeric(4, 1), nullable=False)
+    living_space = Column(Numeric(4, 1), nullable=False)
     floor = Column(Integer, nullable=False)
     furniture = Column(String(200))
     technics = Column(String(200))
     balcony_or_loggia = Column(String(120))
     room_type = Column(String(120))
-    ceiling_height = Column(Numeric(3, 1))
+    ceiling_height = Column(Numeric(4, 1))
     bathroom = Column(String(120))
     window = Column(String(120))
     repair = Column(String(120))
@@ -31,22 +31,38 @@ class Flat(Base):
     transaction_type = Column(String(120))
     decorating = Column(String(120))
     warm_floor = Column(Boolean)
-    seller = Column(String(120))
-    type_seller = Column(String(200))
     description = Column(Text)
     time_of_add = Column(TIMESTAMP, nullable=False)
-    status = Column(Integer, ForeignKey('sailing_status.id'), nullable=False)
     house_id = Column(Integer, ForeignKey('house.id'), nullable=False)
+
+
+class Author(Base):
+    __tablename__ = 'author'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    seller = Column(String(120))
+    type_seller = Column(String(200))
+
+
+class Relations(Base):
+    __tablename__ = 'relations'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    obl_id = Column(Integer, ForeignKey('obl.id'))
+    city_id = Column(Integer, ForeignKey('city.id'))
+    district_id = Column(Integer, ForeignKey('district.id'))
+    street_id = Column(Integer, ForeignKey('street.id'), nullable=False)
+    house_id = Column(Integer, ForeignKey('house.id'), nullable=False)
+    flat_id = Column(Integer, ForeignKey('flat.id'), nullable=False)
+    author_id = Column(Integer, ForeignKey('author.id'), nullable=False)
+    status_id = Column(Integer, ForeignKey('sailing_status.id'), nullable=False)
+    site_id = Column(Integer, ForeignKey('sailing_status.id'), nullable=False)
 
 
 class House(Base):
     __tablename__ = 'house'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    obl = Column(String(150))
-    street = Column(String(200), nullable=False)
-    city = Column(String(150))
-    number_of_house = Column(String(50))
     new_building_name = Column(String(200))
     offical_builder = Column(String(200))
     year_of_construction = Column(Integer)
@@ -66,7 +82,7 @@ class Street(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     street = Column(String(155), nullable=False)
-    district_id = Column(Integer, ForeignKey('district.id'), nullable=False)
+    number_of_house = Column(String(100), nullable=False)
 
 
 class District(Base):
@@ -74,7 +90,6 @@ class District(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     district = Column(String(255), nullable=False)
-    city_id = Column(Integer, ForeignKey('city.id'), nullable=False)
 
 
 class City(Base):
@@ -82,7 +97,6 @@ class City(Base):
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     city = Column(String(155), nullable=False)
-    obl_id = Column(Integer, ForeignKey('obl.id'), nullable=False)
 
 
 class Obl(Base):
@@ -96,8 +110,7 @@ class Active_flat(Base):
     __tablename__ = 'active_flat'
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    number_author = Column(Integer)
-    id_in_site = Column(Integer)
+    id_rel = Column(Integer, ForeignKey('relations.id'), nullable=False)
     site_id = Column(Integer, ForeignKey('where_download.id'), nullable=False)
 
 
