@@ -1,6 +1,7 @@
-from app.def_list import getting_total_html, getting_links, getting_rendom_link
-from app.def_list import getting_url, checking_status, getting_html_flat
 from bs4 import BeautifulSoup as Bs
+from transliterate import translit, get_available_language_codes
+from app.def_list import getting_url, checking_status, getting_html_flat
+from app.def_list import getting_total_html, getting_links, getting_rendom_link
 
 
 def parsAvitoFlat(html):
@@ -10,9 +11,10 @@ def parsAvitoFlat(html):
     price = soup.find('span', itemprop="price")
     price = int(price['content'])
 
+
     def qty_of_rooms(soup):
         try:
-            qty_of_rooms = int(soup.find(text='Количество комнат').next.next.next)
+            qty_of_rooms = soup.find(text='Количество комнат').next.next.next
         except:
             qty_of_rooms = None
         finally:
@@ -179,7 +181,7 @@ def parsAvitoFlat(html):
 
     return {
         "id_avito": flat_id,
-        'number_of_tel': 'без номера',
+        'number_of_tel': None,
         'price': price,
         'qty_of_rooms': qty_of_rooms(soup),
         'total_space': total_space(soup),
@@ -203,25 +205,43 @@ def parsAvitoFlat(html):
     }
 
 
-def parsAvitoHouse(html):
+def parsAvitoHouse(html:str, url:str) -> dict:
+
+    def get_city(url: str) -> str:
+        city = url.split('/')[3]
+        city = translit(city, 'ru')
+        return city.capitalize().strip()
+
     soup = Bs(html, 'html.parser')
     address = soup.find('div', itemprop="address")
     lst = address.next.getText().split(',')
-    if len(lst) == 4:
-        number_of_house = lst[-1]
-        street = lst[-2]
-        city = lst[-3]
-        obl = lst[-4]
-    elif len(lst) == 5:
-        number_of_house = lst[-1]
-        street = lst[-2]
-        city = lst[2] + ' ' + lst[3]
-        obl = lst[1]
+    try:
+        lst.remove(get_city(url))
+    except:
+        pass
+
+    if any(map(str.isdigit, lst[-2])):
+        number_of_house = " ".join(lst[-2:])
+        try:
+            obl = lst[-4]
+        except:
+            obl = None
     else:
-        number_of_house = lst[-1]
         street = lst[-2]
-        city = None
-        obl = None
+        number_of_house = lst[-1]
+        try:
+            obl = lst[-3]
+        except:
+            obl = None
+
+    def district(soup):
+        try:
+            address = soup.find('div', itemprop="address")
+            disrict = address.next.next.next.next.getText()
+        except:
+            disrict = None
+        finally:
+            return disrict
 
     def type_of_home(soup):
         try:
@@ -305,15 +325,17 @@ def parsAvitoHouse(html):
 
     def new_building_name(soup):
         try:
-            new_building_name = soup.find(text='Название новостройки').next.next.next
+            new_building_name = soup.find(text='Название новостройки').next.next.next.next
+            new_building_name = new_building_name.getText()
         except:
             new_building_name = None
         finally:
             return new_building_name
+
     return {
             'obl': obl,
             'street': street,
-            'city': city,
+            'city': get_city(url),
             'number_of_house': number_of_house,
             'new_building_name': new_building_name(soup),
             'offical_builder': offical_builder(soup),
@@ -326,7 +348,7 @@ def parsAvitoHouse(html):
             'yard': yard(soup),
             'parking': parking(soup),
             'deadline': deadline(soup),
-            'district': address.next.next.next.next.getText(),
+            'district': district(soup),
             'site': 'AVITO'
         }
 

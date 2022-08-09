@@ -14,6 +14,25 @@ def add_and_commit(obj: object) -> None:
     config.session.commit()
 
 
+def clear_tab_active_flat(flag: str) -> None:
+    """Функция для очистки активных квартир перед поиском"""
+    match flag:
+        case 'avito':
+            config.session.query(Active_flat).filter(Active_flat.site_id == 1).delete(synchronize_session="fetch")
+            # удаляем все записи с сайта в авито с активными квартирами
+    config.session.commit()
+
+
+def add_new_price(price: int, flat_id: int) -> None:
+    """Функция, которая проверяет изменилась ли цена если есть то добавляет цену квартиры"""
+    flat_info = config.session.query(Flat).get(flat_id)
+    if flat_info.price != price:
+        flat_info.price = price
+        add_new_price = History_of_price(flat_id=flat_id, price=price, time_of_add_price=datetime.now())
+        add_and_commit(add_new_price)
+        print('Цена обновлена')
+
+
 def check_obl(house: dict) -> any:
     """Функция проверяет в какой области находится квартира и
     возращает ID области"""
@@ -94,9 +113,7 @@ def add_house(house: dict, street_id: int) -> int:
 
 
 def add_and_check_flat(flat: dict, house_id) -> int and bool:
-    tel = flat['number_of_tel']
-    flat_info = config.session.query(Flat).filter(Flat.id_avito == flat['id_avito'] or
-                                                  Flat.number_of_tel.like(f'{tel}')).first()
+    flat_info = config.session.query(Flat).filter(Flat.id_avito == flat['id_avito']).first()
     if not flat_info:
         del flat['seller']
         del flat['type_seller']
@@ -110,12 +127,15 @@ def add_author(flat: dict) -> int or None:
     """Функция для проверки автора и добавление его в базу"""
     seller = flat['seller']
     type_seller = flat['type_seller']
-    author_info = config.session.query(Author).filter(Author.seller.like(f'{seller}'),
+    if seller:
+        author_info = config.session.query(Author).filter(Author.seller.like(f'{seller}'),
                                                       Author.type_seller.like(f'{type_seller}')).first()
-    if not author_info:
-        author_info = Author(seller=seller, type_seller=type_seller)
-        add_and_commit(author_info)
-    return author_info.id
+        if not author_info:
+            author_info = Author(seller=seller, type_seller=type_seller)
+            add_and_commit(author_info)
+        return author_info.id
+    else:
+        return sqlalchemy.sql.null()
 
 
 def check_site(house: dict) -> int:
@@ -134,20 +154,32 @@ def add_flat_in_active(rel_id, site_id) -> None:
 
 def load_in_base(flat: dict, house: dict):
     """Функция для загрузки данных о квартирах в базу"""
+    site_id = check_site(house)
     street_id = check_street(house)
+    city_id = check_city(house)
+    obl_id = check_obl(house)
+    district_id = check_district(house)
+    author_id = add_author(flat)
     id_house = add_house(house, street_id)
     id_flat = add_and_check_flat(flat, id_house)
-    site_id = check_site(house)
     if not id_flat[1]:
-        total_info = Relations(obl_id=check_obl(house), city_id=check_city(house),
-                               district_id=check_district(house), street_id=street_id,
-                               flat_id=id_flat[0], author_id=add_author(flat),
+        total_info = Relations(obl_id=obl_id, city_id=city_id,
+                               district_id=district_id, street_id=street_id,
+                               flat_id=id_flat[0], author_id=author_id,
                                status_id=1, house_id=id_house, site_id=site_id)
+        add_price = History_of_price(flat_id=id_flat[0], price=flat['price'],
+                                     time_of_add_price=datetime.now())
+        config.session.add(add_price)
         add_and_commit(total_info)
+        print('Добавлена новая квартира')
+        add_flat_in_active(rel_id=total_info.id, site_id=site_id)
     else:
         total_info = config.session.query(Relations).filter(Relations.flat_id == id_flat[0]).first()
-        total_info.status_id = 1
-    add_flat_in_active(rel_id=total_info.id, site_id=site_id)
+        if total_info:
+            total_info.status_id = 1
+            add_new_price(price=flat['price'], flat_id=total_info.flat_id)
+            print("Квартира обновлена")
+            add_flat_in_active(rel_id=total_info.id, site_id=site_id)
 
 
 

@@ -2,11 +2,11 @@
 import time
 import random
 import psycopg2
-from bs4 import BeautifulSoup
-from psycopg2 import Error
-from selenium import webdriver
+from config import config
 from urllib import request
-from app.class_list import user_DB, password_DB, host, port, db
+from psycopg2 import Error
+from bs4 import BeautifulSoup
+from selenium import webdriver
 from fake_useragent import UserAgent
 from selenium.webdriver.chrome.service import Service
 from webdriver_manager.chrome import ChromeDriverManager
@@ -39,7 +39,7 @@ def getting_total_html(url):
             options.add_argument("--disable-blink-features=AutomationControlled")
             options.add_experimental_option("excludeSwitches", ["enable-automation"])
             options.add_experimental_option('useAutomationExtension', False)
-            options.add_argument(f'user-agent={userAgent}')
+            options.add_argument(f'user-agent={config.userAgent}')
             options.add_argument("start-maximized")
             driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
             driver.get(url)
@@ -95,18 +95,6 @@ def getting_html_flat(url):
         except (Exception, Error) as error:
             print('Ошибка при получении HTML страницы c квартирой', error)
             time.sleep(20)
-
-
-def clearing_none():
-    """Очищаем None"""
-    try:
-        connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
-        cursor = connection.cursor()
-        cursor.execute(f"DELETE FROM flats WHERE address = 'None';")
-        connection.commit()
-        print('Non - ы успешно удалены')
-    except (Exception, Error) as error:
-        print("Ошибка при работе с PostgresSQL", error)
 
 
 def checking_status():

@@ -14,11 +14,11 @@ class Flat(Base):
     id_avito = Column(BIGINT)
     number_of_tel = Column(String(120))
     price = Column(BIGINT, nullable=False)
-    qty_of_rooms = Column(Integer, nullable=False)
+    qty_of_rooms = Column(String(50), nullable=False)
     total_space = Column(Numeric(4, 1), nullable=False)
-    square_of_kitchen = Column(Numeric(4, 1), nullable=False)
-    living_space = Column(Numeric(4, 1), nullable=False)
-    floor = Column(Integer, nullable=False)
+    square_of_kitchen = Column(Numeric(4, 1))
+    living_space = Column(Numeric(4, 1))
+    floor = Column(Integer)
     furniture = Column(String(200))
     technics = Column(String(200))
     balcony_or_loggia = Column(String(120))
@@ -54,7 +54,7 @@ class Relations(Base):
     street_id = Column(Integer, ForeignKey('street.id'), nullable=False)
     house_id = Column(Integer, ForeignKey('house.id'), nullable=False)
     flat_id = Column(Integer, ForeignKey('flat.id'), nullable=False)
-    author_id = Column(Integer, ForeignKey('author.id'), nullable=False)
+    author_id = Column(Integer, ForeignKey('author.id'))
     status_id = Column(Integer, ForeignKey('sailing_status.id'), nullable=False)
     site_id = Column(Integer, ForeignKey('sailing_status.id'), nullable=False)
 
@@ -68,8 +68,8 @@ class House(Base):
     year_of_construction = Column(Integer)
     floors_in_the_house = Column(Integer)
     type_of_home = Column(String(150))
-    passenger_bodice = Column(String(100), nullable=False)
-    service_lift = Column(String(100), nullable=False)
+    passenger_bodice = Column(String(100))
+    service_lift = Column(String(100))
     in_home = Column(String(200))
     yard = Column(Text)
     parking = Column(Text)
@@ -127,3 +127,11 @@ class Status(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     status = Column(String(100), nullable=False)
 
+
+class History_of_price(Base):
+    __tablename__ = 'history_of_price'
+
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    flat_id = Column(Integer, ForeignKey('flat.id'), nullable=False)
+    price = Column(BIGINT, nullable=False)
+    time_of_add_price = Column(TIMESTAMP, nullable=False)
