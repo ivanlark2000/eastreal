@@ -15,3 +15,4 @@ geckodriver.log!/alembic.ini
 alembic/__pycache__
 app/__pycache__
 !/alembic.ini
+!/alembic.ini
