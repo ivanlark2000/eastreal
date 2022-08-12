@@ -27,7 +27,7 @@ def main():
                         house=house_in_avito
                     )
             except Exception as e:
-                print('Не получилось загрузить данные со страницы' + str(e))
+                print('Не получилось загрузить данные со страницы ' + str(e))
                 continue
 
 

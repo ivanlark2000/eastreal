@@ -221,16 +221,19 @@ def parsAvitoHouse(html:str, url:str) -> dict:
         pass
 
     if any(map(str.isdigit, lst[-2])):
-        number_of_house = " ".join(lst[-2:])
+        street = lst[-3].strip()
+        street = " ".join(sorted(street.split()))
+        number_of_house = " ".join(lst[-2:]).strip()
         try:
-            obl = lst[-4]
+            obl = lst[-4].strip()
         except:
             obl = None
     else:
-        street = lst[-2]
-        number_of_house = lst[-1]
+        street = lst[-2].strip()
+        street = " ".join(sorted(street.split()))
+        number_of_house = lst[-1].strip()
         try:
-            obl = lst[-3]
+            obl = lst[-3].strip()
         except:
             obl = None
 

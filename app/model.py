@@ -1,7 +1,7 @@
 from app.config import config
 from sqlalchemy import create_engine
 from sqlalchemy import BIGINT, DECIMAL
-from sqlalchemy import Column, Integer, String, Sequence, TIMESTAMP, VARCHAR, ForeignKey, Text, Numeric, Boolean
+from sqlalchemy import Column, Integer, String, Sequence, TIMESTAMP, VARCHAR, ForeignKey, Text, Numeric, Boolean, DECIMAL
 from sqlalchemy.orm import relation
 
 Base = config.Base
@@ -14,16 +14,16 @@ class Flat(Base):
     id_avito = Column(BIGINT)
     number_of_tel = Column(String(120))
     price = Column(BIGINT, nullable=False)
-    qty_of_rooms = Column(String(50), nullable=False)
-    total_space = Column(Numeric(4, 1), nullable=False)
-    square_of_kitchen = Column(Numeric(4, 1))
-    living_space = Column(Numeric(4, 1))
+    qty_of_rooms = Column(DECIMAL(50), nullable=False)
+    total_space = Column(DECIMAL(4, 1), nullable=False)
+    square_of_kitchen = Column(DECIMAL(4, 1))
+    living_space = Column(DECIMAL(4, 1))
     floor = Column(Integer)
     furniture = Column(String(200))
     technics = Column(String(200))
     balcony_or_loggia = Column(String(120))
     room_type = Column(String(120))
-    ceiling_height = Column(Numeric(4, 1))
+    ceiling_height = Column(DECIMAL(4, 1))
     bathroom = Column(String(120))
     window = Column(String(120))
     repair = Column(String(120))
