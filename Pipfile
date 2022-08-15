@@ -8,18 +8,9 @@ sqlalchemy = "*"
 alembic = "*"
 psycopg2-binary = "*"
 python-dotenv = "*"
-selenium = "*"
-webdriver-manager = "*"
-fake-useragent = "*"
 beautifulsoup4 = "*"
 datetime = "*"
-requests = "*"
 transliterate = "*"
-pandas = "*"
-openpyxl = "*"
-xlsxwriter = "*"
-xlwt = "*"
-progress = "*"
 
 [dev-packages]
 
