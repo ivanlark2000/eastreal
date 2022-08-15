@@ -1,16 +1,13 @@
+import ast
 from bs4 import BeautifulSoup as Bs
 from transliterate import translit, get_available_language_codes
-from app.def_list import getting_url, checking_status, getting_html_flat
-from app.def_list import getting_total_html, getting_links, getting_rendom_link
 
 
-def parsAvitoFlat(html):
+def parsAvitoFlat(html: str, url: str) -> dict:
     soup = Bs(html, 'html.parser')
-    flat_id = soup.find('span', attrs={'data-marker': 'item-view/item-id'})
-    flat_id = int(flat_id.contents[0][-10:])
     price = soup.find('span', itemprop="price")
     price = int(price['content'])
-
+    flat_id = int(url[url.rfind('_') + 1:])
 
     def qty_of_rooms(soup):
         try:
@@ -202,6 +199,7 @@ def parsAvitoFlat(html):
         'warm_floor': warm_floor(soup),
         **seller(soup),
         'description': description(soup),
+        'url': url,
     }
 
 
@@ -219,10 +217,10 @@ def parsAvitoHouse(html:str, url:str) -> dict:
         lst.remove(get_city(url))
     except:
         pass
-
-    if any(map(str.isdigit, lst[-2])):
+    print(lst)
+    if any(map(str.isdigit, lst[-2])) and len(lst[-2]) < 10:
         street = lst[-3].strip()
-        street = " ".join(sorted(street.split()))
+        street = " ".join((sorted(street.split()))[::-1])
         number_of_house = " ".join(lst[-2:]).strip()
         try:
             obl = lst[-4].strip()
@@ -230,7 +228,7 @@ def parsAvitoHouse(html:str, url:str) -> dict:
             obl = None
     else:
         street = lst[-2].strip()
-        street = " ".join(sorted(street.split()))
+        street = " ".join((sorted(street.split()))[::-1])
         number_of_house = lst[-1].strip()
         try:
             obl = lst[-3].strip()
@@ -305,6 +303,8 @@ def parsAvitoHouse(html:str, url:str) -> dict:
     def parking(soup):
         try:
             parking = soup.find(text='Парковка').next.next.next
+            if type(parking) == tag:
+                parking = soup.find(text='Парковка').next.next.next.next
         except:
             parking = None
         finally:

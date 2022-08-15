@@ -3,8 +3,6 @@ import sqlalchemy
 from app.model import *
 from datetime import datetime
 from app.config import config
-from app.def_list import getting_total_html, getting_links, getting_rendom_link
-from app.def_list import getting_url, checking_status, getting_html_flat
 from app.avito_pars import parsAvitoFlat, parsAvitoHouse
 
 
@@ -113,6 +111,7 @@ def add_house(house: dict, street_id: int) -> int:
 
 
 def add_and_check_flat(flat: dict, house_id) -> int and bool:
+    print(flat)
     flat_info = config.session.query(Flat).filter(Flat.id_avito == flat['id_avito']).first()
     if not flat_info:
         del flat['seller']

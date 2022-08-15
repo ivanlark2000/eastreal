@@ -14,7 +14,7 @@ class Flat(Base):
     id_avito = Column(BIGINT)
     number_of_tel = Column(String(120))
     price = Column(BIGINT, nullable=False)
-    qty_of_rooms = Column(DECIMAL(50), nullable=False)
+    qty_of_rooms = Column(String(50), nullable=False)
     total_space = Column(DECIMAL(4, 1), nullable=False)
     square_of_kitchen = Column(DECIMAL(4, 1))
     living_space = Column(DECIMAL(4, 1))
@@ -32,6 +32,7 @@ class Flat(Base):
     decorating = Column(String(120))
     warm_floor = Column(Boolean)
     description = Column(Text)
+    url = Column(Text, nullable=False)
     time_of_add = Column(TIMESTAMP, nullable=False)
     house_id = Column(Integer, ForeignKey('house.id'), nullable=False)
 

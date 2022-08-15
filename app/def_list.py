@@ -1,15 +1,11 @@
 # coding=utf-8
 import time
 import random
-import psycopg2
+import http.client
+import urllib.error
 from config import config
-from urllib import request
-from psycopg2 import Error
 from bs4 import BeautifulSoup
-from selenium import webdriver
-from fake_useragent import UserAgent
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
+from urllib.request import urlopen
 
 
 def getting_url():
@@ -25,42 +21,6 @@ def getting_url():
         for number in list_:
             start_site = f'https://www.avito.ru/kaliningrad/kvartiry/prodam-ASgBAgICAUSSA8YQ?cd=1&p={number}'
             yield start_site
-
-
-def getting_total_html(url):
-    """Получим стартовый HTML"""
-    while True:
-        try:
-            options = webdriver.ChromeOptions()
-            options.add_argument("--disable-extensions")
-            options.add_argument("--disable-gpu")
-            options.add_argument("--headless")
-            options.add_argument("--disable-blink-features")
-            options.add_argument("--disable-blink-features=AutomationControlled")
-            options.add_experimental_option("excludeSwitches", ["enable-automation"])
-            options.add_experimental_option('useAutomationExtension', False)
-            options.add_argument(f'user-agent={config.userAgent}')
-            options.add_argument("start-maximized")
-            driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()), options=options)
-            driver.get(url)
-            driver.set_page_load_timeout(20)  # Устанавливаем тайм-аут в 30 сек
-            driver.refresh()
-            driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка
-            time.sleep(2)
-            driver.execute_script("window.scrollTo(0, 2080)")  # прокрутка прокручиваем вниз страницы
-            time.sleep(3)
-            html = driver.page_source  # получаем html страницы
-            if html is None:  # or sys.get-sizeof(html) < 25000:
-                print('Штмл пуст')
-                time.sleep(20)
-                driver.quit()
-                continue
-            driver.quit()
-            return html
-        except (Exception, Error) as error:
-            print('Ошибка при работе с Селениумом', error)
-            time.sleep(20)
-            driver.quit()
 
 
 def getting_links(html):
@@ -84,54 +44,11 @@ def getting_rendom_link(list_links):
         print('Ошибка при создании рандомных cсылок' + str(e))
 
 
-def getting_html_flat(url):
+def getting_html(url):
     """Получим html для дома и квартиры"""
-    while True:
-        try:
-            response = request.urlopen(url, timeout=30.0)
-            html_flat = response.read().decode("utf-8")
-            time.sleep(3)
-            return html_flat
-        except (Exception, Error) as error:
-            print('Ошибка при получении HTML страницы c квартирой', error)
-            time.sleep(20)
-
-
-def checking_status():
-    """Функция по сверке айдишников в базе и установке статуса 'продана'"""
-    list_old_id, list_new_id = [], []
     try:
-        connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
-        cursor = connection.cursor()
-        cursor.execute(f"SELECT flat_id FROM flats WHERE status = 'active';")
-        result = cursor.fetchall()
-        for res in result:
-            for id in res:
-                list_old_id.append(int(id))
-        del result
-        cursor.close()
-        file = open('../sys/temp.txt', 'r')
-        number = file.readline()
-        while number != '':  # Считываем файл
-            list_new_id.append(int(number.rstrip('\n')))
-            number = file.readline()
-        file.close()
-        for new_id in list_new_id:  # сравниваем два списка
-            if new_id in list_old_id:
-                list_old_id.remove(new_id)
-        count = 1
-        for old_id in list_old_id:  # отправляем статут sail для старых айдишников
-            try:
-                connection = psycopg2.connect(user=user_DB, password=password_DB, host=host, port=port, database=db)
-                cursor = connection.cursor()
-                cursor.execute(f"UPDATE flats SET status = 'sales' WHERE flat_id = '{old_id}'")
-                connection.commit()
-                print(f'{count}. Квартира № {old_id} продана.')
-                count += 1
-            except (Exception, Error) as error:
-                print("Ошибка при работе с PostgresSQL", error)
-            finally:
-                cursor.close()
-    except (Exception, Error) as error:
-        print("Ошибка при работе с PostgresSQL", error)
-
+        respose = urlopen(url).read().decode("utf-8")
+        time.sleep(5)
+        return respose
+    except (http.client.IncompleteRead) as e:
+        return e.partial.decode("utf-8")

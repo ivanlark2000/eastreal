@@ -15,6 +15,11 @@ beautifulsoup4 = "*"
 datetime = "*"
 requests = "*"
 transliterate = "*"
+pandas = "*"
+openpyxl = "*"
+xlsxwriter = "*"
+xlwt = "*"
+progress = "*"
 
 [dev-packages]
 
