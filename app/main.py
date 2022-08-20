@@ -1,55 +1,28 @@
-# coding=utf-8
-import time
-import os
-from app.class_list import Flats, Buildings
-from app.def_list import getting_total_html, getting_links, getting_rendom_link
-from app.def_list import getting_url, checking_status, getting_html_flat
+from app.def_list import *
+from app.avito_pars import parsAvitoFlat, parsAvitoHouse
+from app.load_in_base import load_in_base, clear_tab_active_flat
 
 
-def main(page=1):
-    # создаем временный файл
-    file = open("../sys/temp.txt", "w")
-    file.close()
-    # clearing_none()
-    # генерируем рандомную стартовую ссылку
+def main():
+    clear_tab_active_flat(flag='avito')
     for url in getting_url():
         print(url)
-        html = getting_total_html(url)  # Получаем html стартовой страницы
+        html = getting_html(url)  # Получаем html стартовой страницы
         list_links = getting_links(html)  # получаем список ссылок квартир
-        while list_links is None:
-            time.sleep(1)
-            list_links = getting_links(html)
         links = getting_rendom_link(list_links)  # извлекаем рандомную ссылку
         for link in next(links):
-            html_flat = getting_html_flat(link)
-            if html_flat is None:
-                continue
-
-            time.sleep(2)
+            print(link)
             try:
-                build = Buildings(html_flat)  # Cоздаем объект с данными по дому
-                fl = Flats(html_flat)  # Создаем объект с данными по квартире
-            except Exception as error:
-                print('Не удалось создать объекты', error)
-                with open('../sys/flat.html', 'w') as file:
-                    file.write(html_flat)
+                html_flat = getting_html(link)
+                flat_in_avito = parsAvitoFlat(html_flat, url=link)
+                house_in_avito = parsAvitoHouse(html=html_flat, url=link)
+                load_in_base(
+                            flat=flat_in_avito,
+                            house=house_in_avito
+                        )
+            except Exception as e:
+                print('Не получилось загрузить данные со страницы ' + str(e))
                 continue
-
-            if build.checking() is None:  # Проверяем есть ли дом в базе
-                build.save()
-
-            if fl.checking() is None:  # Проверяем существует ли квартира в базе
-                page = fl.save(page)
-
-            else:  # Если есть квартира в базе меняем статус обновляем цену
-                fl.adding_price()
-
-            with open("../sys/temp.txt", "a") as file:
-                file.write(str(fl.flat_id) + "\n")
-
-    checking_status()
-    os.remove("../sys/temp.txt")
-    print("Operation completed!")
 
 
 if __name__ == "__main__":

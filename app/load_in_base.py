@@ -28,7 +28,7 @@ def add_new_price(price: int, flat_id: int) -> None:
         flat_info.price = price
         add_new_price = History_of_price(flat_id=flat_id, price=price, time_of_add_price=datetime.now())
         add_and_commit(add_new_price)
-        print('Цена обновлена')
+        print(f'Цена у квартиры ID {flat_id} обновлена')
 
 
 def check_obl(house: dict) -> any:
@@ -111,7 +111,6 @@ def add_house(house: dict, street_id: int) -> int:
 
 
 def add_and_check_flat(flat: dict, house_id) -> int and bool:
-    print(flat)
     flat_info = config.session.query(Flat).filter(Flat.id_avito == flat['id_avito']).first()
     if not flat_info:
         del flat['seller']
@@ -170,14 +169,14 @@ def load_in_base(flat: dict, house: dict):
                                      time_of_add_price=datetime.now())
         config.session.add(add_price)
         add_and_commit(total_info)
-        print('Добавлена новая квартира')
+        print(f'Добавлена новая квартира ID in base - {total_info.flat_id}')
         add_flat_in_active(rel_id=total_info.id, site_id=site_id)
     else:
         total_info = config.session.query(Relations).filter(Relations.flat_id == id_flat[0]).first()
         if total_info:
             total_info.status_id = 1
             add_new_price(price=flat['price'], flat_id=total_info.flat_id)
-            print("Квартира обновлена")
+            print(f"Квартира обновлена ID in base - {total_info.flat_id}")
             add_flat_in_active(rel_id=total_info.id, site_id=site_id)
 
 

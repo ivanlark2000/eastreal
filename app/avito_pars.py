@@ -217,7 +217,7 @@ def parsAvitoHouse(html:str, url:str) -> dict:
         lst.remove(get_city(url))
     except:
         pass
-    print(lst)
+
     if any(map(str.isdigit, lst[-2])) and len(lst[-2]) < 10:
         street = lst[-3].strip()
         street = " ".join((sorted(street.split()))[::-1])
