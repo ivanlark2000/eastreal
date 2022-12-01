@@ -1,8 +1,9 @@
 from app.config import config
+from sqlalchemy.orm import relation
 from sqlalchemy import create_engine
 from sqlalchemy import BIGINT, DECIMAL
 from sqlalchemy import Column, Integer, String, Sequence, TIMESTAMP, VARCHAR, ForeignKey, Text, Numeric, Boolean, DECIMAL
-from sqlalchemy.orm import relation
+
 
 Base = config.Base
 

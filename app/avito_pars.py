@@ -14,6 +14,8 @@ def parsAvitoFlat(html: str, url: str) -> dict:
             qty_of_rooms = soup.find(text='Количество комнат').next.next.next
         except:
             qty_of_rooms = None
+            with open('flat.html', 'w') as file:
+                file.write(str(soup))
         finally:
             return qty_of_rooms
 
