@@ -1,9 +1,7 @@
-import os
 import sqlalchemy
-from app.model import *
+from Pars_Skript.model import *
 from datetime import datetime
 from app.config import config
-from app.avito_pars import parsAvitoFlat, parsAvitoHouse
 
 
 def add_and_commit(obj: object) -> None:
