@@ -25,7 +25,7 @@ CREATE TABLE BF_Ads_Houses (
     CONSTRAINT BF_Ads_Houses_pk PRIMARY KEY (LINK)
 );
 
--- Table: BF_Apatments_Ads
+
 CREATE TABLE BF_Apatments_Ads (
     LINK int  NOT NULL,
     S_Area varchar(150)  NOT NULL,
@@ -34,13 +34,13 @@ CREATE TABLE BF_Apatments_Ads (
     S_Type_Street Varchar(150)  NOT NULL,
     S_Street varchar(150)  NOT NULL,
     N_Street smallint  NOT NULL,
-    F_Qty_Room smallint  NOT NULL,
+    S_Qty_Room smallint  NOT NULL,
     N_Qty_Total_Space decimal(6,2)  NOT NULL,
     N_Qty_Living_Space decimal(6,2)  NULL,
     N_Qty_Kitchen_Space decimal(6,2)  NOT NULL,
     M_Price money  NULL,
     N_Floor smallint  NULL,
-    B_Balkony boolean  NOT NULL,
+    B_Balcony boolean  NOT NULL,
     B_Loggia boolean  NOT NULL,
     S_Type_Of_Room Varchar(150)  NOT NULL,
     N_Ceiling_Height decimal(4,2)  NOT NULL,
@@ -49,7 +49,7 @@ CREATE TABLE BF_Apatments_Ads (
     S_Kinde_Of_Repaire Varchar(150)  NOT NULL,
     B_Heating boolean  NOT NULL,
     S_Furniture varchar(500)  NOT NULL,
-    S_Tehnics varchar(500)  NOT NULL,
+    S_Technics varchar(500)  NOT NULL,
     S_Method_Of_Sale Varchar(150)  NOT NULL,
     S_Type_Of_Transaction Varchar(150)  NOT NULL,
     S_Description varchar  NOT NULL,
@@ -61,7 +61,6 @@ CREATE TABLE BF_Apatments_Ads (
     S_Yeard varchar(500)  NOT NULL,
     S_Parking varchar(500)  NOT NULL,
     S_Name_New_Bealding varchar(150)  NOT NULL,
-    S_Housing Varchar(150)  NOT NULL,
     S_Officiall_Builder Varchar(150)  NOT NULL,
     S_Type_of_Participation varchar(200)  NOT NULL,
     D_Deadline_for_Delivery timestamp  NOT NULL,
@@ -371,7 +370,7 @@ COMMENT ON TABLE FS_Session IS 'Таблица с типами сессии';
 
 -- Table: FS_Sourse
 CREATE TABLE FS_Sourse (
-    LINK smallint  NOT NULL,
+    LINK smallserial,
     C_Name varchar(150)  NOT NULL,
     C_Concst varchar(50)  NOT NULL,
     CONSTRAINT FS_Sourse_pk PRIMARY KEY (LINK)

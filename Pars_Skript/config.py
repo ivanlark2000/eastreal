@@ -1,24 +1,31 @@
 import os
+import psycopg2
 from dotenv import load_dotenv
-from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
-from sqlalchemy.ext.declarative import declarative_base
+
 
 load_dotenv(override=True)
 
 
 class Config:
     """Класс с настройками"""
-    userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36'
+    userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' \
+                'Chrome/102.0.5005.63 Safari/537.36 '
 
     def __init__(self):
-        Session = sessionmaker()
+        self.NAME_DB = os.environ.get('name_db')
         self.USERNAME_DB = os.environ.get('user_DB')
         self.PASSWORD_DB = os.environ.get('password_DB')
-        self.engine = create_engine(f'postgresql://{self.USERNAME_DB}:{self.PASSWORD_DB}@localhost/flats', echo=False)
-        Session.configure(bind=self.engine)
-        self.Base = declarative_base()
-        self.session = Session()
+        self.PORT = os.environ.get('port')
+        self.HOST = os.environ.get('host')
+        self.CON = self.make_con()
+        self.CURSOR = self.CON.cursor()
+
+    def make_con(self):
+        return psycopg2.connect(dbname=self.NAME_DB,
+                                user=self.USERNAME_DB,
+                                password=self.PASSWORD_DB,
+                                host=self.HOST,
+                                port=self.PORT)
 
 
 config = Config()

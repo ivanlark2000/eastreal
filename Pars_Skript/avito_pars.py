@@ -1,6 +1,5 @@
-import ast
 from bs4 import BeautifulSoup as Bs
-from transliterate import translit, get_available_language_codes
+from transliterate import translit
 
 
 def parsAvitoFlat(html: str, url: str) -> dict:
@@ -174,38 +173,9 @@ def parsAvitoFlat(html: str, url: str) -> dict:
             type_seller = None
         finally:
             return {
-                'seller': seller,
-                'type_seller': type_seller
+                'S_Name_Seller': seller,
+                'S_Type_Of_Seller': type_seller
             }
-
-    return {
-        "id_avito": flat_id,
-        'number_of_tel': None,
-        'price': price,
-        'qty_of_rooms': qty_of_rooms(soup),
-        'total_space': total_space(soup),
-        'square_of_kitchen': square_of_kitchen(soup),
-        'living_space': living_space(soup),
-        'floor': floor(soup),
-        'furniture': furniture(soup),
-        'technics': technics(soup),
-        'balcony_or_loggia': balcony_or_loggia(soup),
-        'room_type': room_type(soup),
-        'ceiling_height': ceiling_height(soup),
-        'bathroom': bathroom(soup),
-        'window': window(soup),
-        'repair': repair(soup),
-        'seilling_method': seilling_method(soup),
-        'transaction_type': transaction_type(soup),
-        'decorating': decorating(soup),
-        'warm_floor': warm_floor(soup),
-        **seller(soup),
-        'description': description(soup),
-        'url': url,
-    }
-
-
-def parsAvitoHouse(html:str, url:str) -> dict:
 
     def get_city(url: str) -> str:
         city = url.split('/')[3]
@@ -338,23 +308,46 @@ def parsAvitoHouse(html:str, url:str) -> dict:
             return new_building_name
 
     return {
-            'obl': obl,
-            'street': street,
-            'city': get_city(url),
-            'number_of_house': number_of_house,
-            'new_building_name': new_building_name(soup),
-            'offical_builder': offical_builder(soup),
-            'year_of_construction': year_of_construction(soup),
-            'floors_in_the_house': floors_in_the_house(soup),
-            'type_of_home': type_of_home(soup),
-            'passenger_bodice': passenger_bodice(soup),
-            'service_lift': service_lift(soup),
-            'in_home': in_home(soup),
-            'yard': yard(soup),
-            'parking': parking(soup),
-            'deadline': deadline(soup),
-            'district': district(soup),
-            'site': 'AVITO'
+            'S_Area': obl,
+            'S_City': get_city(url),
+            'S_Street': street,
+            'S_District': district(soup),
+            'N_Street': number_of_house,
+            'S_Qty_Room': qty_of_rooms(soup),
+            'N_Qty_Total_Space': total_space(soup),
+            'N_Qty_Living_Space ': living_space(soup),
+            'N_Qty_Kitchen_Space': square_of_kitchen(soup),
+            'N_Price': price,
+            'N_Floor': floor(soup),
+            'B_Balcony': balcony_or_loggia(soup),
+            'B_Loggia': balcony_or_loggia(soup),
+            'S_Type_Of_Room': room_type(soup),
+            'S_Ads_Type': '',
+            'N_Ceiling_Height': ceiling_height(soup),
+            'S_Type_Bathroom': bathroom(soup),
+            'S_Window': window(soup),
+            'S_Kind_Of_Repair': repair(soup),
+            'B_Heating': warm_floor(soup),
+            'S_Furniture': furniture(soup),
+            'S_Technics': technics(soup),
+            'S_Decorating': decorating(soup),
+            'S_Method_Of_Sale ': seilling_method(soup),
+            'S_Type_Of_Transaction ': transaction_type(soup),
+            'S_Description ': description(soup),
+            'S_Type_House': type_of_home(soup),
+            'N_Year_Building': year_of_construction(soup),
+            'N_Floor_In_House': floors_in_the_house(soup),
+            'B_Passenger_Elevator': passenger_bodice(soup),
+            'B_Freight_Elevator': service_lift(soup),
+            'S_Yard': yard(soup),
+            'S_Parking': parking(soup),
+            'S_Name_New_Building': new_building_name(soup),
+            'S_Official_Builder': offical_builder(soup),
+            'S_Type_of_Participation': '',
+            'D_Deadline_for_Delivery': deadline(soup),
+            'S_Site_Links': url,
+            'F_Source': 1,
+            **seller(soup),
         }
 
 
