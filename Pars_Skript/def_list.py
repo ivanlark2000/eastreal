@@ -41,7 +41,7 @@ def getting_rendom_link(list_links):
         time.sleep(3)
         yield list_links
     except Exception as e:
-        print('Ошибка при создании рандомных cсылок' + str(e))
+        print('Ошибка при создании рандомныx cсылок' + str(e))
 
 
 def getting_html(url):
@@ -50,5 +50,5 @@ def getting_html(url):
         respose = urlopen(url).read().decode("utf-8")
         time.sleep(5)
         return respose
-    except (http.client.IncompleteRead) as e:
+    except http.client.IncompleteRead as e:
         return e.partial.decode("utf-8")

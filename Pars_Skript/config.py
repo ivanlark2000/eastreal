@@ -17,8 +17,6 @@ class Config:
         self.PASSWORD_DB = os.environ.get('password_DB')
         self.PORT = os.environ.get('port')
         self.HOST = os.environ.get('host')
-        self.CON = self.make_con()
-        self.CURSOR = self.CON.cursor()
 
     def make_con(self):
         return psycopg2.connect(dbname=self.NAME_DB,

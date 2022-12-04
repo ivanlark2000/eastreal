@@ -1,5 +1,6 @@
 from def_list import *
-from avito_pars import parsAvitoFlat, parsAvitoHouse
+from avito_pars import parsAvitoFlat
+from load_to_base import load_to_base
 
 
 def main():
@@ -10,15 +11,9 @@ def main():
         links = getting_rendom_link(list_links)  # извлекаем рандомную ссылку
         for link in next(links):
             print(link)
-            try:
-                html_flat = getting_html(link)
-                flat_in_avito = parsAvitoFlat(html_flat, url=link)
-                house_in_avito = parsAvitoHouse(html=html_flat, url=link)
-                print(flat_in_avito)
-                print(house_in_avito)
-            except Exception as e:
-                print('Не получилось загрузить данные со страницы ' + str(e))
-                continue
+            html_flat = getting_html(link)
+            flat_in_avito = parsAvitoFlat(html_flat, url=link)
+            load_to_base(flat_in_avito)
 
 
 if __name__ == "__main__":

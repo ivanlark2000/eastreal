@@ -1,3 +1,3 @@
-INSERT INTO FS_Sourse (C_Name, C_Concst, S_Domain)
-VALUES ('домофонд', 'domfond', 'https://www.avito.ru/')
-        ('авито', 'avito', 'https://www.domofond.ru/');
+INSERT INTO FS_Source (C_Name, C_Const, S_Domen)
+VALUES  ('авито', 'avito', 'https://www.domofond.ru/'),
+    ('домофонд', 'domfond', 'https://www.avito.ru/');
