@@ -2,8 +2,7 @@
 import time
 import random
 import http.client
-import urllib.error
-from config import config
+from config import logger
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 

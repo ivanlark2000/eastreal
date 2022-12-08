@@ -347,7 +347,6 @@ def deadline(soup):
 
 
 def second_number_house(soup):
-
     try:
         number_of_house = soup.find(text='Корпус, строение').next.next.next
         lst = []
@@ -381,9 +380,10 @@ def parsAvitoFlat(html: str, url: str) -> dict:
     price = int(price['content'])
     flat_id = int(url[url.rfind('_') + 1:])
     soup = Bs(html, 'html.parser')
-    address = soup.find('div', itemprop="address")
-    lst = address.next.getText().split(',')
-    try:
+    address = soup.find('div', itemprop="address").text
+    #lst = address.next.getText().split(',')
+
+    '''try:
         lst.remove(get_city(url))
     except:
         pass
@@ -391,8 +391,7 @@ def parsAvitoFlat(html: str, url: str) -> dict:
     if any(map(str.isdigit, lst[-2])) and len(lst[-2]) < 10:
         street = lst[-3].strip()
         street = " ".join((sorted(street.split()))[::-1])
-        number_of_house = " ".join(lst[-2:]).strip()
-
+        number_of_house = lst[-1]
         try:
             obl = lst[-4].strip()
         except:
@@ -406,26 +405,13 @@ def parsAvitoFlat(html: str, url: str) -> dict:
         except:
             obl = None
 
-    word = []
-    for sim in number_of_house:
-        if sim.isdigit():
-            word.append(sim)
-
-    try:
-        number_of_house = int(''.join(word))
-    except:
-        number_of_house = second_number_house(soup)
-
     street_lst = street.split(' ')
     s_street = street_lst[1]
-    s_type_Street = street_lst[0]
+    s_type_Street = street_lst[0]'''
     return {
-        'S_Area': obl,
         'S_City': get_city(url),
-        'S_Street': s_street,
-        'S_Type_Street': s_type_Street,
+        'S_Full_Street': address,
         'S_District': district(soup),
-        'N_Street': number_of_house,
         'S_Qty_Room': qty_of_rooms(soup),
         'N_Qty_Total_Space': total_space(soup),
         'N_Qty_Living_Space': living_space(soup),
