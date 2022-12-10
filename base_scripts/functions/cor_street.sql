@@ -1,43 +1,37 @@
-CREATE OR REPLACE FUNCTION cor_street(street varchar) RETURNS varchar(10)
-    AS $$
-    BEGIN
-        CASE street
-            WHEN 'улица' THEN street := 'ул.';
-			ELSE
-        END CASE;
-        RETURN street;
-    END;
+CREATE OR REPLACE FUNCTION public.format_street(
+--CREATE DATE 2022-08-12
+--функция которая упорядочивает значения в улицах
 
-$$
-LANGUAGE plpgsql
+	street character varying)
+    RETURNS character varying
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE PARALLEL UNSAFE
+AS $BODY$
 
-
-CREATE OR REPLACE FUNCTION format_street(street varchar) RETURNS varchar(100)
-    AS $$
     DECLARE
-        value1 array[] := STRING_TO_ARRAY(street, ' ');
-
+        value1 varchar(250)[] := STRING_TO_ARRAY(street, ' ');
+		rez varchar(250);
+		i varchar(30);
 
     BEGIN
-        CASE street
-            WHEN 'улица' THEN street := 'ул.';
-			ELSE
-        END CASE;
-        RETURN street;
+		value1 = array_replace(value1, 'улица', 'ул.');
+		value1 = array_replace(value1, 'бульвар', 'б-р.');
+		WITH str (street_column)
+		AS (
+		SELECT UNNEST(value1)
+		ORDER BY length(UNNEST(value1))
+		)
+		SELECT string_agg(ltrim(street_column), ' ') a
+		FROM str
+
+		INTO rez;
+
+        RETURN rez;
     END;
 
-$$
-LANGUAGE plpgsql
+$BODY$;
 
-SELECT
-	SPLIT_PART(s_full_street, ',', 1),
-	SPLIT_PART(s_full_street, ',', 2),
-	SPLIT_PART(s_full_street, ',', 3),
-	SPLIT_PART(SPLIT_PART(s_full_street, ',', 4),  'р-н', 1),
-	SPLIT_PART(SPLIT_PART(s_full_street, ',', 4),  'р-н', 2)
+ALTER FUNCTION public.format_street(character varying)
+    OWNER TO ivan;
 
-
-FROM bf_temp_apartments_ads
-WHERE SPLIT_PART(s_full_street, ',', 4) != ''
-	AND SPLIT_PART(s_full_street, ',', 4) ~ '[0-9]'
-	AND SPLIT_PART(s_full_street, ',', 2) ~ 'улица' = false
