@@ -1,6 +1,6 @@
 from bs4 import BeautifulSoup as Bs
 from transliterate import translit
-
+from itertools import groupby
 
 def ads_type(soup) -> str:
     lst = ['Новостройки', 'Вторичка']
@@ -374,43 +374,45 @@ def new_building_name(soup):
         return new_building_name
 
 
-def parsAvitoFlat(html: str, url: str) -> dict:
+def get_full_street(soup, city) ->str:
+    lst_keyword = [
+        'район', 'округ', 'пос.', 'область', 'микрорайон', 'жилой комплекс', 'г.о.', 'посёлок', 'СНТ'
+    ]
+    address = soup.find('div', itemprop="address").text
+    lst = [i.strip() for i in address.split(',')]
+    lst_rez = []
+    for i in lst:
+        if 'р-н' in i:
+            i = i.split('р-н')[0]
+        if 'область' in i:
+            continue
+        if i == city.capitalize():
+            continue
+        lst_rez.append(i)
+    lst.clear()
+    for i in lst_rez:
+        for n in lst_keyword:
+            if n in i:
+                i = ''
+        lst.append(i)
+    lst = [x for x, _ in groupby(lst)]
+    if '' in lst:
+        lst.remove('')
+    lst[0] = ' '.join(reversed(sorted(lst[0].split(' '))))
+    print(lst)
+    return ', '.join(lst)
+
+
+def parsAvitoFlat(html: str, url: str, city:str) -> dict:
     soup = Bs(html, 'html.parser')
     price = soup.find('span', itemprop="price")
     price = int(price['content'])
     flat_id = int(url[url.rfind('_') + 1:])
     soup = Bs(html, 'html.parser')
-    address = soup.find('div', itemprop="address").text
-    #lst = address.next.getText().split(',')
 
-    '''try:
-        lst.remove(get_city(url))
-    except:
-        pass
-
-    if any(map(str.isdigit, lst[-2])) and len(lst[-2]) < 10:
-        street = lst[-3].strip()
-        street = " ".join((sorted(street.split()))[::-1])
-        number_of_house = lst[-1]
-        try:
-            obl = lst[-4].strip()
-        except:
-            obl = None
-    else:
-        street = lst[-2].strip()
-        street = " ".join((sorted(street.split()))[::-1])
-        number_of_house = lst[-1].strip()
-        try:
-            obl = lst[-3].strip()
-        except:
-            obl = None
-
-    street_lst = street.split(' ')
-    s_street = street_lst[1]
-    s_type_Street = street_lst[0]'''
     return {
         'S_City': get_city(url),
-        'S_Full_Street': address,
+        'S_Full_Street': get_full_street(soup, city=city),
         'S_District': district(soup),
         'S_Qty_Room': qty_of_rooms(soup),
         'N_Qty_Total_Space': total_space(soup),

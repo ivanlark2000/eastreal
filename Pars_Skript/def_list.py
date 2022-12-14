@@ -7,19 +7,15 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
 
-def getting_url():
-    """Генератор стартовых ссылок"""
-    list120 = list(range(1, 21))
-    list2140 = list(range(21, 41))
-    list4160 = list(range(41, 61))
-    list6180 = list(range(61, 81))
-    list8199 = list(range(81, 100))
-    list_gen = [list120, list2140, list4160, list6180, list8199]
-    for list_ in list_gen:
-        random.shuffle(list_)
-        for number in list_:
-            start_site = f'https://www.avito.ru/kaliningrad/kvartiry/prodam-ASgBAgICAUSSA8YQ?cd=1&p={number}'
-            yield start_site
+def getting_url(city: str) -> list:
+    lst = list(range(0, 101))
+    random.shuffle(lst)
+    for n in lst:
+        for link in [
+            f'https://www.avito.ru/{city}/kvartiry/prodam/vtorichka-ASgBAQICAUSSA8YQAUDmBxSMUg?cd=1&p={n}',
+            f'https://www.avito.ru/{city}/kvartiry/prodam/novostroyka-ASgBAQICAUSSA8YQAUDmBxSOUg?cd=1&p={n}'
+        ]:
+            yield link
 
 
 def getting_links(html):

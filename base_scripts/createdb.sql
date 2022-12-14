@@ -629,39 +629,151 @@ CREATE TABLE MN_Ads_Houses (
     CONSTRAINT MN_Ads_Houses_pk PRIMARY KEY (LINK)
 );
 
--- Table: MN_Apartments_Ads
-CREATE TABLE MN_Apartments_Ads (
-    LINK serial,
-    F_House int  NOT NULL,
-    F_Qty_Room smallint  NOT NULL,
-    N_Qty_Total_Space decimal(6,2)  NOT NULL,
-    N_Qty_Living_Space decimal(6,2)  NULL,
-    N_Qty_Kitchen_Space decimal(6,2)  NOT NULL,
-    M_Price money  NULL,
-    F_Floor smallint  NOT NULL,
-    F_Tehnics smallint  NULL,
-    F_Furniture smallint  NOT NULL,
-    F_Decorating_Type smallint  NULL,
-    B_Loggia boolean  NOT NULL,
-    B_Balkony boolean  NOT NULL,
-    F_Ads_Object smallint  NOT NULL,
-    F_Type_Of_Room smallint  NOT NULL,
-    N_Ceiling_Height decimal(4,2)  NOT NULL,
-    F_Type_Bathroom smallint  NOT NULL,
-    F_Window smallint  NOT NULL,
-    F_Kind_Of_Repair smallint  NOT NULL,
-    B_Heating boolean  NOT NULL,
-    F_Method_Of_Sale smallint  NOT NULL,
-    F_Type_Of_Transaction smallint  NOT NULL,
-    S_Description varchar  NOT NULL,
-    S_Type_of_Participation varchar(200)  NOT NULL,
-    S_Name_Company Varchar(150)  NOT NULL,
-    S_Name_Seller Varchar(150)  NOT NULL,
-    F_Type_Of_Seller smallint  NOT NULL,
-    F_Status_Of_Ads smallint  NOT NULL,
-    D_Date timestamp  NOT NULL,
-    CONSTRAINT MN_Apartments_Ads_pk PRIMARY KEY (LINK)
+CREATE TABLE IF NOT EXISTS public.mn_apartments_ads
+(
+    link integer NOT NULL DEFAULT nextval('mn_apartments_ads_link_seq'::regclass),
+    f_house integer NOT NULL,
+    f_qty_room smallint NOT NULL,
+    n_qty_total_space numeric(6,2) NOT NULL,
+    n_qty_living_space numeric(6,2),
+    n_qty_kitchen_space numeric(6,2) NOT NULL,
+    m_price money,
+    f_floor smallint NOT NULL,
+    f_technics smallint,
+    f_furniture smallint NOT NULL,
+    f_decorating smallint,
+    b_loggia boolean NOT NULL,
+    b_balkony boolean NOT NULL,
+    f_ads_object smallint NOT NULL,
+    f_type_of_room smallint NOT NULL,
+    n_ceiling_height numeric(4,2) NOT NULL,
+    f_type_bathroom smallint NOT NULL,
+    f_window smallint NOT NULL,
+    f_kind_of_repair smallint NOT NULL,
+    b_heating boolean NOT NULL,
+    f_method_of_sale smallint NOT NULL,
+    f_type_of_transaction smallint NOT NULL,
+    s_description character varying COLLATE pg_catalog."default" NOT NULL,
+    s_type_of_participation character varying(200) COLLATE pg_catalog."default" NOT NULL,
+    s_name_company character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    s_name_seller character varying(150) COLLATE pg_catalog."default" NOT NULL,
+    f_type_of_seller smallint NOT NULL,
+    f_status_of_ads smallint NOT NULL,
+    d_date timestamp without time zone NOT NULL,
+    CONSTRAINT mn_apartments_ads_pk PRIMARY KEY (link),
+    CONSTRAINT bf_apatments_ads_fs_floor FOREIGN KEY (f_floor)
+        REFERENCES public.fs_floor (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bf_apatments_ads_fs_kinde_of_repaire FOREIGN KEY (f_kind_of_repair)
+        REFERENCES public.s_kind_of_repair (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bf_apatments_ads_fs_method_of_sale FOREIGN KEY (f_method_of_sale)
+        REFERENCES public.fs_method_of_sale (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bf_apatments_ads_fs_qty_room FOREIGN KEY (f_qty_room)
+        REFERENCES public.fs_qty_room (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bf_apatments_ads_fs_type_bathroom FOREIGN KEY (f_type_bathroom)
+        REFERENCES public.fs_type_bathroom (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bf_apatments_ads_fs_type_of_room FOREIGN KEY (f_type_of_room)
+        REFERENCES public.fs_type_of_room (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bf_apatments_ads_fs_type_of_seller FOREIGN KEY (f_type_of_seller)
+        REFERENCES public.fs_type_of_seller (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bf_apatments_ads_fs_type_of_transaction FOREIGN KEY (f_type_of_transaction)
+        REFERENCES public.fs_type_of_transaction (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT bf_apatments_ads_fs_window FOREIGN KEY (f_window)
+        REFERENCES public.fs_window (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT mn_apatments_ads_es_furniture FOREIGN KEY (f_furniture)
+        REFERENCES public.es_furniture (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE,
+    CONSTRAINT mn_apatments_ads_es_technics FOREIGN KEY (f_technics)
+        REFERENCES public.es_technics (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE CASCADE,
+    CONSTRAINT mn_apatments_ads_fs_ads_object FOREIGN KEY (f_ads_object)
+        REFERENCES public.fs_ads_object (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT mn_apatments_ads_fs_decorating_type FOREIGN KEY (f_decorating)
+        REFERENCES public.fs_decorating_type (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT mn_apatments_ads_fs_status_of_ads FOREIGN KEY (f_status_of_ads)
+        REFERENCES public.fs_status_of_ads (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION,
+    CONSTRAINT mn_apatments_ads_mn_house FOREIGN KEY (f_house)
+        REFERENCES public.mn_house (link) MATCH SIMPLE
+        ON UPDATE NO ACTION
+        ON DELETE NO ACTION
+)
+
+TABLESPACE pg_default;
+
+ALTER TABLE IF EXISTS public.mn_apartments_ads
+    OWNER to ivan;
+
+COMMENT ON TABLE MN_Apartments_Ads IS 'Основная таблица которая включает объявления квартир';
+
+CREATE TABLE MN_Period_Deadline (
+    LINK smallserial PRIMARY KEY
+    ,F_House smallint REFERENCES MN_House(link)
+    ,D_Date_Begin timestamp
+    ,D_Date_End timestamp
+    ,D_Date_Create timestamp
+)
+
+COMMENT ON TABLE MN_Period_Deadline IS 'Таблица с диапазоном времени по вводу в эксплуатацию'
+
+CREATE TABLE ES_Technics (
+    LINK serial PRIMARY KEY
+    ,F_Flat int REFERENCES MN_Apartments_Ads(LINK)
+    ,F_Technics_Type smallint REFERENCES FS_Technic_Types(LINK)
+    ,D_Date_Create timestamp
 );
+
+COMMENT ON TABLE ES_Technics IS 'Таблица с наличием техники';
+
+CREATE TABLE FS_Technics_Type (
+    LINK smallserial PRIMARY KEY
+    ,C_Name varchar(250)
+);
+
+
+COMMENT ON TABLE FS_Technics_Type IS 'Таблица с типами техники'
+
+CREATE TABLE ES_Furniture (
+    LINK serial PRIMARY KEY
+    ,F_Flat int REFERENCES MN_Apartments_Ads(LINK)
+    ,F_Furniture_Type smallint REFERENCES FS_Furniture_Types(LINK)
+    ,D_Date_Create timestamp
+);
+
+COMMENT ON TABLE ES_Furniture IS 'Таблица с наличием мебели у квартиры';
+
+CREATE TABLE FS_Furniture_Types (
+    LINK smallserial PRIMARY KEY
+    ,C_Name varchar(250)
+);
+
+COMMENT ON TABLE FS_Furniture_Types IS 'Таблица с видами мебели'
+
+
 
 -- Table: MN_Commercial_Real_Estate
 CREATE TABLE MN_Commercial_Real_Estate (
