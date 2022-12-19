@@ -1,5 +1,5 @@
 from def_list import *
-from config import logger
+from pars_skript.settings.config import logger
 from avito_pars import parsAvitoFlat
 from load_to_base import load_to_base
 from urllib.error import HTTPError

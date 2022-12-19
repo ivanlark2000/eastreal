@@ -8,6 +8,10 @@ python-dotenv = "*"
 psycopg2-binary = "*"
 beautifulsoup4 = "*"
 transliterate = "*"
+requests = "*"
+selenium = "*"
+webdriver-manager = "*"
+geopy = "*"
 
 [dev-packages]
 

@@ -2,7 +2,6 @@
 import time
 import random
 import http.client
-from config import logger
 from bs4 import BeautifulSoup
 from urllib.request import urlopen
 

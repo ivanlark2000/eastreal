@@ -109,7 +109,7 @@ BEGIN
 
     ALTER TABLE ads ALTER COLUMN S_District TYPE int USING S_District::int;
     ALTER TABLE ads ALTER COLUMN S_Street_Type TYPE int USING S_Street_Type::int;
-    --SELECT * FROM FS_street
+    --SELECT * FROM ads
     INSERT INTO FS_Street (F_District, F_Type_Street, C_Name, f_city)
     SELECT S_District, S_Street_Type, S_Street, s_City
     FROM Ads
@@ -155,7 +155,6 @@ BEGIN
        D_Deadline_for_Delivery varchar(150)
     );
 
---SELECT * FROM ads
     INSERT INTO House
     SELECT
        link
@@ -252,32 +251,62 @@ BEGIN
        ,F_Official_Builder
        ,S_Name_New_Building
 	)
-    SELECT
-       F_Street
-       ,N_Qty_Floor
-       ,S_Number
-       ,N_Year_Building
-       ,B_Passenger_Elevator
-       ,B_Freight_Elevator
-       ,F_Parking
-       ,F_Yard
-       ,F_Type_House
-       ,F_Official_Builder
-       ,S_Name_New_Building
-    FROM House
-    WHERE F_Street||' '||S_Number||' '||N_Qty_Floor NOT IN (
-        SELECT F_Street||' '||S_Number||' '||N_Qty_Floor
-        FROM MN_House
-    );
+	WITH h (
+			n_n
+		   ,F_Street
+		   ,N_Qty_Floor
+		   ,S_Number
+		   ,N_Year_Building
+		   ,B_Passenger_Elevator
+		   ,B_Freight_Elevator
+		   ,F_Parking
+		   ,F_Yard
+		   ,F_Type_House
+		   ,F_Official_Builder
+		   ,S_Name_New_Building
+		)
+	AS (
+		SELECT
+			ROW_NUMBER() OVER (PARTITION BY F_Street, S_Number ORDER BY N_Year_Building DESC)
+		   ,F_Street
+		   ,N_Qty_Floor
+		   ,S_Number
+		   ,N_Year_Building
+		   ,B_Passenger_Elevator
+		   ,B_Freight_Elevator
+		   ,F_Parking
+		   ,F_Yard
+		   ,F_Type_House
+		   ,F_Official_Builder
+		   ,S_Name_New_Building
+		FROM House
+    )
+	SELECT
+		   F_Street
+		   ,N_Qty_Floor
+		   ,S_Number
+		   ,N_Year_Building
+		   ,B_Passenger_Elevator
+		   ,B_Freight_Elevator
+		   ,F_Parking
+		   ,F_Yard
+		   ,F_Type_House
+		   ,F_Official_Builder
+		   ,S_Name_New_Building
+	FROM h
+    WHERE F_Street||' '||S_Number NOT IN (
+        SELECT F_Street||' '||S_Number
+		FROM MN_House
+   		) AND n_n = 1;
 
     ALTER TABLE ads ADD COLUMN F_House int;
-	--SELECT * FROM ads
+
 	ALTER TABLE Ads ALTER COLUMN n_floor_in_house TYPE varchar(10) USING n_floor_in_house::varchar;
 
     UPDATE ads a
     SET F_House = m.link
     FROM MN_House m
-    WHERE a.s_Street =  m.F_Street AND a.n_street = m.S_Number AND a.N_floor_in_house = m.N_Qty_Floor;
+    WHERE a.s_Street =  m.F_Street AND a.n_street = m.S_Number;
 
     INSERT INTO FS_Qty_room (c_name)
     SELECT F_Qty_room
@@ -323,28 +352,27 @@ BEGIN
 		n_qty_kitchen_space numeric(6,2),
 		m_price money,
 		f_floor smallint,
-		f_tehnics varchar(500),
+		f_technics varchar(500),
 		f_furniture varchar(500),
 		f_decorating varchar(250),
 		b_loggia boolean,
 		b_balcony boolean,
 		f_type_of_room varchar(150),
+		f_ads_type varchar(100),
 		n_ceiling_height numeric(4,2),
 		f_type_bathroom varchar(150),
 		f_window varchar(150),
-		f_kind_of_repair varchar(150),
+		f_kind_of_repaire varchar(150),
 		b_heating boolean,
 		f_method_of_sale varchar(150),
 		f_type_of_transaction varchar(150),
 		s_description character varying,
-		s_type_of_participation character varying(200),
-		s_name_company character varying(150),
-		s_name_seller character varying(150),
+		f_seller character varying(150),
 		f_type_of_seller varchar(150),
-		f_status_of_ads varchar(150),
 		f_link_site varchar(300),
 		f_procedure_session smallint,
-		f_sourse smallint
+		f_sourse smallint,
+		d_date timestamp
 	);
 
 	INSERT INTO apartments
@@ -363,6 +391,7 @@ BEGIN
 		b_loggia,
 		b_balcony,
 		s_type_of_room,
+		s_ads_type,
 		n_ceiling_height,
 		s_type_bathroom,
 		s_window ,
@@ -371,13 +400,386 @@ BEGIN
 		s_method_of_sale,
 		s_type_of_transaction,
 		s_description,
-		s_type_of_participation,
-		s_name_company,
 		s_name_seller,
 		s_type_of_seller,
-		f_source
+		s_site_links,
+		f_procedure_session,
+		f_source,
+		d_date
 	FROM ads;
-	SELECT * FROM apartments;
+
+	INSERT INTO FS_Decorating_Type (C_Name)
+	SELECT f_decorating
+	FROM apartments
+	WHERE f_decorating NOT IN (
+		SELECT C_Name FROM FS_Decorating_Type
+	) AND f_decorating IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_decorating = d.link
+	FROM FS_Decorating_Type d
+	WHERE d.C_Name = a.f_decorating;
+
+	ALTER TABLE apartments ALTER COLUMN F_Decorating TYPE smallint USING F_Decorating::smallint;
+
+	INSERT INTO FS_Ads_Type (C_Name)
+	SELECT f_ads_type
+	FROM apartments
+	WHERE f_ads_type NOT IN (
+		SELECT C_Name FROM FS_Ads_Type
+	) AND f_ads_type IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_ads_type = d.link
+	FROM FS_Ads_Type d
+	WHERE d.C_Name = a.f_ads_type;
+
+	ALTER TABLE apartments ALTER COLUMN F_Ads_Type TYPE smallint USING F_Ads_Type::smallint;
+
+	INSERT INTO FS_Type_of_Room (C_Name)
+	SELECT f_type_of_room
+	FROM apartments
+	WHERE f_type_of_room NOT IN (
+		SELECT C_Name FROM FS_Type_Of_Room
+	) AND f_type_of_room IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_type_of_room = d.link
+	FROM FS_Type_of_Room d
+	WHERE d.C_Name = a.f_type_of_room;
+
+	ALTER TABLE apartments ALTER COLUMN F_Type_Of_Room TYPE smallint USING F_Type_Of_Room::smallint;
+
+	INSERT INTO FS_Type_Bathroom (C_Name)
+	SELECT f_type_bathroom
+	FROM apartments
+	WHERE f_type_bathroom NOT IN (
+		SELECT C_Name FROM FS_Type_Bathroom
+	) AND f_type_bathroom IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_type_bathroom = d.link
+	FROM FS_Type_Bathroom d
+	WHERE d.C_Name = a.f_type_Bathroom;
+
+	ALTER TABLE apartments ALTER COLUMN F_Type_Bathroom TYPE smallint USING F_Type_Bathroom::smallint;
+
+	INSERT INTO FS_Type_of_Transaction (C_Name)
+	SELECT f_type_of_transaction
+	FROM apartments
+	WHERE f_type_of_transaction NOT IN (
+		SELECT C_Name FROM FS_Type_OF_Transaction
+	) AND f_type_of_transaction IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_type_of_transaction = d.link
+	FROM FS_Type_Of_Transaction d
+	WHERE d.C_Name = a.f_type_of_transaction;
+
+	ALTER TABLE apartments ALTER COLUMN F_Type_Of_Transaction TYPE smallint USING F_Type_Of_Transaction::smallint;
+
+	INSERT INTO FS_Kind_Of_Repaire (C_Name)
+	SELECT f_kind_of_repaire
+	FROM apartments
+	WHERE f_kind_of_repaire NOT IN (
+		SELECT C_Name FROM FS_Kind_Of_Repaire
+	) AND f_kind_of_repaire IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_kind_of_repaire = d.link
+	FROM FS_Kind_Of_Repaire d
+	WHERE d.C_Name = a.f_kind_of_repaire;
+
+	ALTER TABLE apartments ALTER COLUMN F_Kind_of_repaire TYPE smallint USING F_Kind_of_Repaire::smallint;
+
+	INSERT INTO FS_Method_of_Sale (C_Name)
+	SELECT f_method_of_sale
+	FROM apartments
+	WHERE f_method_of_sale NOT IN (
+		SELECT C_Name FROM FS_Method_of_sale
+	) AND f_method_of_sale IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_method_of_sale = d.link
+	FROM FS_Method_of_sale d
+	WHERE d.C_Name = a.f_method_of_sale;
+
+	ALTER TABLE apartments ALTER COLUMN F_Method_Of_Sale TYPE smallint USING F_Method_Of_Sale::smallint;
+
+	UPDATE apartments a
+	SET f_type_of_seller = NULL
+	WHERE f_type_of_seller ~ '[0-9]';
+
+	INSERT INTO FS_Type_Of_Seller (C_Name)
+	SELECT f_type_of_seller
+	FROM apartments
+	WHERE f_type_of_seller NOT IN (
+		SELECT C_Name FROM FS_TYpe_Of_Seller
+	) AND f_type_of_seller IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_type_of_seller = d.link
+	FROM FS_Type_of_Seller d
+	WHERE d.C_Name = a.f_type_of_seller;
+
+	ALTER TABLE apartments ALTER COLUMN F_Type_Of_Seller TYPE smallint USING F_Type_Of_Seller::smallint;
+
+	INSERT INTO FS_Window (C_Name)
+	SELECT f_window
+	FROM apartments
+	WHERE f_window NOT IN (
+		SELECT C_Name FROM FS_Window
+	) AND f_window IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_window = d.link
+	FROM FS_Window d
+	WHERE d.C_Name = a.f_window;
+
+	ALTER TABLE apartments ALTER COLUMN F_Window TYPE smallint USING F_window::smallint;
+
+	INSERT INTO MN_Seller (f_type_of_seller, C_Full_Name)
+	SELECT f_type_of_seller, f_seller
+	FROM apartments
+	WHERE f_seller||' '||f_type_of_Seller NOT IN (
+		SELECT C_Full_Name||' '||f_type_of_seller FROM MN_Seller
+	) AND f_seller IS NOT NULL
+	GROUP BY 1, 2;
+
+	UPDATE apartments a
+	SET f_seller = s.link
+	FROM MN_Seller s
+	WHERE s.C_Full_name = a.f_seller;
+
+	ALTER TABLE apartments ALTER COLUMN F_Seller TYPE smallint USING F_Seller::smallint;
+
+	DROP TABLE IF EXISTS templ_flat;
+	CREATE TEMPORARY TABLE templ_flat (
+				f_house int
+				,f_qty_room smallint
+				,n_qty_total_space numeric(6,2)
+				,n_qty_living_space numeric(6,2)
+				,n_qty_kitchen_space numeric(6,2)
+				,f_floor smallint
+				,f_decorating smallint
+				,b_loggia boolean
+				,b_balcony boolean
+				,f_ads_type smallint
+				,f_type_of_room smallint
+				,n_ceiling_height numeric(4,2)
+				,f_type_bathroom smallint
+				,f_window smallint
+				,f_kind_of_repaire smallint
+				,b_heating boolean
+				,m_price money
+				,f_method_of_sale smallint
+				,f_type_of_transaction smallint
+				,f_seller int
+				,d_date timestamp
+				);
+	WITH templ (
+					n_n
+					,f_house
+					,f_qty_room
+					,n_qty_total_space
+					,n_qty_living_space
+					,n_qty_kitchen_space
+					,f_floor
+					,f_decorating
+					,b_loggia
+					,b_balcony
+					,f_ads_type
+					,f_type_of_room
+					,n_ceiling_height
+					,f_type_bathroom
+					,f_window
+					,f_kind_of_repaire
+					,b_heating
+					,m_price
+					,f_method_of_sale
+					,f_type_of_transaction
+					,f_seller
+					,d_date
+					)
+				AS (
+				SELECT
+						ROW_NUMBER() OVER (PARTITION BY f_house, f_qty_room, n_qty_total_space)
+						,f_house
+						,f_qty_room
+						,n_qty_total_space
+						,n_qty_living_space
+						,n_qty_kitchen_space
+						,f_floor
+						,f_decorating
+						,b_loggia
+						,b_balcony
+						,f_ads_type
+						,f_type_of_room
+						,n_ceiling_height
+						,f_type_bathroom
+						,f_window
+						,f_kind_of_repaire
+						,b_heating
+						,m_price
+						,f_method_of_sale
+						,f_type_of_transaction
+						,f_seller
+						,d_date
+				FROM apartments
+				)
+			INSERT INTO templ_flat (
+					f_house
+					,f_qty_room
+					,n_qty_total_space
+					,n_qty_living_space
+					,n_qty_kitchen_space
+					,f_floor
+					,f_decorating
+					,b_loggia
+					,b_balcony
+					,f_ads_type
+					,f_type_of_room
+					,n_ceiling_height
+					,f_type_bathroom
+					,f_window
+					,f_kind_of_repaire
+					,b_heating
+					,m_price
+					,f_method_of_sale
+					,f_type_of_transaction
+					,f_seller
+					,d_date
+					)
+			SELECT
+					f_house
+					,f_qty_room
+					,n_qty_total_space
+					,n_qty_living_space
+					,n_qty_kitchen_space
+					,f_floor
+					,f_decorating
+					,b_loggia
+					,b_balcony
+					,f_ads_type
+					,f_type_of_room
+					,n_ceiling_height
+					,f_type_bathroom
+					,f_window
+					,f_kind_of_repaire
+					,b_heating
+					,m_price
+					,f_method_of_sale
+					,f_type_of_transaction
+					,f_seller
+					,d_date
+			FROM templ
+			WHERE n_n = 1;
+
+	INSERT INTO MN_Apartments_Ads (
+		f_house
+		,f_qty_room
+		,n_qty_total_space
+		,n_qty_living_space
+		,n_qty_kitchen_space
+		,f_floor
+		,f_decorating
+		,b_loggia
+		,b_balcony
+		,f_ads_type
+		,f_type_of_room
+		,n_ceiling_height
+		,f_type_bathroom
+		,f_window
+		,f_kind_of_repaire
+		,b_heating
+		,f_method_of_sale
+		,f_type_of_transaction
+		,f_seller
+		,d_date
+	)
+	SELECT
+		f_house
+		,f_qty_room
+		,n_qty_total_space
+		,n_qty_living_space
+		,n_qty_kitchen_space
+		,f_floor
+		,f_decorating
+		,b_loggia
+		,b_balcony
+		,f_ads_type
+		,f_type_of_room
+		,n_ceiling_height
+		,f_type_bathroom
+		,f_window
+		,f_kind_of_repaire
+		,b_heating
+		,f_method_of_sale
+		,f_type_of_transaction
+		,f_seller
+		,d_date
+	FROM templ_flat
+	WHERE f_house||' '||f_floor||' '||n_qty_total_space||' '||f_qty_room NOT IN (
+		SELECT link||' '||f_floor||' '||n_qty_total_space||' '||f_qty_room
+		FROM MN_Apartments_Ads
+	);
+
+	ALTER TABLE apartments ADD COLUMN f_flat int;
+
+	UPDATE apartments a
+	SET f_flat = m.link
+	FROM MN_Apartments_Ads m
+	WHERE  a.f_floor = m.f_floor AND a.n_qty_total_space = m.n_qty_total_space
+		AND a.f_qty_room = m.f_qty_room AND m.f_house = a.f_house;
+
+	DELETE FROM apartments WHERE f_flat IS NULL;
+
+	SELECT
+		add_technics(f_flat, f_technics, 2)
+		,add_technics(f_flat, f_furniture, 1)
+	FROM apartments;
+
+	INSERT INTO INF_Descriptions (f_apatments_ads, s_descriptions)
+	SELECT f_flat, s_description
+	FROM apartments a
+	WHERE f_flat||' '||s_description NOT IN (
+		SELECT f_apatments_ads||' '||S_Descriptions FROM INF_Descriptions
+	);
+
+	INSERT INTO mn_ads_price (f_flat, n_price)
+	WITH current_price (n_n, f_flat, n_price) AS
+	(
+		SELECT
+			row_number() OVER (PARTITION BY f_flat ORDER BY d_date DESC)
+			,f_flat
+			,n_price
+		FROM mn_ads_price
+		)
+	SELECT a.f_flat, a.m_price
+	FROM apartments a
+		INNER JOIN current_price p
+			USING(f_flat)
+	WHERE n_n = 1 AND a.m_price <> p.n_price;
+
+	INSERT INTO mn_ads_price (f_flat, n_price)
+	SELECT f_flat, m_price
+	FROM apartments
+	WHERE f_flat NOT IN (
+		SELECT F_flat FROM mn_ads_price
+		);
+
+
+
+
 
 
 

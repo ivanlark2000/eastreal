@@ -1,7 +1,7 @@
 /sys/os
 /sys/time
 .idea
-Pars_Skript/.env
+pars_skript/settings/.env
 /urllib_reqvest_start.py
 /html.txt
 /config.py

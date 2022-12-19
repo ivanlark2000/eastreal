@@ -34,3 +34,15 @@ EXECUTE PROCEDURE Add_Create_Date();
 CREATE trigger ES_Furniture_add_date
 BEFORE INSERT ON ES_Furniture FOR EACH ROW
 EXECUTE PROCEDURE Add_Create_Date();
+
+CREATE trigger mn_ads_price_add_date
+BEFORE INSERT ON mn_ads_price FOR EACH ROW
+EXECUTE PROCEDURE Add_Date();
+
+CREATE trigger INF_Sys_add_date
+BEFORE INSERT ON INF_Sys FOR EACH ROW
+EXECUTE PROCEDURE Add_Create_Date();
+
+CREATE trigger ps_ads_position_add_date
+BEFORE INSERT ON ps_ads_position FOR EACH ROW
+EXECUTE PROCEDURE Add_Date();

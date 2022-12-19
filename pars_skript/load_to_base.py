@@ -1,5 +1,4 @@
-from psycopg2 import DatabaseError
-from config import config, logger
+from pars_skript.settings.config import config, logger
 
 
 lst_arg = [

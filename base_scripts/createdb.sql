@@ -220,6 +220,19 @@ CREATE TABLE BF_Temp_Commercial_Real_Estate (
     CONSTRAINT BF_Temp_Commercial_Real_Estate_pk PRIMARY KEY (LINK)
 );
 
+CREATE TABLE INF_Sys (
+    link serial PRIMARY KEY
+    ,f_flat int REFERENCES MN_Apartments_Ads (LINK)
+    ,f_ads_house int REFERENCES MN_Ads_Houses (LINK)
+    ,f_commercial int REFERENCES MN_Commercial (LINK)
+    ,s_site_link varchar(250) NOT NULL
+    ,f_source smallint NOT NULL
+    ,f_procedure_session smallint NOT NULL
+    ,d_date_create timestamp
+);
+COMMENT ON TABLE INF_Sys IS 'Таблица с системными данными об объявлении'
+
+
 -- Table: FS_Ads_Object
 CREATE TABLE FS_Ads_Object (
     LINK smallserial,
@@ -256,6 +269,15 @@ CREATE TABLE FS_City (
     F_Area smallint  NOT NULL,
     CONSTRAINT FS_City_pk PRIMARY KEY (LINK)
 );
+
+CREATE TABLE mn_json_object (
+	link smallserial PRIMARY KEY,
+	f_city smallint REFERENCES fs_city(link),
+	f_object smallint REFERENCES fs_objects_type(link),
+	json json,
+	d_date timestamp
+);
+COMMENT ON TABLE mn_json_object IS 'Таблица с Джисонами с Open Map Street';
 
 -- Table: FS_Decorating_Type
 CREATE TABLE FS_Decorating_Type (
