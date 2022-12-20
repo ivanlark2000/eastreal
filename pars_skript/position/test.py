@@ -4,7 +4,7 @@ overpass_url = "http://overpass-api.de/api/interpreter"
 overpass_query = """
 [out:json];
 area[name="Калининград"];
-nwr[landuse=industrial](area);
+nwr[leisure=park](area);
 out center;
 """
 response = requests.get(overpass_url,
