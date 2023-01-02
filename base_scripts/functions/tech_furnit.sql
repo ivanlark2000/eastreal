@@ -1,8 +1,9 @@
-CREATE OR REPLACE FUNCTION public.add_technics(
+--DROP FUNCTION add_technics(f_flat integer, s_items text, var integer)
+create or replace FUNCTION public.add_technics(
 	f_flat integer,
 	s_items text,
 	var integer)
-    RETURNS boolean
+    RETURNS void
     LANGUAGE 'plpython3u'
     COST 100
     VOLATILE PARALLEL UNSAFE
@@ -51,8 +52,7 @@ for i in items:
 	if i not in items_active:
 		plpy.execute(plan, [f_flat, i])
 
-return 1
 $BODY$;
 
-ALTER FUNCTION public.add_technics(integer, text, integer)
+alter FUNCTION public.add_technics(integer, text, integer)
     OWNER TO ivan;

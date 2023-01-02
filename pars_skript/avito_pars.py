@@ -2,6 +2,7 @@ from bs4 import BeautifulSoup as Bs
 from transliterate import translit
 from itertools import groupby
 
+
 def ads_type(soup) -> str:
     lst = ['Новостройки', 'Вторичка']
     for t in lst:
@@ -202,8 +203,8 @@ def seller(soup):
         type_seller = None
     finally:
         return {
-            'S_Name_Seller': seller,
-            'S_Type_Of_Seller': type_seller
+            'S_Seller': seller,
+            'S_Seller_Type': type_seller
         }
 
 
@@ -374,7 +375,7 @@ def new_building_name(soup):
         return new_building_name
 
 
-def get_full_street(soup, city) ->str:
+def get_full_street(soup, city) -> str:
     lst_keyword = [
         'район', 'округ', 'пос.', 'область', 'микрорайон', 'жилой комплекс', 'г.о.', 'посёлок', 'СНТ'
     ]
@@ -395,24 +396,21 @@ def get_full_street(soup, city) ->str:
             if n in i:
                 i = ''
         lst.append(i)
-    lst = [x for x, _ in groupby(lst)]
-    if '' in lst:
-        lst.remove('')
-    lst[0] = ' '.join(reversed(sorted(lst[0].split(' '))))
     print(lst)
     return ', '.join(lst)
 
 
-def parsAvitoFlat(html: str, url: str, city:str) -> dict:
+def parsAvitoFlat(html: str, url: str, city: str) -> dict:
     soup = Bs(html, 'html.parser')
     price = soup.find('span', itemprop="price")
     price = int(price['content'])
-    flat_id = int(url[url.rfind('_') + 1:])
+    site_id = int(url[url.rfind('_') + 1:])
     soup = Bs(html, 'html.parser')
 
     return {
+        'site_id': site_id,
         'S_City': get_city(url),
-        'S_Full_Street': get_full_street(soup, city=city),
+        'S_Street': get_full_street(soup, city=city),
         'S_District': district(soup),
         'S_Qty_Room': qty_of_rooms(soup),
         'N_Qty_Total_Space': total_space(soup),
@@ -422,22 +420,22 @@ def parsAvitoFlat(html: str, url: str, city:str) -> dict:
         'N_Floor': floor(soup),
         'B_Balcony': balkon(soup),
         'B_Loggia': loggia(soup),
-        'S_Type_Of_Room': room_type(soup),
+        'S_Type_Room': room_type(soup),
         'S_Ads_Type': ads_type(soup),
         'N_Ceiling_Height': ceiling_height(soup),
-        'S_Type_Bathroom': bathroom(soup),
+        'S_Bathroom_Type': bathroom(soup),
         'S_Window': window(soup),
-        'S_Kind_Of_Repair': repair(soup),
+        'S_Repair_Type': repair(soup),
         'B_Heating': warm_floor(soup),
         'S_Furniture': furniture(soup),
         'S_Technics': technics(soup),
-        'S_Decorating': decorating(soup),
+        'S_decoration': decorating(soup),
         'S_Method_Of_Sale': selling_method(soup),
-        'S_Type_Of_Transaction': transaction_type(soup),
+        'S_Transaction_Type': transaction_type(soup),
         'S_Description': description(soup),
         'S_Type_House': type_of_home(soup),
         'N_Year_Building': year_of_construction(soup),
-        'N_Floor_In_House': floors_in_the_house(soup),
+        'S_Qty_floor': floors_in_the_house(soup),
         'B_Passenger_Elevator': passenger_bodice(soup),
         'B_Freight_Elevator': service_lift(soup),
         'S_Yard': yard(soup),

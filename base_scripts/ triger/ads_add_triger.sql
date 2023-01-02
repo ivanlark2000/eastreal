@@ -47,6 +47,10 @@ CREATE trigger ps_ads_position_add_date
 BEFORE INSERT ON ps_ads_position FOR EACH ROW
 EXECUTE PROCEDURE Add_Date();
 
+CREATE trigger mn_apartments_add_date
+BEFORE INSERT ON mn_apartments_ads FOR EACH ROW
+EXECUTE PROCEDURE Add_Date();
+
 CREATE trigger ps_json_object
 BEFORE INSERT ON mn_json_object FOR EACH ROW
 EXECUTE PROCEDURE pars_json();

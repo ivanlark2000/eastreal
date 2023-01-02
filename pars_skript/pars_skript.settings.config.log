@@ -1,0 +1,84 @@
+PARSER 2023-01-01 19:13:55,241 CRITICAL httpx.HTTPStatusError: Client error '403 ' for url 'https://cleaner.dadata.ru/api/v1/clean/address'
+For more information check: https://httpstatuses.com/403
+CONTEXT:  Traceback (most recent call last):
+  PL/Python function "get_position_house", line 14, in <module>
+    result = dadata.clean("address", f"{city} {street} {n_house}")
+  PL/Python function "get_position_house", line 165, in clean
+  PL/Python function "get_position_house", line 58, in clean
+  PL/Python function "get_position_house", line 42, in _post
+  PL/Python function "get_position_house", line 744, in raise_for_status
+PL/Python function "get_position_house"
+PL/pgSQL assignment "arr_coord = (SELECT get_position_house(NEW.s_city, NEW.s_street, NEW.n_street))"
+PL/pgSQL function load_ads_to_base() line 76 at assignment
+Traceback (most recent call last):
+  File "/home/ivan/PROJECT/RealEstate/pars_skript/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.ExternalRoutineException: httpx.HTTPStatusError: Client error '403 ' for url 'https://cleaner.dadata.ru/api/v1/clean/address'
+For more information check: https://httpstatuses.com/403
+CONTEXT:  Traceback (most recent call last):
+  PL/Python function "get_position_house", line 14, in <module>
+    result = dadata.clean("address", f"{city} {street} {n_house}")
+  PL/Python function "get_position_house", line 165, in clean
+  PL/Python function "get_position_house", line 58, in clean
+  PL/Python function "get_position_house", line 42, in _post
+  PL/Python function "get_position_house", line 744, in raise_for_status
+PL/Python function "get_position_house"
+PL/pgSQL assignment "arr_coord = (SELECT get_position_house(NEW.s_city, NEW.s_street, NEW.n_street))"
+PL/pgSQL function load_ads_to_base() line 76 at assignment
+
+PARSER 2023-01-01 19:14:01,417 CRITICAL httpx.HTTPStatusError: Client error '403 ' for url 'https://cleaner.dadata.ru/api/v1/clean/address'
+For more information check: https://httpstatuses.com/403
+CONTEXT:  Traceback (most recent call last):
+  PL/Python function "get_position_house", line 14, in <module>
+    result = dadata.clean("address", f"{city} {street} {n_house}")
+  PL/Python function "get_position_house", line 165, in clean
+  PL/Python function "get_position_house", line 58, in clean
+  PL/Python function "get_position_house", line 42, in _post
+  PL/Python function "get_position_house", line 744, in raise_for_status
+PL/Python function "get_position_house"
+PL/pgSQL assignment "arr_coord = (SELECT get_position_house(NEW.s_city, NEW.s_street, NEW.n_street))"
+PL/pgSQL function load_ads_to_base() line 76 at assignment
+Traceback (most recent call last):
+  File "/home/ivan/PROJECT/RealEstate/pars_skript/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.ExternalRoutineException: httpx.HTTPStatusError: Client error '403 ' for url 'https://cleaner.dadata.ru/api/v1/clean/address'
+For more information check: https://httpstatuses.com/403
+CONTEXT:  Traceback (most recent call last):
+  PL/Python function "get_position_house", line 14, in <module>
+    result = dadata.clean("address", f"{city} {street} {n_house}")
+  PL/Python function "get_position_house", line 165, in clean
+  PL/Python function "get_position_house", line 58, in clean
+  PL/Python function "get_position_house", line 42, in _post
+  PL/Python function "get_position_house", line 744, in raise_for_status
+PL/Python function "get_position_house"
+PL/pgSQL assignment "arr_coord = (SELECT get_position_house(NEW.s_city, NEW.s_street, NEW.n_street))"
+PL/pgSQL function load_ads_to_base() line 76 at assignment
+
+PARSER 2023-01-01 19:14:07,487 CRITICAL httpx.HTTPStatusError: Client error '403 ' for url 'https://cleaner.dadata.ru/api/v1/clean/address'
+For more information check: https://httpstatuses.com/403
+CONTEXT:  Traceback (most recent call last):
+  PL/Python function "get_position_house", line 14, in <module>
+    result = dadata.clean("address", f"{city} {street} {n_house}")
+  PL/Python function "get_position_house", line 165, in clean
+  PL/Python function "get_position_house", line 58, in clean
+  PL/Python function "get_position_house", line 42, in _post
+  PL/Python function "get_position_house", line 744, in raise_for_status
+PL/Python function "get_position_house"
+PL/pgSQL assignment "arr_coord = (SELECT get_position_house(NEW.s_city, NEW.s_street, NEW.n_street))"
+PL/pgSQL function load_ads_to_base() line 76 at assignment
+Traceback (most recent call last):
+  File "/home/ivan/PROJECT/RealEstate/pars_skript/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.ExternalRoutineException: httpx.HTTPStatusError: Client error '403 ' for url 'https://cleaner.dadata.ru/api/v1/clean/address'
+For more information check: https://httpstatuses.com/403
+CONTEXT:  Traceback (most recent call last):
+  PL/Python function "get_position_house", line 14, in <module>
+    result = dadata.clean("address", f"{city} {street} {n_house}")
+  PL/Python function "get_position_house", line 165, in clean
+  PL/Python function "get_position_house", line 58, in clean
+  PL/Python function "get_position_house", line 42, in _post
+  PL/Python function "get_position_house", line 744, in raise_for_status
+PL/Python function "get_position_house"
+PL/pgSQL assignment "arr_coord = (SELECT get_position_house(NEW.s_city, NEW.s_street, NEW.n_street))"
+PL/pgSQL function load_ads_to_base() line 76 at assignment
+

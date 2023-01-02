@@ -1,19 +1,9 @@
-import requests
-import json
-overpass_url = "http://overpass-api.de/api/interpreter"
-overpass_query = """
-[out:json];
-area[name="Калининград"];
-nwr[leisure=park](area);
-out center;
-"""
-response = requests.get(overpass_url,
-                        params={'data': overpass_query})
+from dadata import Dadata
 
-for i in response.json()['elements']:
-    print(json.dumps(i))
-    try:
-        print(i['tags']['name'], i['tags']['operator'],)
-    except:
-        continue
-    #print(i['id'], i['center']['lat'], i['center']['lon'])
+api_key = '43b0036c75f55f532a18d6291423bd960c45304b'
+secret = '14a01cfb738a67787f176342817c8c6aabbeda77'
+
+with Dadata(api_key, secret) as dadata:
+    rez = dadata.suggest(name='address', query='Калининград 3-я Б. Окружная')
+    for r in rez:
+        print(r)

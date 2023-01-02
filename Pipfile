@@ -11,7 +11,7 @@ transliterate = "*"
 requests = "*"
 selenium = "*"
 webdriver-manager = "*"
-geopy = "*"
+dadata = "*"
 
 [dev-packages]
 

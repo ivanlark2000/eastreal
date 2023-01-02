@@ -1,4 +1,4 @@
-
+--DROP FUNCTION load_json_object(f_city integer, city varchar(150), f_object integer, tags text[])
 CREATE OR REPLACE FUNCTION load_json_object(f_city integer, city varchar(150), f_object integer, tags text[])
 RETURNS boolean
 AS
