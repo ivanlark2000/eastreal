@@ -3,34 +3,131 @@ from dadata import Dadata
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
-from selenium.webdriver import ActionChains
+from selenium.webdriver.chrome.options import Options
+from pars_skript.settings.config import config, logger
 
+chrom_option = Options()
 api_key = '43b0036c75f55f532a18d6291423bd960c45304b'
 secret = '14a01cfb738a67787f176342817c8c6aabbeda77'
 
-driver = webdriver.Chrome()
 
-url = 'https://yandex.ru/maps'
-
-with Dadata(api_key, secret) as dadata:
-    address = dadata.suggest(name='address', query='Калининград 3-я Б. Окружная 243')[0]['value']
-
-driver.get(url)
-
-while True:
+def get_right_street(street: str) -> str:
     try:
-        action = ActionChains(driver)
-        el = driver.find_element(By.TAG_NAME, 'input')
-        el.send_keys(address, Keys.ENTER)
-        time.sleep(3)
-        break
+        with Dadata(api_key, secret) as dadata:
+            address = dadata.suggest(name='address', query=street)[0]['value']
+            dadata.close()
+        return address
     except Exception as e:
-        time.sleep(3)
+        logger.warning(f'Не удалось получить данные в Дадата адрес {address} '
+                       f'ошибка {e}')
 
-coord = driver.find_element(By.CLASS_NAME, 'toponym-card-title-view__coords-badge').text.split(', ')
 
-lat = float(coord[0])
-lon = float(coord[1])
+def get_position_ya(adress: str) -> tuple[float, float]:
+    url = 'https://yandex.ru/maps'
+    chrom_option.add_argument("--headless")
+    driver = webdriver.Chrome(options=chrom_option)
+    try:
+        driver.get(url)
+        while True:
+            try:
+                el = driver.find_element(By.TAG_NAME, 'input')
+                el.send_keys(adress, Keys.ENTER)
+                time.sleep(3)
+                break
+            except Exception as e:
+                logger.info('Обновления id элемента яндекс')
+        lst = driver.find_element(By.CLASS_NAME, 'toponym-card-title-view__coords-badge').text.split(', ')
+        return float(lst[0]), float(lst[1])
+    except Exception as e:
+        logger.warning(f'Не удалось получить координаты с яндекс улица {adress} {e}')
 
-print(lat)
-print(lon)
+
+def get_all_street_without_coord(conn):
+
+    sql = """SELECT 
+            h.link
+            ,s.link
+            ,c.c_name
+            ,s.c_name
+            ,h.s_number
+            ,full_address
+        FROM mn_house h
+            INNER JOIN fs_street s
+                ON s.link = h.f_street
+            INNER JOIN fs_city c
+                ON c.link = s.f_city
+        WHERE 1=1
+            AND h.lat IS NULL AND h.lon IS NULL
+            AND s_number <> ''"""
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        rez = cursor.fetchall()
+        cursor.close()
+        return rez
+    except Exception:
+        logger.warning('''Не удалось получить список домов без координат с БД''', exc_info=True)
+    finally:
+        cursor.close()
+
+
+def add_coord_to_base(id: int, lat: float, lon: float, conn: object):
+    sql = f"""UPDATE mn_house 
+            SET lat = {lat}, lon = {lon}
+            WHERE link = {id}"""
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql)
+        conn.commit()
+    except Exception:
+        logger.warning(f'''Не удалось добавить координаты в БД
+                            id_house = {id}
+                            coord = {lat}, {lon}''',
+                       exc_info=True)
+    finally:
+        cursor.close()
+
+
+def add_full_address(conn: object, streetid: int, full_adress: str):
+    sql = f"""
+            UPDATE fs_street 
+            SET full_address = '{full_adress}'
+            WHERE link = {streetid}"""
+    try:
+        cursor = conn.cursor()
+        cursor.execute(sql)
+    except Exception:
+        logger.warning(f'''Не удалось загрузить в БД название полной улицы
+                           streetid     = {streetid},
+                           full_address = {full_adress}''',
+                       exc_info=True)
+    finally:
+        cursor.close()
+
+
+def add_coord_to_base():
+    conn = config.make_con()
+    data = get_all_street_without_coord(conn=conn)
+    count = len(data)
+    print(f'к обновлению {count} домов')
+    for row in data:
+        try:
+            if not row[5]:
+                print(row)
+                street = get_right_street(row[2] + " " + row[3].strip())
+                add_full_address(conn, streetid=row[1], full_adress=street)
+                print(f'{count}  {street}')
+                if not street:
+                    street = row[2] + " " + row[3].strip()
+                street = street + ' ' + row[4].strip()
+                lat, lon = get_position_ya(street)
+                print(lat, lon)
+                add_coord_to_base(row[0], lat, lon, conn)
+            else:
+                street = row[2] + ' ' + row[5] + ' ' + row[4].strip()
+                lat, lon = get_position_ya(street)
+                add_coord_to_base(row[0], lat, lon, conn)
+        except Exception as e:
+            logger.info(exc_info=True)
+        finally:
+            count -= 1

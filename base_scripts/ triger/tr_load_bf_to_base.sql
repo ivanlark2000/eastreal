@@ -129,8 +129,7 @@ BEGIN
                 END IF;
 
             INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator,
-                b_freight_elevator, f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number,
-                lat, lon, fias)
+                b_freight_elevator, f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number)
             VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator,
                 NEW.b_freight_elevator, id_parking, id_yard, id_type_house,
                 id_official_builder, NEW.s_name_new_building, NEW.n_street)
