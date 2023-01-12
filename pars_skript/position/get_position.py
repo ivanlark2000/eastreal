@@ -11,14 +11,16 @@ api_key = '43b0036c75f55f532a18d6291423bd960c45304b'
 secret = '14a01cfb738a67787f176342817c8c6aabbeda77'
 
 
-def get_right_street(street: str) -> str:
+def get_right_street(street: str):
     try:
         with Dadata(api_key, secret) as dadata:
-            address = dadata.suggest(name='address', query=street)[0]['value']
+            address = dadata.suggest(name='address', query=street)
+            if not address:
+                return
             dadata.close()
-        return address
+        return address[0]['value']
     except Exception as e:
-        logger.warning(f'Не удалось получить данные в Дадата адрес {address} '
+        logger.warning(f'Не удалось получить данные в Дадата адрес {street} '
                        f'ошибка {e}')
 
 
@@ -43,7 +45,6 @@ def get_position_ya(adress: str) -> tuple[float, float]:
 
 
 def get_all_street_without_coord(conn):
-
     sql = """SELECT 
             h.link
             ,s.link
@@ -105,7 +106,7 @@ def add_full_address(conn: object, streetid: int, full_adress: str):
         cursor.close()
 
 
-def add_coord_to_base():
+def add_coord():
     conn = config.make_con()
     data = get_all_street_without_coord(conn=conn)
     count = len(data)
@@ -113,21 +114,23 @@ def add_coord_to_base():
     for row in data:
         try:
             if not row[5]:
-                print(row)
                 street = get_right_street(row[2] + " " + row[3].strip())
-                add_full_address(conn, streetid=row[1], full_adress=street)
-                print(f'{count}  {street}')
                 if not street:
                     street = row[2] + " " + row[3].strip()
+                else:
+                    add_full_address(conn, streetid=row[1], full_adress=street)
                 street = street + ' ' + row[4].strip()
                 lat, lon = get_position_ya(street)
-                print(lat, lon)
                 add_coord_to_base(row[0], lat, lon, conn)
             else:
                 street = row[2] + ' ' + row[5] + ' ' + row[4].strip()
                 lat, lon = get_position_ya(street)
                 add_coord_to_base(row[0], lat, lon, conn)
+            logger.info(f'Данные по координатам по адресу {street} получены успешно ')
         except Exception as e:
-            logger.info(exc_info=True)
+            logger.info('inf', exc_info=True)
         finally:
             count -= 1
+
+
+add_coord()

@@ -1,6 +1,5 @@
 from bs4 import BeautifulSoup as Bs
 from transliterate import translit
-from itertools import groupby
 
 
 def ads_type(soup) -> str:

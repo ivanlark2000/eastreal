@@ -17,3 +17,8 @@ BEGIN
 RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE TRIGGER unpack_inf_factory
+    BEFORE INSERT ON inf_factory
+    FOR EACH ROW
+    EXECUTE PROCEDURE pars_json();

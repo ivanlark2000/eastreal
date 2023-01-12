@@ -51,8 +51,9 @@ BEGIN
             END IF;
 
     ELSE
-        SELECT link INTO id_street FROM Fs_Street
-        WHERE C_Name = NEW.s_street AND F_City = id_city;
+        SELECT link INTO id_street FROM fs_street
+        WHERE C_Name = RTRIM(LTRIM(NEW.s_street)) AND f_city = id_city
+        LIMIT 1;
 
         IF id_street IS NULL
             THEN
@@ -64,8 +65,9 @@ BEGIN
 
         SELECT link INTO id_house FROM MN_House
         WHERE 1=1
-            AND s_number = NEW.n_street
-            AND f_street = id_street;
+            AND s_number = LTRIM(RTRIM(NEW.n_street))
+            AND f_street = id_street
+        LIMIT 1;
 
         IF id_house IS NULL THEN
 
@@ -128,11 +130,10 @@ BEGIN
                     END IF;
                 END IF;
 
-            INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator,
-                b_freight_elevator, f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number)
-            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator,
-                NEW.b_freight_elevator, id_parking, id_yard, id_type_house,
-                id_official_builder, NEW.s_name_new_building, NEW.n_street)
+            INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
             RETURNING link INTO id_house;
             END IF;
 
@@ -147,8 +148,6 @@ BEGIN
                 INSERT INTO fs_qty_room (c_name)
                 VALUES (NEW.s_qty_room)
                 RETURNING link AS id_qty_room;
-
-
                 END IF;
             END IF;
 
@@ -267,6 +266,7 @@ BEGIN
                     VALUES (NEW.s_seller_type)
                     RETURNING link INTO id_seller_type;
                     END IF;
+                END IF;
 
             IF id_seller IS NULL
                 THEN
@@ -328,8 +328,6 @@ BEGIN
 
         INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id)
         VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, siteid);
-
-		END IF;
 	END IF;
 	RETURN NEW;
 END;
