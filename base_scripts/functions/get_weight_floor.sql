@@ -1,0 +1,1 @@
+CREATE OR REPLACE FUNCTION get_weight_floor()

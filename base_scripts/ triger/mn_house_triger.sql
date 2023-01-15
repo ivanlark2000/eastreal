@@ -12,7 +12,8 @@ RETURN NEW;
 END;
 $BODY$;
 
-CREATE TRIGGER del_whitespace_mn_house
+
+CREATE OR REPLACE TRIGGER del_whitespace_mn_house
     BEFORE INSERT
     ON public.mn_house
     FOR EACH ROW
@@ -40,26 +41,17 @@ BEGIN
         get_weight_factory(MIN(distance))
     INTO weight
     FROM fact;
-
-    SELECT f_house INTO house_id
-    FROM mn_house_metrics
-    WHERE f_house = NEW.link;
-
-    IF house_id IS NULL THEN
-        INSERT INTO mn_house_metrics (f_house)
-        VALUES (NEW.link);
-    END IF;
-
-    UPDATE mn_house_metrics
+	
+    UPDATE mn_metrics
     SET factory = weight
     WHERE f_house = NEW.link;
-
+	
     RETURN NEW;
 END;
 $BODY$
-LANGUAGE plpgsql
+LANGUAGE plpgsql;
 
-CREATE TRIGGER add_house_metrics
+CREATE OR REPLACE TRIGGER add_house_metrics
     AFTER UPDATE
     ON public.mn_house
     FOR EACH ROW

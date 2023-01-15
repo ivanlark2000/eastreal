@@ -1,5 +1,5 @@
 --функция для расчета веса близости производств и котельных
-CREATE OR REPLACE FUNCTION get_weight_factory(distance integer, OUT weight numeric)
+CREATE OR REPLACE FUNCTION get_weight_factory(distance numeric, OUT weight numeric)
 AS
 $BODY$
 

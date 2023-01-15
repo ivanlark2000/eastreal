@@ -328,6 +328,9 @@ BEGIN
 
         INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id)
         VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, siteid);
+
+	INSERT INTO mn_metrics (f_house, f_flat, f_city)
+	VALUES (id_house, id_apartments_ads, id_city);
 	END IF;
 	RETURN NEW;
 END;

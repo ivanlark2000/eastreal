@@ -1,7 +1,7 @@
 -- функция для расчета расстояния между двумя точками на плоскости
 -- DROP FUNCTION calculation_position(lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric)
 CREATE OR REPLACE FUNCTION calculation_position(lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric)
-RETURNS smallint
+RETURNS numeric
 AS
 $BODY$
 DECLARE
