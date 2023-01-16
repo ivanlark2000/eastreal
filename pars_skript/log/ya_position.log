@@ -1,0 +1,148 @@
+PARSER_DIST 2023-01-16 18:29:38,439 INFO Обновления id элемента яндекс
+PARSER_DIST 2023-01-16 18:29:41,743 WARNING Не удалось получить координаты с яндекс улица Калининград г Калининград, ул Орудийная ЖК «Трио» Message: no such element: Unable to locate element: {"method":"css selector","selector":".toponym-card-title-view__coords-badge"}
+  (Session info: headless chrome=108.0.5359.124)
+Stacktrace:
+#0 0x558ce16fb2a3 <unknown>
+#1 0x558ce14b9f77 <unknown>
+#2 0x558ce14f680c <unknown>
+#3 0x558ce14f6a71 <unknown>
+#4 0x558ce1530734 <unknown>
+#5 0x558ce1516b5d <unknown>
+#6 0x558ce152e47c <unknown>
+#7 0x558ce1516903 <unknown>
+#8 0x558ce14e9ece <unknown>
+#9 0x558ce14eafde <unknown>
+#10 0x558ce174b63e <unknown>
+#11 0x558ce174eb79 <unknown>
+#12 0x558ce173189e <unknown>
+#13 0x558ce174fa83 <unknown>
+#14 0x558ce1724505 <unknown>
+#15 0x558ce1770ca8 <unknown>
+#16 0x558ce1770e36 <unknown>
+#17 0x558ce178c333 <unknown>
+#18 0x7f3f7baa6b43 <unknown>
+
+PARSER_DIST 2023-01-16 18:29:41,804 INFO inf
+Traceback (most recent call last):
+  File "/home/ivan/PROJECT/RealEstate/pars_skript/position/get_position.py", line 139, in add_coord
+    lat, lon = get_position_ya(street)
+TypeError: cannot unpack non-iterable NoneType object
+PARSER_DIST 2023-01-16 18:29:47,672 WARNING Не удалось получить координаты с яндекс улица Калининград Горького/3-я Большая Окружная ЖК «Альпенштадт» Message: no such element: Unable to locate element: {"method":"css selector","selector":".toponym-card-title-view__coords-badge"}
+  (Session info: headless chrome=108.0.5359.124)
+Stacktrace:
+#0 0x55b8ea0582a3 <unknown>
+#1 0x55b8e9e16f77 <unknown>
+#2 0x55b8e9e5380c <unknown>
+#3 0x55b8e9e53a71 <unknown>
+#4 0x55b8e9e8d734 <unknown>
+#5 0x55b8e9e73b5d <unknown>
+#6 0x55b8e9e8b47c <unknown>
+#7 0x55b8e9e73903 <unknown>
+#8 0x55b8e9e46ece <unknown>
+#9 0x55b8e9e47fde <unknown>
+#10 0x55b8ea0a863e <unknown>
+#11 0x55b8ea0abb79 <unknown>
+#12 0x55b8ea08e89e <unknown>
+#13 0x55b8ea0aca83 <unknown>
+#14 0x55b8ea081505 <unknown>
+#15 0x55b8ea0cdca8 <unknown>
+#16 0x55b8ea0cde36 <unknown>
+#17 0x55b8ea0e9333 <unknown>
+#18 0x7fb1dc70db43 <unknown>
+
+PARSER_DIST 2023-01-16 18:29:47,725 INFO inf
+Traceback (most recent call last):
+  File "/home/ivan/PROJECT/RealEstate/pars_skript/position/get_position.py", line 135, in add_coord
+    lat, lon = get_position_ya(street)
+TypeError: cannot unpack non-iterable NoneType object
+PARSER_DIST 2023-01-16 18:29:53,651 WARNING Не удалось получить координаты с яндекс улица Калининград Виктора Денисова/Флотская/Аксакова/Кипарисовая/Рихарда Зорге/Нальчикская/Таврическая/пр-д Крымский ЖК «Восто к» Message: no such element: Unable to locate element: {"method":"css selector","selector":".toponym-card-title-view__coords-badge"}
+  (Session info: headless chrome=108.0.5359.124)
+Stacktrace:
+#0 0x5615982592a3 <unknown>
+#1 0x561598017f77 <unknown>
+#2 0x56159805480c <unknown>
+#3 0x561598054a71 <unknown>
+#4 0x56159808e734 <unknown>
+#5 0x561598074b5d <unknown>
+#6 0x56159808c47c <unknown>
+#7 0x561598074903 <unknown>
+#8 0x561598047ece <unknown>
+#9 0x561598048fde <unknown>
+#10 0x5615982a963e <unknown>
+#11 0x5615982acb79 <unknown>
+#12 0x56159828f89e <unknown>
+#13 0x5615982ada83 <unknown>
+#14 0x561598282505 <unknown>
+#15 0x5615982ceca8 <unknown>
+#16 0x5615982cee36 <unknown>
+#17 0x5615982ea333 <unknown>
+#18 0x7f0832377b43 <unknown>
+
+PARSER_DIST 2023-01-16 18:29:53,704 INFO inf
+Traceback (most recent call last):
+  File "/home/ivan/PROJECT/RealEstate/pars_skript/position/get_position.py", line 135, in add_coord
+    lat, lon = get_position_ya(street)
+TypeError: cannot unpack non-iterable NoneType object
+PARSER_DIST 2023-01-16 18:29:59,770 INFO Данные по координатам по адресу Калининград г Калининград, ул Ростовская 15 получены успешно 
+PARSER_DIST 2023-01-16 18:30:01,074 INFO Обновления id элемента яндекс
+PARSER_DIST 2023-01-16 18:30:04,541 INFO Данные по координатам по адресу Калининград г Калининград, ул Ю.Гагарина 135 получены успешно 
+PARSER_DIST 2023-01-16 18:30:05,913 INFO Обновления id элемента яндекс
+PARSER_DIST 2023-01-16 18:30:09,434 INFO Данные по координатам по адресу Калининград г Калининград, Московский пр-кт 144 получены успешно 
+PARSER_DIST 2023-01-16 18:30:14,881 INFO Данные по координатам по адресу Калининград г Калининград, ул Дзержинского 51 получены успешно 
+PARSER_DIST 2023-01-16 18:30:20,416 INFO Данные по координатам по адресу Калининград г Калининград, ул Минусинская 17 получены успешно 
+PARSER_DIST 2023-01-16 18:30:25,830 INFO Данные по координатам по адресу Калининград г Калининград, Южный б-р 3 получены успешно 
+PARSER_DIST 2023-01-16 18:30:31,487 INFO Данные по координатам по адресу Калининград г Калининград, ул Ю.Гагарина 76А получены успешно 
+PARSER_DIST 2023-01-16 18:30:37,000 INFO Данные по координатам по адресу Калининград г Калининград, ул Вагоностроительная 33 получены успешно 
+PARSER_DIST 2023-01-16 18:30:42,524 INFO Данные по координатам по адресу Калининград г Калининград, ул Красноармейская 3 получены успешно 
+PARSER_DIST 2023-01-16 18:30:47,949 INFO Данные по координатам по адресу Калининград г Калининград, ул Чаадаева 13 получены успешно 
+PARSER_DIST 2023-01-16 18:30:53,373 INFO Данные по координатам по адресу Калининград Южное Полукольцо 6  к2 получены успешно 
+PARSER_DIST 2023-01-16 18:30:58,842 INFO Данные по координатам по адресу Калининград г Калининград, ул Багратиона 132 получены успешно 
+PARSER_DIST 2023-01-16 18:31:00,291 INFO Обновления id элемента яндекс
+PARSER_DIST 2023-01-16 18:31:03,780 INFO Данные по координатам по адресу Калининград г Калининград, ул Артиллерийская 47 получены успешно 
+PARSER_DIST 2023-01-16 18:31:09,326 INFO Данные по координатам по адресу Калининград г Калининград, ул Земельная 12 получены успешно 
+PARSER_DIST 2023-01-16 18:31:14,828 INFO Данные по координатам по адресу Калининград г Калининград, ул Орудийная 79 получены успешно 
+PARSER_DIST 2023-01-16 18:31:20,272 INFO Данные по координатам по адресу Калининград г Калининград, ул Космонавта Леонова 64А получены успешно 
+PARSER_DIST 2023-01-16 18:31:26,297 INFO Данные по координатам по адресу Калининград г Калининград, ул Беговая 3 получены успешно 
+PARSER_DIST 2023-01-16 18:31:31,799 INFO Данные по координатам по адресу Калининград г Калининград, ул Маршала Жукова 5 получены успешно 
+PARSER_DIST 2023-01-16 18:31:37,833 INFO Данные по координатам по адресу Калининград г Калининград, ул О.Кошевого 44 получены успешно 
+PARSER_DIST 2023-01-16 18:31:43,357 INFO Данные по координатам по адресу Калининград г Калининград, ул Красная 28 получены успешно 
+PARSER_DIST 2023-01-16 18:31:49,015 INFO Данные по координатам по адресу Калининград Вали Котика 4 получены успешно 
+PARSER_DIST 2023-01-16 18:31:50,489 INFO Обновления id элемента яндекс
+PARSER_DIST 2023-01-16 18:31:53,942 INFO Данные по координатам по адресу Калининград г Калининград, ул Первомайская 6 получены успешно 
+PARSER_DIST 2023-01-16 18:31:55,274 INFO Обновления id элемента яндекс
+PARSER_DIST 2023-01-16 18:31:58,779 INFO Данные по координатам по адресу Калининград г Калининград, ул 9 Апреля 74 получены успешно 
+PARSER_DIST 2023-01-16 18:32:04,237 INFO Данные по координатам по адресу Калининград г Калининград, ул Счастливая 6 к2 получены успешно 
+PARSER_DIST 2023-01-16 18:32:09,717 INFO Данные по координатам по адресу Калининград г Калининград, ул Маршала Баграмяна 32 получены успешно 
+PARSER_DIST 2023-01-16 18:32:15,584 INFO Данные по координатам по адресу Калининград г Калининград, ул Пригородная 13 к1 получены успешно 
+PARSER_DIST 2023-01-16 18:32:21,658 INFO Данные по координатам по адресу Калининград г Калининград, ул Черниговская 19 получены успешно 
+PARSER_DIST 2023-01-16 18:32:26,996 WARNING Не удалось получить координаты с яндекс улица Калининград г Калининград, ул Елизаветинская ЖК «Янтарный» Message: no such element: Unable to locate element: {"method":"css selector","selector":".toponym-card-title-view__coords-badge"}
+  (Session info: headless chrome=108.0.5359.124)
+Stacktrace:
+#0 0x55d00013d2a3 <unknown>
+#1 0x55cfffefbf77 <unknown>
+#2 0x55cffff3880c <unknown>
+#3 0x55cffff38a71 <unknown>
+#4 0x55cffff72734 <unknown>
+#5 0x55cffff58b5d <unknown>
+#6 0x55cffff7047c <unknown>
+#7 0x55cffff58903 <unknown>
+#8 0x55cffff2bece <unknown>
+#9 0x55cffff2cfde <unknown>
+#10 0x55d00018d63e <unknown>
+#11 0x55d000190b79 <unknown>
+#12 0x55d00017389e <unknown>
+#13 0x55d000191a83 <unknown>
+#14 0x55d000166505 <unknown>
+#15 0x55d0001b2ca8 <unknown>
+#16 0x55d0001b2e36 <unknown>
+#17 0x55d0001ce333 <unknown>
+#18 0x7f52533d6b43 <unknown>
+
+PARSER_DIST 2023-01-16 18:32:27,050 INFO inf
+Traceback (most recent call last):
+  File "/home/ivan/PROJECT/RealEstate/pars_skript/position/get_position.py", line 139, in add_coord
+    lat, lon = get_position_ya(street)
+TypeError: cannot unpack non-iterable NoneType object
+PARSER_DIST 2023-01-16 18:32:32,522 INFO Данные по координатам по адресу Калининград г Калининград, ул Карташева 46Д получены успешно 
+PARSER_DIST 2023-01-16 18:32:38,057 INFO Данные по координатам по адресу Калининград г Калининград, ул Грига 38 получены успешно 
+PARSER_DIST 2023-01-16 18:32:43,537 INFO Данные по координатам по адресу Калининград г Калининград, ул Корсунская 5А получены успешно 

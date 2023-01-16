@@ -1,9 +1,18 @@
+import logging
 from def_list import *
-from settings.config import logger
 from avito_pars import parsAvitoFlat
-from load_to_base import load_to_base
 from urllib.error import HTTPError
 from transliterate import translit
+from pars_skript.load_to_base import load_to_base
+
+logger = logging.getLogger('PARSER')
+logger.setLevel(logging.INFO)
+
+handler = logging.FileHandler(f'log/pars_avito.log', 'w')
+formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+
+handler.setFormatter(formatter)
+logger.addHandler(handler)
 
 CITY_RUS = 'Калининград'
 CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)

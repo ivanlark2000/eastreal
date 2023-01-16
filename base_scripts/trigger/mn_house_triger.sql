@@ -14,10 +14,10 @@ BEGIN
 	
 	SELECT COUNT(*) 
 	INTO N_House
-	FROM mn_json_biulding b
+	FROM mn_json_building b
 	WHERE 1=1  
 		AND f_city = NEW.f_city
-		AND update_openstreet_objects(NEW.lat, NEW.lon, b.latitude, b.longitude) < 200;
+		AND calculation_position(NEW.lat, NEW.lon, b.latitude, b.longitude) < 200;
 	
 	NEW.N_Count_House = N_House;
 
@@ -27,7 +27,7 @@ $BODY$;
 
 
 CREATE OR REPLACE TRIGGER del_whitespace_mn_house
-    BEFORE INSERT
+    BEFORE INSERT OR UPDATE
     ON public.mn_house
     FOR EACH ROW
     EXECUTE FUNCTION public.del_whitespace_mn_house();

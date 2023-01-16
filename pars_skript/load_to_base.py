@@ -1,4 +1,4 @@
-from pars_skript.settings.config import config, logger
+from pars_skript.settings.config import config
 
 
 lst_arg = [
@@ -62,6 +62,7 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
 
 
 def load_to_base(dct) -> None:
+    from pars_skript.main import logger
     atr = arg_value(lst_arg, dct)
     try:
         conn = config.make_con()

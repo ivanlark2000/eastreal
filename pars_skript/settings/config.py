@@ -1,19 +1,9 @@
 import os
-import logging
 import psycopg2
 from dotenv import load_dotenv
 
 
 load_dotenv(override=True)
-
-logger = logging.getLogger('PARSER')
-logger.setLevel(logging.INFO)
-
-handler = logging.FileHandler(f'{__name__}.log', 'w')
-formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-
-handler.setFormatter(formatter)
-logger.addHandler(handler)
 
 
 class Config:
