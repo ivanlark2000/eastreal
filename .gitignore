@@ -10,11 +10,9 @@ pars_skript/settings/.env
 /sys/flat.html
 /sys/geckodriver
 /sys/chromedriver
-geckodriver.log!/alembic.ini
 /__pycache__
-alembic/__pycache__
 app/__pycache__
-!/alembic.ini
-!/alembic.ini
+/log
+
 
 
