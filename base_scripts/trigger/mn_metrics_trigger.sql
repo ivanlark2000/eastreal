@@ -1,6 +1,7 @@
 -- Триггер к таблце 'mn_metrics'
 --CREATE DATE 2023-01-14 
 -- 2023-01-15 Добавили общий вес по этажу
+-- 2023-01-17 Добавили вес по температуре
 
 CREATE OR REPLACE FUNCTION tr_metrics()
 RETURNS TRIGGER
@@ -9,6 +10,7 @@ $BODY$
 DECLARE
 	value numeric(3,2);
 	w_factory numeric(3,2);
+	temperature numeric(3,2);
 
 BEGIN
 	WITH fact (distance)
@@ -26,9 +28,13 @@ BEGIN
 	
 	NEW.factory = w_factory;
 
-	SELECT AVG(air) INTO value
-	FROM mn_metrics
-	WHERE f_city = NEW.f_city;
+	SELECT weight INTO value
+	FROM fs_index_pollution i
+        INNER JOIN inf_air_pollution p
+            ON i.link = p.f_index 
+	WHERE p.f_city = NEW.f_city
+    ORDER BY d_date
+    LIMIT 1;
 	
 	NEW.air = value;
 	
@@ -41,6 +47,12 @@ BEGIN
 	IF NEW.factory IS NOT NULL THEN
 		NEW.factory_floor = get_weight_factory_floor(NEW.f_flat, NEW.factory);
 	END IF;
+
+	SELECT weigth INTO temperature
+	FROM inf_temperature
+	WHERE f_city = NEW.f_city;
+
+    NEW.w_temp = temperature;
 
 	RETURN NEW;
 END;

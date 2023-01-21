@@ -12,12 +12,12 @@ DECLARE
 BEGIN
     	NEW.s_number := RTRIM(LTRIM(NEW.s_number));
 	
-	SELECT COUNT(*) 
+	SELECT COUNT(*)
 	INTO N_House
-	FROM mn_json_building b
+	FROM mn_house b
 	WHERE 1=1  
 		AND f_city = NEW.f_city
-		AND calculation_position(NEW.lat, NEW.lon, b.latitude, b.longitude) < 200;
+		AND calculation_position(NEW.lat, NEW.lon, b.lat, b.lon) < 200;
 	
 	NEW.N_Count_House = N_House;
 

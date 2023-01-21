@@ -7,7 +7,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 from pars_skript.settings.config import config
 
-
 logger = logging.getLogger('PARSER_DIST')
 logger.setLevel(logging.INFO)
 
@@ -19,6 +18,7 @@ logger.addHandler(handler)
 
 
 chrom_option = Options()
+
 api_key = '43b0036c75f55f532a18d6291423bd960c45304b'
 secret = '14a01cfb738a67787f176342817c8c6aabbeda77'
 
