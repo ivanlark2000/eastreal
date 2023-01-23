@@ -16,5 +16,5 @@ pars_skript/__init__.py
 app/__pycache__
 /log
 
-
-
+!/pars_skript/pars_index/PIndx01.dbf
+!/pars_skript/position/test.py

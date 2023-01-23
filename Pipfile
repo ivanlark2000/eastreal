@@ -12,6 +12,10 @@ requests = "*"
 selenium = "*"
 webdriver-manager = "*"
 dadata = "*"
+bson = "*"
+dbfpy = "*"
+dbf-light = "*"
+dbfread = "*"
 
 [dev-packages]
 

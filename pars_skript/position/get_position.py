@@ -1,3 +1,4 @@
+import sys
 import time
 import logging
 from dadata import Dadata
@@ -5,6 +6,9 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
+
+sys.path.extend(['/home/lark/PROJECT/RealEstate'])
+
 from pars_skript.settings.config import config
 
 logger = logging.getLogger('PARSER_DIST')
@@ -15,7 +19,6 @@ formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
 
 handler.setFormatter(formatter)
 logger.addHandler(handler)
-
 
 chrom_option = Options()
 
