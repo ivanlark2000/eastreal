@@ -16,6 +16,8 @@ bson = "*"
 dbfpy = "*"
 dbf-light = "*"
 dbfread = "*"
+neovim = "*"
+black = "*"
 
 [dev-packages]
 

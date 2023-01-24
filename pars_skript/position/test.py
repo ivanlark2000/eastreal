@@ -1,12 +1,7 @@
-from dadata import Dadata
+import requests
 
-api_key = '43b0036c75f55f532a18d6291423bd960c45304b'
-secret = '14a01cfb738a67787f176342817c8c6aabbeda77'
+url = 'https://routing.openstreetmap.de/routed-car/route/v1/driving/20.5031,54.71529;20.50416,54.7147?overview=false&geometries=polyline&steps=true'
 
-addres = 'г. Калининград ул Изумрудная 14'
+response = requests.get(url)
 
-dadata = Dadata(api_key, secret)
-
-address = dadata.suggest(name='address', query=addres)
-
-print(address)
+print(response.json())

@@ -1,8 +1,12 @@
+import sys
 import logging
 from def_list import *
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
+
+sys.path.extend(['/home/lark/PROJECT/RealEstate'])
+
 from pars_skript.load_to_base import load_to_base
 
 logger = logging.getLogger('PARSER')
