@@ -20,6 +20,9 @@ app/__pycache__
 /pars_skript/position/test.py
 /pars_skript/position/__init__.py
 /pars_skript/position/__pycache__
+/pars_skript/position/chromedriver
+
+
 
 /pars_skript/log/
 /pars_skript/settings/__init__.py
