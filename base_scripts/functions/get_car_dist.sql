@@ -23,7 +23,7 @@ try:
     return int(response['routes'][0]['distance'])
 
 except Exception as Error:
-    plpy.notice(f'Не уалось получить дистанцию между ддомом № {f_house} и объектом № {f_object}\n {Error}')    
+    plpy.notice(f'Не уалось получить дистанцию между домом № {f_house} и объектом № {f_object}\n {Error}')    
 
 $BODY$
 LANGUAGE 'plpython3u'
