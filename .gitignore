@@ -18,6 +18,6 @@ app/__pycache__
 
 !/pars_skript/pars_index/PIndx01.dbf
 !/pars_skript/position/test.py
-!/pars_skript/log/
+/pars_skript/log/
 !/pars_skript/settings/__init__.py
 
