@@ -33,10 +33,8 @@ BEGIN
             AND calculation_position(lat1, lon1, latitude, longitude) < 3000
     LOOP
         
-        query = ' SELECT get_foot_car_dist('
-                ||house_id||', '||value.object_id||', '||lat1||', '||lon1||', '||value.lat||
-                ', '||value.lon||
-                ')';  
+        query = format('SELECT get_foot_car_dist(%s, %I, %s, %s, %s, %s)',
+                house_id, value.object_id, lat1, lon1, value.lat, value.lon); 
                 
         INSERT INTO ts_dist_task (f_status, query)
         VALUES (1, query);
