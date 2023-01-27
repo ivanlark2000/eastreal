@@ -2,8 +2,6 @@
 --CREATE DATE 2023.01.24
 
 CREATE OR REPLACE FUNCTION get_foot_distance(
-    f_house integer,
-    f_object varchar(150),
     lat1 numeric, 
     lon1 numeric, 
     lat2 numeric, 
@@ -16,7 +14,7 @@ $BODY$
 
 import requests
 
-url = f'https://routing.openstreetmap.de/routed-bike/route/v1/driving/{lat1},{lon1};{lat2},{lon2}?'
+url = f'https://routing.openstreetmap.de/routed-foot/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?'
 
 try:
     response = requests.get(url).json()

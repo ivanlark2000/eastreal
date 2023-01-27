@@ -25,6 +25,7 @@ BEGIN
         SELECT 
             latitude AS lat
             ,longitude AS lon
+            ,f_objects_type AS objects_type
             ,object_id
             ,name_obj
         FROM ps_object_position 
@@ -33,8 +34,8 @@ BEGIN
             AND calculation_position(lat1, lon1, latitude, longitude) < 3000
     LOOP
         
-        query = format('SELECT get_foot_car_dist(%s, %I, %s, %s, %s, %s)',
-                house_id, value.object_id, lat1, lon1, value.lat, value.lon); 
+        query = format('CALL load_end_dist(''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'')',
+                city_id, house_id, value.object_id, value.objects_type, lat1, lon1, value.lat, value.lon); 
                 
         INSERT INTO ts_dist_task (f_status, query)
         VALUES (1, query);

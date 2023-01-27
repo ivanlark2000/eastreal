@@ -1,5 +1,4 @@
 import os
-import sys 
 import psycopg2
 from dotenv import load_dotenv
 
@@ -8,8 +7,8 @@ load_dotenv(override=True)
 
 class Config:
     """Класс с настройками"""
-    userAgent = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) ' \
-                'Chrome/102.0.5005.63 Safari/537.36 '
+    userAgent = '''Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36
+                (KHTML, like Gecko) Chrome/102.0.5005.63 Safari/537.36 '''
 
     def __init__(self):
         self.NAME_DB = os.environ.get('name_db')
