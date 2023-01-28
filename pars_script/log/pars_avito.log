@@ -9515,3 +9515,180 @@ PARSER 2023-01-28 23:38:49,557 INFO В базу закачалось 3124 ква
 PARSER 2023-01-28 23:38:55,026 INFO В базу закачалось 3125 квартрира с айдишником 2696666423 c адресом , , Озёрная ул., 10
 PARSER 2023-01-28 23:39:00,506 INFO В базу закачалось 3126 квартрира с айдишником 2555596817 c адресом Орудийная ул., 32Б
 PARSER 2023-01-28 23:39:06,101 INFO В базу закачалось 3127 квартрира с айдишником 2721186119 c адресом ул. Павлика Морозова, 62
+PARSER 2023-01-28 23:39:12,041 INFO В базу закачалось 3128 квартрира с айдишником 2709754453 c адресом , ул. Беланова, 8
+PARSER 2023-01-28 23:39:27,418 INFO В базу закачалось 3129 квартрира с айдишником 2262228234 c адресом ул. Б. Окружная 3-я, д. 243
+PARSER 2023-01-28 23:39:33,013 INFO В базу закачалось 3130 квартрира с айдишником 2262249957 c адресом ул. Б. Окружная 3-я, д. 243
+PARSER 2023-01-28 23:39:38,599 INFO В базу закачалось 3131 квартрира с айдишником 2448226846 c адресом ул. Флагманская, д. 3
+PARSER 2023-01-28 23:39:44,070 CRITICAL квартрира с айдишником 2490912413 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47753, 9086, 9, null, f, f, null, null, 5, 287, Жилой квартал «Seven», 2023-01-28 23:39:44.056819, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:39:49,596 CRITICAL квартрира с айдишником 2491294019 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47754, 9086, 9, null, f, f, null, null, 5, 287, Жилой квартал «Seven», 2023-01-28 23:39:49.584063, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:39:55,117 CRITICAL квартрира с айдишником 2491118764 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47755, 9086, 9, null, f, f, null, null, 5, 287, Жилой квартал «Seven», 2023-01-28 23:39:55.104941, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:40:00,574 INFO В базу закачалось 3135 квартрира с айдишником 2527880048 c адресом ул. Тихоненко, д. 76
+PARSER 2023-01-28 23:40:06,054 INFO В базу закачалось 3136 квартрира с айдишником 2261918967 c адресом ул. Тихорецкая, д. 2
+PARSER 2023-01-28 23:40:11,689 INFO В базу закачалось 3137 квартрира с айдишником 2260588685 c адресом ул. Кипарисовая, д. 2
+PARSER 2023-01-28 23:40:17,195 CRITICAL квартрира с айдишником 2317901836 c адресом ул. 1-я Большая окружная/Компасная/Дубовая аллея, стр. 2 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47756, 10710, 9, null, f, f, null, null, 5, 295, ЖК «Теодор Кроне», 2023-01-28 23:40:17.182766, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:40:22,759 INFO В базу закачалось 3139 квартрира с айдишником 2267266740 c адресом ул. Интернациональная, д. 18
+PARSER 2023-01-28 23:40:28,349 INFO В базу закачалось 3140 квартрира с айдишником 2478690287 c адресом ул. Октябрьская, д. 12
+PARSER 2023-01-28 23:40:34,018 CRITICAL квартрира с айдишником 2491785120 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47757, 9086, 9, null, f, f, null, null, 5, 287, Жилой квартал «Seven», 2023-01-28 23:40:34.003169, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:40:39,544 CRITICAL квартрира с айдишником 2490813090 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47758, 9086, 9, null, t, t, 23, 6, 2, 287, Жилой квартал «Seven», 2023-01-28 23:40:39.531328, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:40:45,065 INFO В базу закачалось 3143 квартрира с айдишником 2299094090 c адресом ул. Батальная, д. 104
+PARSER 2023-01-28 23:40:50,580 CRITICAL квартрира с айдишником 2491088466 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47759, 9086, 9, null, f, f, null, null, 5, 287, Жилой квартал «Seven», 2023-01-28 23:40:50.56746, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:40:56,147 INFO В базу закачалось 3145 квартрира с айдишником 2538542273 c адресом ул. Орудийная, д. 6.2
+PARSER 2023-01-28 23:41:01,649 INFO В базу закачалось 3146 квартрира с айдишником 2528780048 c адресом ул. Тихоненко, д. 76
+PARSER 2023-01-28 23:41:07,168 CRITICAL квартрира с айдишником 2491820553 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47760, 9086, 9, null, f, f, null, null, 5, 287, Жилой квартал «Seven», 2023-01-28 23:41:07.156388, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:41:12,591 CRITICAL квартрира с айдишником 2262464253 c адресом Советский пр-т, стр. 122 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47761, 9191, 16, null, f, f, null, null, 5, 318, ЖК «Соло», 2023-01-28 23:41:12.578836, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:41:18,066 INFO В базу закачалось 3149 квартрира с айдишником 2262733990 c адресом ул. Тихорецкая, д. 2
+PARSER 2023-01-28 23:41:23,524 INFO В базу закачалось 3150 квартрира с айдишником 2768114614 c адресом ул. Коммунистическая, д. 4
+PARSER 2023-01-28 23:41:28,987 CRITICAL квартрира с айдишником 2491353061 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47762, 9086, 9, null, f, f, null, null, 5, 287, Жилой квартал «Seven», 2023-01-28 23:41:28.974375, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:41:34,461 INFO В базу закачалось 3152 квартрира с айдишником 2528584482 c адресом ул. Тихоненко, д. 76
+PARSER 2023-01-28 23:41:39,974 INFO В базу закачалось 3153 квартрира с айдишником 2267540392 c адресом ул. Интернациональная, д. 18
+PARSER 2023-01-28 23:41:45,408 CRITICAL квартрира с айдишником 2318122916 c адресом ул. 1-я Большая окружная/Компасная/Дубовая аллея, стр. 2 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47763, 10711, 9, null, f, f, null, null, 5, 295, ЖК «Теодор Кроне», 2023-01-28 23:41:45.395592, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:41:50,850 CRITICAL квартрира с айдишником 2491619233 c адресом ул. Батальная, стр. 1 не была закачена
+Traceback (most recent call last):
+  File "/home/lark/PROJECT/RealEstate/pars_script/load_to_base.py", line 69, in load_to_base
+    cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+psycopg2.errors.CheckViolation: new row for relation "mn_house" violates check constraint "not_empty_mn_house"
+DETAIL:  Failing row contains (47764, 9086, 9, null, f, f, null, null, 5, 287, Жилой квартал «Seven», 2023-01-28 23:41:50.837617, , null, null, 24741, 0, null).
+CONTEXT:  SQL statement "INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link"
+PL/pgSQL function load_ads_to_base() line 132 at SQL statement
+
+PARSER 2023-01-28 23:41:56,281 INFO В базу закачалось 3156 квартрира с айдишником 2362992978 c адресом ул. Новгородская, д. 3А, корп. 7
+PARSER 2023-01-28 23:42:01,750 INFO В базу закачалось 3157 квартрира с айдишником 2574021533 c адресом пр-т Калинина, д. 113
+PARSER 2023-01-28 23:42:07,252 INFO В базу закачалось 3158 квартрира с айдишником 2262012798 c адресом ул. Тихорецкая, д. 1
+PARSER 2023-01-28 23:42:12,798 INFO В базу закачалось 3159 квартрира с айдишником 2267605271 c адресом ул. Интернациональная, д. 18
+PARSER 2023-01-28 23:42:18,377 INFO В базу закачалось 3160 квартрира с айдишником 2267436030 c адресом ул. Интернациональная, д. 18
