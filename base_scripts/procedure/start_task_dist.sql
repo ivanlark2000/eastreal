@@ -6,23 +6,35 @@ AS
 $BODY$
 DECLARE 
     proc record;    
+    active_proc integer;
 
-BEGIN 
-    FOR proc IN
-        SELECT link, query 
-        FROM ts_dist_task 
-        WHERE f_status = 1
-        ORDER BY d_date_add
+BEGIN
 
-    LOOP
-        EXECUTE(proc.query);
-        COMMIT;
+    SELECT pid INTO active_proc
+    FROM pg_stat_activity
+    WHERE state = 'active' AND query = 'CALL start_task_dist();';
 
-        UPDATE ts_dist_task SET f_status = 2 WHERE link = proc.link;
+    IF active_proc IS NULL THEN 
+        FOR proc IN
+            SELECT link, query 
+            FROM ts_dist_task 
+            WHERE f_status = 1
+            ORDER BY d_date_add
+
+        LOOP
+            EXECUTE(proc.query);
+
+            UPDATE ts_dist_task SET f_status = 2 WHERE link = proc.link;
         
-        RAISE NOTICE 'Запрос №%I выполнен успешно', proc.link;
+            RAISE NOTICE 'Запрос №%I выполнен успешно', proc.link;
+            
+            COMMIT;
+            
+        END LOOP;
+    ELSE 
+        RAISE NOTICE 'В БД данный запрос уже активирован';
+        END IF;
 
-    END LOOP;
 END;
 $BODY$
 LANGUAGE plpgsql;

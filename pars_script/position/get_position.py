@@ -9,7 +9,7 @@ from selenium.webdriver.chrome.options import Options
 
 sys.path.extend(['/home/lark/PROJECT/RealEstate'])
 
-from pars_skript.settings.config import config
+from pars_script.settings.config import config
 
 logger = logging.getLogger('PARSER_DIST')
 logger.setLevel(logging.INFO)

@@ -30,4 +30,5 @@ app/__pycache__
 
 /pard_skript/flat.html
 
-
+/base_scripts/job/log
+/base_scripts/job/date_out.txt

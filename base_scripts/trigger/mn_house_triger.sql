@@ -32,7 +32,6 @@ CREATE OR REPLACE TRIGGER del_whitespace_mn_house
     FOR EACH ROW
     EXECUTE FUNCTION public.del_whitespace_mn_house();
 
----
 CREATE OR REPLACE FUNCTION public.add_house_metrics()
 RETURNS TRIGGER
 AS
@@ -59,7 +58,10 @@ BEGIN
     SET factory = weight
     WHERE f_house = NEW.link;
 	
+    PERFORM add_task_distance(NEW.f_city, NEW.link, NEW.lat, NEW.lon);  
+
     RETURN NEW;
+
 END;
 $BODY$
 LANGUAGE plpgsql;

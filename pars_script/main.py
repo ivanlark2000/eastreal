@@ -7,12 +7,12 @@ from transliterate import translit
 
 sys.path.extend(['/home/lark/PROJECT/RealEstate'])
 
-from pars_skript.load_to_base import load_to_base
+from pars_script.load_to_base import load_to_base
 
 logger = logging.getLogger('PARSER')
 logger.setLevel(logging.INFO)
 
-handler = logging.FileHandler(f'log/pars_avito.log', 'w')
+handler = logging.FileHandler('log/pars_avito.log', 'w')
 formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
 
 handler.setFormatter(formatter)
@@ -23,6 +23,7 @@ CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)
 
 
 def main():
+    count = 1
     for url in getting_url(city=CITY):
         try:
             html = getting_html(url)  # Получаем html стартовой страницы
@@ -38,10 +39,10 @@ def main():
                 continue
             try:
                 flat_in_avito = parsAvitoFlat(html_flat, url=link, city=CITY_RUS)
-                load_to_base(flat_in_avito)
+                load_to_base(flat_in_avito, count)
+                count += 1
             except Exception as e:
-                logger.warning(f'{url} \nNot correct data from site' + str(e), exc_info=True)
-
+                logger.warning(f'{url} \nNot correct data from site', exc_info=True)
 
 if __name__ == "__main__":
     main()

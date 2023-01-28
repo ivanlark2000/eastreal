@@ -1,5 +1,4 @@
-from pars_skript.settings.config import config
-
+from pars_script.settings.config import config
 
 lst_arg = [
     'site_id',
@@ -61,8 +60,8 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
     return ', '.join(lst_column), ', '.join(str(x) for x in lst_data_out)
 
 
-def load_to_base(dct) -> None:
-    from pars_skript.main import logger
+def load_to_base(dct: dict, count: int) -> None:
+    from pars_script.main import logger
     atr = arg_value(lst_arg, dct)
     try:
         conn = config.make_con()
@@ -71,6 +70,10 @@ def load_to_base(dct) -> None:
                VALUES ({atr[1]})""")
         conn.commit()
         cursor.close()
-        logger.info('Ads load in base successful')
+        msg = f"В базу закачалось {count} квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
+        logger.info(msg)
+        print(msg)
     except Exception as e:
-        logger.critical(e, exc_info=True)
+        msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
+        logger.critical(msg, exc_info=True)
+        print(msg)
