@@ -1,4 +1,4 @@
---Поцедура которая запускает задачи в таблице ts_dist_task
+--Поцедура которая в таблице ts_dist_task
 --CREATE DATE 2023.01.27
 
 CREATE OR REPLACE PROCEDURE start_task_dist()
@@ -10,11 +10,11 @@ DECLARE
 
 BEGIN
 
-    SELECT pid INTO active_proc
+    SELECT COUNT(pid) INTO active_proc
     FROM pg_stat_activity
     WHERE state = 'active' AND query = 'CALL start_task_dist();';
 
-    IF active_proc IS NULL THEN 
+    IF active_proc < 2 THEN 
         FOR proc IN
             SELECT link, query 
             FROM ts_dist_task 
