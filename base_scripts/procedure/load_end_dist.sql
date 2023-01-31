@@ -27,9 +27,9 @@ BEGIN
     
     INSERT INTO ps_dist_house_to_object (f_city, f_house, object_id, f_type_object, n_short_dist, n_car_dist, n_foot_dist)
     VALUES (city_id, house_id, object_id, id_type_object, short_dist, car_dist, foot_dist);
-
+    
     RAISE NOTICE 'Данные по дисатнции от дома №% до обьекта №% успешно загружены', house_id, object_id;
-
+    
 END;
 $BODY$
 LANGUAGE plpgsql;

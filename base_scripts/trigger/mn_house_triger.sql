@@ -32,6 +32,9 @@ CREATE OR REPLACE TRIGGER del_whitespace_mn_house
     FOR EACH ROW
     EXECUTE FUNCTION public.del_whitespace_mn_house();
 
+
+--2023.01.30 добавмлм срабатывание задач по дистанции в триггер 
+
 CREATE OR REPLACE FUNCTION public.add_house_metrics()
 RETURNS TRIGGER
 AS

@@ -22,8 +22,6 @@ app/__pycache__
 /pars_script/position/__pycache__
 /pars_script/position/chromedriver
 
-
-
 /pars_script/log/
 /pars_script/settings/__init__.py
 
@@ -32,3 +30,5 @@ app/__pycache__
 
 /base_scripts/job/log
 /base_scripts/job/date_out.txt
+/base_scripts/job/task.txt
+

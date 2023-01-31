@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE start_task_dist()
 AS
 $BODY$
 DECLARE 
-    proc record;    
+    proc record;   
     active_proc integer;
 
 BEGIN
@@ -20,16 +20,13 @@ BEGIN
             FROM ts_dist_task 
             WHERE f_status = 1
             ORDER BY d_date_add
+            LIMIT 100
 
         LOOP
             EXECUTE(proc.query);
-
             UPDATE ts_dist_task SET f_status = 2 WHERE link = proc.link;
         
             RAISE NOTICE 'Запрос №%I выполнен успешно', proc.link;
-            
-            COMMIT;
-            
         END LOOP;
     ELSE 
         RAISE NOTICE 'В БД данный запрос уже активирован';

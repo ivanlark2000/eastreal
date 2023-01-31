@@ -6,8 +6,7 @@ RETURNS trigger
 AS
 $BODY$
 BEGIN
-    NEW.d_date_add = NOW();
-
+    NEW.d_date_add = clock_timestamp();
     RETURN NEW;
 END;
 $BODY$
@@ -24,7 +23,7 @@ AS
 $BODY$
 
 BEGIN 
-    NEW.d_date_compl = NOW();
+    NEW.d_date_compl = clock_timestamp();
     RETURN NEW;
 END;
 
