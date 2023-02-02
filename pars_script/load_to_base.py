@@ -1,4 +1,8 @@
-from pars_script.settings.config import config
+import sys
+
+
+sys.path.insert(1, '/home/lark/PROJECT/RealEstate/settings')
+
 
 lst_arg = [
     'site_id',
@@ -61,7 +65,8 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
 
 
 def load_to_base(dct: dict, count: int) -> None:
-    from pars_script.main import logger
+    from main import logger
+    from config import config
     atr = arg_value(lst_arg, dct)
     try:
         conn = config.make_con()

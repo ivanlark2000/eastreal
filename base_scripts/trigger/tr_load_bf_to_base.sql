@@ -1,3 +1,6 @@
+--ALTER DATE 
+    --2023.02.02 добавили закачку данных в таблицу inf_descriotions
+
 CREATE OR REPLACE FUNCTION load_ads_to_base() RETURNS trigger
 AS $$
 DECLARE
@@ -303,7 +306,7 @@ BEGIN
                 RETURNING link INTO id_transaction_type;
                 END IF;
             END IF;
-
+        
         INSERT INTO mn_apartments_ads (
             f_house, f_qty_room, f_ads_type, n_qty_total_space, n_qty_living_space, n_qty_kitchen_space,
             f_floor, f_decorating, B_Loggia, B_Balcony, f_room_type, n_ceiling_height, b_heating,
@@ -328,6 +331,9 @@ BEGIN
 
         INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id)
         VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, siteid);
+        
+        INSERT INTO inf_descriptions (f_flat, c_name)
+        VALUES (id_apartments_ads, NEW.s_description);
 
 	INSERT INTO mn_metrics (f_house, f_flat, f_city)
 	VALUES (id_house, id_apartments_ads, id_city);
@@ -335,7 +341,3 @@ BEGIN
 	RETURN NEW;
 END;
 $$ LANGUAGE plpgsql
-
-
---CREATE TRIGGER bf_temp_apartments_ads_trigger BEFORE INSERT ON bf_temp_apartments_ads
---    FOR EACH ROW EXECUTE FUNCTION load_ads_to_base();

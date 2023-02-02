@@ -64,13 +64,14 @@ CREATE OR REPLACE TRIGGER count_dist
 
 --Триггер который подсчитыает вес по количесву парков и скверов
 --CREATE DATE 2023.01.31
-CREATE OR REPLACE FUNCTION count_park()
+CREATE OR REPLACE FUNCTION count_object()
 RETURNS trigger 
 AS 
 $BODY$
 DECLARE 
     amount integer;       --количество пакров и скверов
     weight numeric(3,2);  -- вес
+    col_name varchar(100);
 
 BEGIN
 
@@ -81,46 +82,46 @@ BEGIN
             FROM ps_dist_house_to_object
             WHERE f_type_object = 33 AND f_house = NEW.f_house;
             
-            weight = 0.5 - ( 0.5 / amount);
-
-            update mn_metrics
-            set amount_sport = weight
-            where f_house = new.f_house;
+            col_name = 'amount_sport';
            
         WHEN 18 THEN 
             SELECT COUNT(*) INTO amount
             FROM ps_dist_house_to_object
             WHERE f_type_object = 18 AND f_house = NEW.f_house;
-
-            weight = 0.5 - ( 0.5 / amount);
-
-            update mn_metrics
-            set amount_prod = weight
-            where f_house = new.f_house;
+            
+            col_name = 'amount_prod';
 
         WHEN 29, 30 THEN 
             SELECT COUNT(*) INTO amount
             FROM ps_dist_house_to_object
             WHERE f_type_object IN (29, 30) AND f_house = NEW.f_house;
           
-
-            weight = 0.5 - ( 0.5 / amount);
-
-            update mn_metrics
-            set amount_ps = weight
-            where f_house = new.f_house;
-
+            col_name = 'amount_ps';
+            
     END CASE;
+    
+        weight = 0.5 - ( 0.5 / amount);
+
+    EXECUTE format('update mn_metrics set %s = $1 where f_house = $2;', col_name)
+            USING weight, new.f_house;
 
     RETURN NEW;
 
+    EXCEPTION 
+        WHEN division_by_zero THEN 
+            RAISE NOTICE 'Перехватли ошибку division_by_zero';
+
+    EXECUTE format('update mn_metrics set %s = 0 where f_house = $1;', col_name)
+            USING new.f_house;
+
+    RETURN NEW;
 END;
 $BODY$
 LANGUAGE plpgsql;
 
-CREATE OR REPLACE TRIGGER cont_park
+CREATE OR REPLACE TRIGGER count_object
     BEFORE INSERT OR UPDATE 
     ON ps_dist_house_to_object
     FOR EACH ROW 
     WHEN (NEW.f_type_object IN (18, 29, 30, 33))
-    EXECUTE FUNCTION count_park();
+    EXECUTE FUNCTION count_object();

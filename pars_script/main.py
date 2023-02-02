@@ -1,13 +1,9 @@
-import sys
 import logging
 from def_list import *
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
-
-sys.path.extend(['/home/lark/PROJECT/RealEstate'])
-
-from pars_script.load_to_base import load_to_base
+from load_to_base import load_to_base
 
 logger = logging.getLogger('PARSER')
 logger.setLevel(logging.INFO)
@@ -43,6 +39,7 @@ def main():
                 count += 1
             except Exception as e:
                 logger.warning(f'{url} \nNot correct data from site', exc_info=True)
+
 
 if __name__ == "__main__":
     main()

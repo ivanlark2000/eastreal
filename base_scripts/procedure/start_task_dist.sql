@@ -20,7 +20,7 @@ BEGIN
             FROM ts_dist_task 
             WHERE f_status = 1
             ORDER BY d_date_add
-            LIMIT 100
+            LIMIT 119
 
         LOOP
             EXECUTE(proc.query);
@@ -34,4 +34,4 @@ BEGIN
 
 END;
 $BODY$
-LANGUAGE plpgsql;
+LANGUAGE plpgsql

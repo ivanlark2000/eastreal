@@ -12,3 +12,5 @@ if  [ -z "$port" ] ;
         source $dir_project/pars_script/settings/.env; 
 fi;
 psql -c '\x' -c "CALL start_task_dist();" --dbname=$name_db >> $dir 2>&1;
+
+echo `date` >> $dir;
