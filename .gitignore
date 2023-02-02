@@ -1,9 +1,9 @@
 /sys/os
 /sys/time
 .idea
-pars_script/settings/.env
+settings/.env
 pars_script/__pycache__
-pars_script/__init__.py
+settings/__init__.py
 /urllib_reqvest_start.py
 /html.txt
 /config.py
