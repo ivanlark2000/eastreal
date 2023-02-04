@@ -17,14 +17,16 @@ def getting_url(city: str) -> list:
             yield link
 
 
-def getting_links(html):
+def getting_links(html:str) -> tuple[str]: # -> list[str, tuple[int, float]]:
     """Получаем список ссылок на квартиры"""
-    list_of_links = []
     soup = BeautifulSoup(html, 'html.parser')
-    links = soup.find_all('a', class_="iva-item-sliderLink-uLz1v")
-    for link in links:
-        list_of_links.append('https://' + 'www.avito.ru' + link.get('href'))
-    return list_of_links
+    prices = soup.find_all('span', {'data-marker': 'item-price'})
+    lst_price = [ i.find('meta', {'itemprop':'price'}).get('content') for i in prices]
+    tags = soup.find_all('a', class_="iva-item-sliderLink-uLz1v")
+    list_links = ['https://' + 'www.avito.ru' + tag.get('href') for tag in tags]
+    ids = soup.find_all('div', {'data-marker': 'item'})
+    ids_lst = [id.get('data-item-id') for id in ids]
+    return tuple([(ids_lst[i], lst_price[i], list_links[i])  for i in range(len(ids_lst))])
 
 
 def getting_rendom_link(list_links):
@@ -38,7 +40,7 @@ def getting_rendom_link(list_links):
         print('Ошибка при создании рандомныx cсылок' + str(e))
 
 
-def getting_html(url):
+def getting_html(url:str):
     """Получим html для дома и квартиры"""
     try:
         respose = urlopen(url).read().decode("utf-8")

@@ -44,8 +44,12 @@ lst_arg = [
     'S_Site_Links',
     'F_Source',
     'S_Seller',
-    'S_Seller_Type'
+    'S_Seller_Type',
 ]
+
+def get_id_in_base() -> None:
+    # функция возрашает список айдишников квартир и цен на текуший момент
+    pass
 
 
 def arg_value(arg: list, dct: dict) -> tuple[str, str]:

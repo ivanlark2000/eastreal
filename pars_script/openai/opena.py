@@ -1,10 +1,12 @@
+import os
 import re
 import sys
 import time
 import openai
+from PIL import Image
 
 
-openai.api_key = "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"
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 
 def lst_des(conn: object) -> list:
@@ -43,7 +45,7 @@ def get_api_resp(text) -> str:
         time.sleep(20)
 
 
-def main():
+def project() -> None:
     sys.path.insert(1, '/home/lark/PROJECT/RealEstate/settings')
     from config import config
     conn = config.make_con()
@@ -53,6 +55,19 @@ def main():
             get_api_resp(t)
             time.sleep(5)
 
+
+def foto():
+    response = openai.Image.create(
+        prompt="ядерный взрыв",
+        n=1,
+        size="1024x1024"
+        )
+    image_url = response['data'][0]['url']
+    print(response)
+
+
+def main():
+    foto()
 
 if __name__ == "__main__":
     main()

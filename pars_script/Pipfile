@@ -15,6 +15,7 @@ dadata = "*"
 neovim = "*"
 black = "*"
 openai = "*"
+pillow = "*"
 
 [dev-packages]
 

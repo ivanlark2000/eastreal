@@ -310,12 +310,12 @@ BEGIN
         INSERT INTO mn_apartments_ads (
             f_house, f_qty_room, f_ads_type, n_qty_total_space, n_qty_living_space, n_qty_kitchen_space,
             f_floor, f_decorating, B_Loggia, B_Balcony, f_room_type, n_ceiling_height, b_heating,
-            f_bathroom_type, f_window, f_repair_type, f_seller, f_method_of_sale, f_transaction_type
+            f_bathroom_type, f_window, f_repair_type, f_seller, f_method_of_sale, f_transaction_type, f_sell_status
         )
         VALUES (id_house, id_qty_room, id_ads_type, NEW.n_qty_total_space, NEW.n_qty_living_space,
              NEW.n_qty_kitchen_space, id_floor, id_decoration, NEW.b_loggia, NEW.b_balcony,
              id_type_room, NEW.n_ceiling_height, NEW.b_heating, id_bathroom_type, id_window,
-             id_repair_type, id_seller, id_method_of_sale, id_transaction_type)
+             id_repair_type, id_seller, id_method_of_sale, id_transaction_type, 1)
         RETURNING link INTO id_apartments_ads;
 
         IF NEW.s_furniture IS NOT NULL THEN
@@ -330,7 +330,7 @@ BEGIN
         VALUES (id_apartments_ads, NEW.n_price);
 
         INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id)
-        VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, siteid);
+        VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, NEW.site_id);
         
         INSERT INTO inf_descriptions (f_flat, c_name)
         VALUES (id_apartments_ads, NEW.s_description);
