@@ -1,4 +1,4 @@
--- Триггерa к таблице 'mn_apertments_ads'
+-- Триггерa к таблице 'inf_sys'
 
 --триггер на вычисление времени когда была проданна квартра 
 --CREATE DATE 2023.02.04
@@ -16,7 +16,7 @@ LANGUAGE plpgsql;
 
 CREATE OR REPLACE TRIGGER add_delta_time
         BEFORE UPDATE 
-        ON public.mn_apartments_ads 
+        ON public.inf_sys 
         FOR EACH ROW
         WHEN (NEW.f_sell_status = 2)
         EXECUTE FUNCTION add_time_delta();

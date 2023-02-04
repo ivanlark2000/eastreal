@@ -1,7 +1,10 @@
 import sys
+import configparser
 
 
 sys.path.insert(1, '/home/lark/PROJECT/RealEstate/settings')
+config = configparser.ConfigParser()
+config.read('sql_request.ini')
 
 lst_arg = [
     'site_id',
@@ -52,21 +55,16 @@ def import_conn() -> object:
     return config.make_con()
 
 
-def get_id_in_base(city_id: int) -> tuple[int]:
+def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
     # функция возрашает список айдишников квартир и цен на текуший момент
     from main import logger
     conn = import_conn()
-    sql_resp = f"""
-                SELECT site_id
-                FROM inf_sys 
-                WHERE f_city = {city_id} AND site_id IS NOT NULL
-            """
     cursor = conn.cursor()
     try:
-        cursor.execute(sql_resp)
+        cursor.execute(config['SQL']['site_id-price.part_1'] + str(city_id))
         rez = cursor.fetchall()
         logger.info('Получили айдишники квартир сайта с БД')
-        return tuple([i[0] for i in rez])
+        return tuple([tuple([i[0], int(i[1])]) for i in rez])
     except Exception as e:
         msg = 'Не удалось получить айдишники кватир сайта с бд'
         print(msg)

@@ -27,6 +27,9 @@ def main():
         except HTTPError as e:
             logger.warning(f'{url} \n ', exc_info=True)
         list_links = getting_links(html)  # получаем список ссылок квартир
+        lst_id_in_base = get_id_in_base(CITY_ID)
+        if lst_id_in_base.count(list_links[0]):
+            print()
         list_links = [link[2] for link in list_links]
         links = getting_rendom_link(list_links)  # извлекаем рандомную ссылку
         for link in next(links):
@@ -45,4 +48,4 @@ def main():
 
 if __name__ == "__main__":
     #main()
-    print(get_id_in_base(24741))
+    print(get_id_in_base(CITY_ID))

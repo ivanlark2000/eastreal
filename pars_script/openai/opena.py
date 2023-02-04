@@ -58,7 +58,7 @@ def project() -> None:
 
 def foto():
     response = openai.Image.create(
-        prompt="ядерный взрыв",
+        prompt="Дота 2 Костя",
         n=1,
         size="1024x1024"
         )
