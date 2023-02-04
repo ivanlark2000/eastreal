@@ -3,7 +3,7 @@ from def_list import *
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
-from load_to_base import load_to_base
+from load_to_base import load_to_base, get_id_in_base
 
 logger = logging.getLogger('PARSER')
 logger.setLevel(logging.INFO)
@@ -14,6 +14,7 @@ formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
 handler.setFormatter(formatter)
 logger.addHandler(handler)
 
+CITY_ID = 24741 
 CITY_RUS = 'Калининград'
 CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)
 
@@ -43,4 +44,5 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    #main()
+    print(get_id_in_base(24741))

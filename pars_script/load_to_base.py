@@ -3,7 +3,6 @@ import sys
 
 sys.path.insert(1, '/home/lark/PROJECT/RealEstate/settings')
 
-
 lst_arg = [
     'site_id',
     'S_City',
@@ -47,10 +46,33 @@ lst_arg = [
     'S_Seller_Type',
 ]
 
-def get_id_in_base() -> None:
-    # функция возрашает список айдишников квартир и цен на текуший момент
-    pass
 
+def import_conn() -> object:
+    from config import config
+    return config.make_con()
+
+
+def get_id_in_base(city_id: int) -> tuple[int]:
+    # функция возрашает список айдишников квартир и цен на текуший момент
+    from main import logger
+    conn = import_conn()
+    sql_resp = f"""
+                SELECT site_id
+                FROM inf_sys 
+                WHERE f_city = {city_id} AND site_id IS NOT NULL
+            """
+    cursor = conn.cursor()
+    try:
+        cursor.execute(sql_resp)
+        rez = cursor.fetchall()
+        logger.info('Получили айдишники квартир сайта с БД')
+        return tuple([i[0] for i in rez])
+    except Exception as e:
+        msg = 'Не удалось получить айдишники кватир сайта с бд'
+        print(msg)
+        logger.critical(msg)
+    finally:
+        cursor.close()
 
 def arg_value(arg: list, dct: dict) -> tuple[str, str]:
     lst_column = []
@@ -70,19 +92,18 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
 
 def load_to_base(dct: dict, count: int) -> None:
     from main import logger
-    from config import config
     atr = arg_value(lst_arg, dct)
     try:
-        conn = config.make_con()
         cursor = conn.cursor()
         cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
                VALUES ({atr[1]})""")
         conn.commit()
         cursor.close()
         msg = f"В базу закачалось {count} квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
-        logger.info(msg)
         print(msg)
     except Exception as e:
         msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
         logger.critical(msg, exc_info=True)
         print(msg)
+    finally:
+        cursor.close()
