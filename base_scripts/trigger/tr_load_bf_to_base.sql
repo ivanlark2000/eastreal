@@ -340,4 +340,12 @@ BEGIN
 	END IF;
 	RETURN NEW;
 END;
-$$ LANGUAGE plpgsql
+$$ LANGUAGE plpgsql;
+
+
+CREATE OR REPLACE TRIGGER load_ads_temp_to_mn
+    BEFORE INSERT OR UPDATE 
+    ON BF_Temp_Apartments_Ads 
+    FOR EACH ROW
+    EXECUTE PROCEDURE load_ads_to_base();
+
