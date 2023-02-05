@@ -6,6 +6,15 @@ from bs4 import BeautifulSoup
 from urllib.request import urlopen
 
 
+def save_html(html: str, file_name: str) -> None:
+    with open(file_name, 'w') as file:
+        file.write(html)
+
+
+def load_html(file_name) -> str:
+    return open(file_name, 'r').read()
+
+
 def getting_url(city: str) -> list:
     lst = list(range(0, 101))
     random.shuffle(lst)
@@ -17,7 +26,7 @@ def getting_url(city: str) -> list:
             yield link
 
 
-def getting_links(html:str) -> tuple[str]: # -> list[str, tuple[int, float]]:
+def getting_links(html:str) -> list[str]: # -> list[str, tuple[int, float]]:
     """Получаем список ссылок на квартиры"""
     soup = BeautifulSoup(html, 'html.parser')
     prices = soup.find_all('span', {'data-marker': 'item-price'})
@@ -26,10 +35,10 @@ def getting_links(html:str) -> tuple[str]: # -> list[str, tuple[int, float]]:
     list_links = ['https://' + 'www.avito.ru' + tag.get('href') for tag in tags]
     ids = soup.find_all('div', {'data-marker': 'item'})
     ids_lst = [id.get('data-item-id') for id in ids]
-    return tuple([(ids_lst[i], lst_price[i], list_links[i])  for i in range(len(ids_lst))])
+    return [(ids_lst[i], lst_price[i], list_links[i])  for i in range(len(ids_lst))]
 
 
-def getting_rendom_link(list_links):
+def getting_rendom_link(list_links: list):
     """Получаем рандомную ссылку и фильтруем список"""
     try:
         link = random.choice(list_links)

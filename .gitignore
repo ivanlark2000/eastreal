@@ -32,3 +32,7 @@ app/__pycache__
 /base_scripts/job/date_out.txt
 /base_scripts/job/task.txt
 
+# Тестовые файлы
+pars_script/test_main.html
+pars_script/test_one_ads.html
+

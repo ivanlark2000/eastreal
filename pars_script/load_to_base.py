@@ -64,11 +64,11 @@ def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
         cursor.execute(config['SQL']['site_id-price.part_1'] + str(city_id))
         rez = cursor.fetchall()
         logger.info('Получили айдишники квартир сайта с БД')
-        return tuple([tuple([i[0], int(i[1])]) for i in rez])
+        return tuple([tuple([i[0], i[1], int(i[2])]) for i in rez])
     except Exception as e:
-        msg = 'Не удалось получить айдишники кватир сайта с бд'
+        msg = 'Не удалось получить айдишники кватир сайта с бд' + str(e)
         print(msg)
-        logger.critical(msg)
+        logger.critical(msg, exc_info=True)
     finally:
         cursor.close()
 
@@ -90,9 +90,10 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
 
 def load_to_base(dct: dict, count: int) -> None:
     from main import logger
+    conn = import_conn()
     atr = arg_value(lst_arg, dct)
+    cursor = conn.cursor()
     try:
-        cursor = conn.cursor()
         cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
                VALUES ({atr[1]})""")
         conn.commit()
@@ -105,3 +106,21 @@ def load_to_base(dct: dict, count: int) -> None:
         print(msg)
     finally:
         cursor.close()
+
+def load_price_to_base(f_flat: int, n_price: int) -> None:
+    from main import logger 
+    conn = import_conn()
+    cursor = conn.cursor()
+    sql = f"""
+            INSERT INTO mn_ads_price (f_flat, n_price)
+            VALUES ({f_flat}, {n_price});
+            """
+    try:
+        cursor.execute(sql)
+        conn.commit()
+        print('Ценна загруженна')
+    except Exception as e:
+        print('Ошибка в загрузке данных по цене')
+    finally:
+        cursor.close()
+

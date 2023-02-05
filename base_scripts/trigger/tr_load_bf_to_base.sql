@@ -329,8 +329,8 @@ BEGIN
         INSERT INTO mn_ads_price (f_flat, n_price)
         VALUES (id_apartments_ads, NEW.n_price);
 
-        INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id, f_city)
-        VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, NEW.site_id, id_city);
+        INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id, f_city, f_sell_status)
+        VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, NEW.site_id, id_city, 1);
         
         INSERT INTO inf_descriptions (f_flat, c_name)
         VALUES (id_apartments_ads, NEW.s_description);
