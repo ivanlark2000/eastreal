@@ -1,10 +1,16 @@
 import sys
 import configparser
-
-
 sys.path.insert(1, '/home/lark/PROJECT/RealEstate/settings')
-config = configparser.ConfigParser()
-config.read('sql_request.ini')
+from config import config
+
+
+conf = configparser.ConfigParser()
+conf.read('sql_request.ini')
+
+
+logger = config.logger
+conn = config.make_con()
+
 
 lst_arg = [
     'site_id',
@@ -27,7 +33,7 @@ lst_arg = [
     'S_Repair_Type',
     'B_Heating',
     'S_Furniture',
-    'S_Technics',
+    'S_Technics',   
     'S_decoration',
     'S_Method_Of_Sale',
     'S_Type_Of_Transaction',
@@ -43,25 +49,19 @@ lst_arg = [
     'S_Official_Builder',
     'S_Participation_Type',
     'D_Deadline_for_Delivery',
-    'S_Site_Links',
+    'S_Site_Links', 
     'F_Source',
     'S_Seller',
     'S_Seller_Type',
 ]
 
 
-def import_conn() -> object:
-    from config import config
-    return config.make_con()
 
-
-def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
+def get_id_in_base(city_id: int, logger: object) -> tuple[tuple[str, int]]:
     # функция возрашает список айдишников квартир и цен на текуший момент
-    from main import logger
-    conn = import_conn()
     cursor = conn.cursor()
     try:
-        cursor.execute(config['SQL']['site_id-price.part_1'] + str(city_id))
+        cursor.execute(conf['SQL']['site_id-price.part_1'] + str(city_id))
         rez = cursor.fetchall()
         logger.info('Получили айдишники квартир сайта с БД')
         return tuple([tuple([i[0], i[1], int(i[2])]) for i in rez])
@@ -89,10 +89,8 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
 
 
 def load_to_base(dct: dict, count: int) -> None:
-    from main import logger
-    conn = import_conn()
-    atr = arg_value(lst_arg, dct)
     cursor = conn.cursor()
+    atr = arg_value(lst_arg, dct)
     try:
         cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
                VALUES ({atr[1]})""")
@@ -108,19 +106,32 @@ def load_to_base(dct: dict, count: int) -> None:
         cursor.close()
 
 def load_price_to_base(f_flat: int, n_price: int) -> None:
-    from main import logger 
-    conn = import_conn()
     cursor = conn.cursor()
     sql = f"""
             INSERT INTO mn_ads_price (f_flat, n_price)
             VALUES ({f_flat}, {n_price});
             """
     try:
-        cursor.execute(sql)
+        cursor.execute(f"""
+            INSERT INTO mn_ads_price (f_flat, n_price)
+            VALUES ({f_flat}, {n_price});
+            """)
         conn.commit()
         print('Ценна загруженна')
     except Exception as e:
         print('Ошибка в загрузке данных по цене')
     finally:
         cursor.close()
+
+
+def load_miss_number(site_id: str) -> None:
+    cursor = conn.cursor()
+    try:
+        cursor.execute(f"""
+                    INSERT INTO inf_miss_ads (f_city, site_id, f_source)
+                    VALUES ({CITY_ID}, {site_id}, 1);
+                       """)
+        print(f'Добавили в БД айдишник {site_id} ошибочного объявления')
+    except Exception as e:
+        print(f'Не удалось добавить айдишник {site_id} ошибочного объявления')
 

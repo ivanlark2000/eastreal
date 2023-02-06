@@ -1,8 +1,16 @@
 import os
 import psycopg2
-from dotenv import load_dotenv
 
-load_dotenv(override=True)
+
+def make_logger():
+    import logging
+    logger = logging.getLogger('PARSER') 
+    logger.setLevel(logging.INFO)
+    handler = logging.FileHandler('pars_script/log/pars_avito.log', 'w')
+    formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+    return logger
 
 
 class Config:
@@ -16,6 +24,7 @@ class Config:
         self.PASSWORD_DB = os.environ.get('password_DB')
         self.PORT = os.environ.get('port')
         self.HOST = os.environ.get('host')
+        self.logger = make_logger()
 
     def make_con(self):
         return psycopg2.connect(dbname=self.NAME_DB,
@@ -23,6 +32,5 @@ class Config:
                                 password=self.PASSWORD_DB,
                                 host=self.HOST,
                                 port=self.PORT)
-
-
+    
 config = Config()
