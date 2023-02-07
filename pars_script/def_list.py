@@ -40,13 +40,10 @@ def getting_links(html:str) -> list[str]: # -> list[str, tuple[int, float]]:
 
 def getting_rendom_link(list_links: list):
     """Получаем рандомную ссылку и фильтруем список"""
-    try:
-        link = random.choice(list_links)
-        list_links.remove(link)  # Удаляем из списка выбранную ссылку.
-        time.sleep(3)
-        yield list_links
-    except Exception as e:
-        print('Ошибка при создании рандомныx cсылок' + str(e))
+    link = random.choice(list_links)
+    list_links.remove(link)  # Удаляем из списка выбранную ссылку.
+    time.sleep(3)
+    yield list_links
 
 
 def getting_html(url:str):

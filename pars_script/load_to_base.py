@@ -4,12 +4,7 @@ sys.path.insert(1, '/home/lark/PROJECT/RealEstate/settings')
 from config import config
 
 
-conf = configparser.ConfigParser()
-conf.read('sql_request.ini')
-
-
-logger = config.logger
-conn = config.make_con()
+logger = config.make_logger('parsAvito.log')
 
 
 lst_arg = [
@@ -57,14 +52,15 @@ lst_arg = [
 
 
 
-def get_id_in_base(city_id: int, logger: object) -> tuple[tuple[str, int]]:
+def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
     # функция возрашает список айдишников квартир и цен на текуший момент
+    conn = config.make_con()
     cursor = conn.cursor()
     try:
-        cursor.execute(conf['SQL']['site_id-price.part_1'] + str(city_id))
+        cursor.execute(f"SELECT * FROM get_siteid_price('{city_id}', '1');")
         rez = cursor.fetchall()
         logger.info('Получили айдишники квартир сайта с БД')
-        return tuple([tuple([i[0], i[1], int(i[2])]) for i in rez])
+        return tuple([tuple([i[0], i[1], (i[2])]) for i in rez])
     except Exception as e:
         msg = 'Не удалось получить айдишники кватир сайта с бд' + str(e)
         print(msg)
@@ -89,6 +85,8 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
 
 
 def load_to_base(dct: dict, count: int) -> None:
+    from main import CITY_ID
+    conn = config.make_con()
     cursor = conn.cursor()
     atr = arg_value(lst_arg, dct)
     try:
@@ -102,10 +100,12 @@ def load_to_base(dct: dict, count: int) -> None:
         msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
         logger.critical(msg, exc_info=True)
         print(msg)
+        load_miss_number(site_id=dct['site_id'], city_id=CITY_ID)
     finally:
         cursor.close()
 
 def load_price_to_base(f_flat: int, n_price: int) -> None:
+    conn = config.make_con()
     cursor = conn.cursor()
     sql = f"""
             INSERT INTO mn_ads_price (f_flat, n_price)
@@ -124,14 +124,17 @@ def load_price_to_base(f_flat: int, n_price: int) -> None:
         cursor.close()
 
 
-def load_miss_number(site_id: str) -> None:
+def load_miss_number(site_id: str, city_id: int) -> None:
+    conn = config.make_con()
     cursor = conn.cursor()
     try:
         cursor.execute(f"""
-                    INSERT INTO inf_miss_ads (f_city, site_id, f_source)
-                    VALUES ({CITY_ID}, {site_id}, 1);
+                    INSERT INTO inf_miss_ads (f_city, site_id, f_source, f_sell_status)
+                    VALUES ({city_id}, {int(site_id)}, 1, 1);
                        """)
+        conn.commit()
         print(f'Добавили в БД айдишник {site_id} ошибочного объявления')
     except Exception as e:
-        print(f'Не удалось добавить айдишник {site_id} ошибочного объявления')
-
+        print(f'Не удалось добавить айдишник {site_id} ошибочного объявления' + str(e))
+    finally:
+        cursor.close()

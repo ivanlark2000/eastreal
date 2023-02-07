@@ -7,20 +7,14 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 
-sys.path.extend(['/home/lark/PROJECT/RealEstate'])
+sys.path.extend(['/home/lark/PROJECT/RealEstate/settings'])
 
-from pars_script.settings.config import config
+from config import config
 
-logger = logging.getLogger('PARSER_DIST')
-logger.setLevel(logging.INFO)
 
-handler = logging.FileHandler(f'../log/ya_position.log', 'w')
-formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-
-handler.setFormatter(formatter)
-logger.addHandler(handler)
-
+logger = config.make_logger('ya_pars_coord.log')
 chrom_option = Options()
+
 
 api_key = '43b0036c75f55f532a18d6291423bd960c45304b'
 secret = '14a01cfb738a67787f176342817c8c6aabbeda77'
@@ -135,8 +129,10 @@ def add_coord():
                 else:
                     add_full_address(conn, streetid=row[1], full_adress=street)
                 street = street + ' ' + row[4].strip()
-                lat, lon = get_position_ya(street)
-                add_coord_to_base(row[0], lat, lon, conn)
+                position = get_positin_ya(street)
+                if position:
+                    lat, lon = position
+                    add_coord_to_base(row[0], lat, lon, conn)
             else:
                 street = row[2] + ' ' + row[5] + ' ' + row[4].strip()
                 lat, lon = get_position_ya(street)
