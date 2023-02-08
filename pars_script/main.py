@@ -2,7 +2,7 @@ from def_list import *
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
-from load_to_base import load_to_base, get_id_in_base, load_price_to_base
+from load_to_base import load_to_base, get_id_in_base, load_price_to_base, logger
 
 
 CITY_ID = 24741 
@@ -61,15 +61,18 @@ def pars():
                 if int(ids_site[0]) == ids_base[0]:
                     if int(ids_site[1]) == ids_base[1]:
                         print(f'В БД есть квартра № {ids_site[0]} с такой же ценой')
-                        break
-                    elif ids_site[1] != ids_base[1] and ids_base[1] is not None:
-                        load_price_to_base(f_flat=ids_base[2], n_price=ids_site[1])
+                    elif ids_base[1]:
                         if int(ids_site[1]) > ids_base[1]:
                             print(f'Квартира с айдишником {ids_site[0]} \
-                                    подорожала на {int(ids_site[1]) - int(ids_base[1])}')
+                                            подорожала на {int(ids_site[1]) - int(ids_base[1])}')
+                            load_price_to_base(f_flat=ids_base[2], n_price=ids_site[1])
+
                         else:
                             print(f'Квартра с айди {ids_site[0]} подешевела на \
                                     {int(ids_base[1]) - int(ids_site[1])}')
+                            load_price_to_base(f_flat=ids_base[2], n_price=ids_site[1])
+
+                    break
 
             else:
                 url = ids_site[2]
