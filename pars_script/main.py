@@ -2,7 +2,7 @@ from def_list import *
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
-from load_to_base import load_to_base, get_id_in_base, load_price_to_base, logger
+from load_to_base import load_to_base, get_id_in_base, load_price_to_base, logger, update_sell_status
 
 
 CITY_ID = 24741 
@@ -10,38 +10,6 @@ CITY_RUS = 'Калининград'
 CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)
 AKTIVE_SITE_ID = []
 
-
-def load_test_file(city=CITY) -> None:
-    url = getting_url(CITY)
-    html = getting_html(next(url))
-    save_html(html, 'test_main.html')
-    links = getting_links(html)
-    save_html(getting_html(links[2][2]), 'test_one_ads.html')
-    print('Сохранены тустовые страницы')
-
-
-def test_total_html() -> None:
-    count = 1
-    html = load_html('test_main.html')
-    lst_links = getting_links(html)
-    ids_in_base = get_id_in_base(CITY_ID)
-    for ids_site in lst_links:
-        AKTIVE_SITE_ID.append(ids_site[0])
-        for ids_base in ids_in_base:
-            if int(ids_site[0]) == ids_base[1]:
-                if int(ids_site[1]) == ids_base[2]:
-                    break
-
-                else:
-                    load_price_to_base(f_flat=ids_base[0], n_price=ids_in_base[1])
-                    
-        else:
-            print(ids_site)
-            html_flat = getting_html(ids_site[2])
-            flat_in_avito = parsAvitoFlat(html_flat, url=ids_site[2], city=CITY_RUS)
-            load_to_base(flat_in_avito, count)
-            count += 1 
-    
 
 def pars():
     count = 1
@@ -88,11 +56,12 @@ def pars():
                 except Exception as e: 
                     logger.warning(f'{url} \nNot correct data from site', exc_info=True)
 
+    update_sell_status(city_id=CITY_ID, siteids=AKTIVE_SITE_ID)
+
 
 def main():
     pars()
-    #load_test_file()
-    #test_total_html()
+
 
 if __name__ == "__main__":
     main()

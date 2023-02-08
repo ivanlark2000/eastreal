@@ -26,7 +26,7 @@ def getting_url(city: str) -> list:
             yield link
 
 
-def getting_links(html:str) -> list[str]: # -> list[str, tuple[int, float]]:
+def getting_links(html:str) -> list[str]:
     """Получаем список ссылок на квартиры"""
     soup = BeautifulSoup(html, 'html.parser')
     prices = soup.find_all('span', {'data-marker': 'item-price'})

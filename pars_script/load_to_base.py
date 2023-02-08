@@ -53,20 +53,20 @@ lst_arg = [
 
 
 def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
-    # функция возрашает список айдишников квартир и цен на текуший момент
+    # функция возвращает список айдишников квартир и цен на текущий момент
     conn = config.make_con()
-    cursor = conn.cursor()
     try:
-        cursor.execute(f"SELECT * FROM get_siteid_price('{city_id}', '1');")
-        rez = cursor.fetchall()
-        logger.info('Получили айдишники квартир сайта с БД')
-        return tuple([tuple([i[0], i[1], (i[2])]) for i in rez])
+        with conn.cursor() as cursor:
+            cursor.execute(f"SELECT * FROM get_siteid_price('{city_id}', '1');")
+            logger.info('Получили айдишники квартир сайта с БД')
+            return tuple([tuple([i[0], i[1], (i[2])]) for i in cursor.fetchall()])
     except Exception as e:
         msg = 'Не удалось получить айдишники кватир сайта с бд' + str(e)
         print(msg)
         logger.critical(msg, exc_info=True)
     finally:
-        cursor.close()
+        conn.close()
+
 
 def arg_value(arg: list, dct: dict) -> tuple[str, str]:
     lst_column = []
@@ -87,22 +87,21 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
 def load_to_base(dct: dict, count: int) -> None:
     from main import CITY_ID
     conn = config.make_con()
-    cursor = conn.cursor()
     atr = arg_value(lst_arg, dct)
     try:
-        cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
-               VALUES ({atr[1]})""")
-        conn.commit()
-        cursor.close()
-        msg = f"В базу закачалось {count} квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
-        print(msg)
+        with conn.cursor() as cursor:
+            cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
+                   VALUES ({atr[1]})""")
+            msg = f"В базу закачалось {count} квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
+            print(msg)
     except Exception as e:
         msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
         logger.critical(msg, exc_info=True)
         print(msg)
         load_miss_number(site_id=dct['site_id'], city_id=CITY_ID)
     finally:
-        cursor.close()
+        conn.close()
+
 
 def load_price_to_base(f_flat: int, n_price: int) -> None:
     conn = config.make_con()
@@ -138,3 +137,18 @@ def load_miss_number(site_id: str, city_id: int) -> None:
         print(f'Не удалось добавить айдишник {site_id} ошибочного объявления' + str(e))
     finally:
         cursor.close()
+
+
+def update_sell_status(city_id: int, siteids:list) -> None:
+    conn = config.make_con()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(f"SELECT update_sell_status('{city_id}',VARIADIC ARRAY{siteids});")
+            conn.commit()
+            logger.info('Айдишники проданых квартир успешно переведенны в статус проданны')
+    except Exception as e:
+        logger.warning('Статусы проданыных квартир не были переведены в историчность', exc_info=True)
+    finally:
+        conn.close
+    
+

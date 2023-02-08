@@ -8,7 +8,7 @@ AS
 $BODY$
 BEGIN 
     NEW.d_date_sell = clock_timestamp();
-    NEW.t_delta = NEW.d_date_sell - NEW.d_date;
+    NEW.t_delta = NEW.d_date_sell - NEW.d_date_create;
     RETURN NEW;
 END;
 $BODY$
