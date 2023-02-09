@@ -93,6 +93,7 @@ def load_to_base(dct: dict, count: int) -> None:
             cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
                    VALUES ({atr[1]})""")
             msg = f"В базу закачалось {count} квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
+            conn.commit()
             print(msg)
     except Exception as e:
         msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
@@ -106,17 +107,12 @@ def load_to_base(dct: dict, count: int) -> None:
 def load_price_to_base(f_flat: int, n_price: int) -> None:
     conn = config.make_con()
     cursor = conn.cursor()
-    sql = f"""
-            INSERT INTO mn_ads_price (f_flat, n_price)
-            VALUES ({f_flat}, {n_price});
-            """
     try:
         cursor.execute(f"""
             INSERT INTO mn_ads_price (f_flat, n_price)
             VALUES ({f_flat}, {n_price});
             """)
         conn.commit()
-        print('Ценна загруженна')
     except Exception as e:
         print('Ошибка в загрузке данных по цене')
     finally:

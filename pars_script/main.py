@@ -24,7 +24,7 @@ def pars():
         lst_id_in_base = get_id_in_base(CITY_ID)
         rendom_link = getting_rendom_link(lst_links)
         for ids_site in next(rendom_link):       # проверяем есть ли квартира в базе
-            AKTIVE_SITE_ID.append(ids_site[0])
+            AKTIVE_SITE_ID.append(int(ids_site[0]))
             for ids_base in lst_id_in_base:
                 if int(ids_site[0]) == ids_base[0]:
                     if int(ids_site[1]) == ids_base[1]:
