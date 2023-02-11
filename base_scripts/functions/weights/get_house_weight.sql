@@ -1,8 +1,9 @@
 ------------------------------------------------------------------------
---Функция которая вернет вес по ростояниям по заданому объекту и квартире 
+--Функция которая вернет вес по расстояниям по заданому объекту и квартире 
 --CREATE DATE 2023.02.09
+--2023.02.11 редактировали формулу 
 
-CREATE OR REPLACE FUNCTION get_house_weight(
+CREATE OR REPLACE FUNCTION get_house_weigth(
     city_id smallint,
     flat_id integer,
     type_object_id smallint
@@ -17,7 +18,7 @@ DECLARE
 BEGIN
 
     SELECT 
-        AVG(0.5/200*n_foot_dist)
+        50 * (0.5 / ( AVG(n_short_dist) / COUNT(*)))
     INTO weigth
     FROM ps_dist_house_to_object
     WHERE 1=1
@@ -25,6 +26,10 @@ BEGIN
         AND f_house = flat_id 
         AND f_type_object = type_object_id 
     GROUP BY f_house;
+
+    IF weigth > 9.9 THEN 
+        weigth = 9.9;
+    END IF;
 
     RETURN weigth;
 

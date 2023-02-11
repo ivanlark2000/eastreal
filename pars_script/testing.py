@@ -25,3 +25,5 @@ def test_update_sell_status():
 
 if __name__ == "__main__":
     test_update_sell_status()
+
+#Тест 

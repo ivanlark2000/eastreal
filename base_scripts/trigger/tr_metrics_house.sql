@@ -44,17 +44,17 @@ BEGIN
 
     NEW.w_temp = temperature;
     
-    NEW.w_dist_park = get_house_weight(NEW.f_city, NEW.f_house, '29');
-    NEW.w_dist_kinder = get_house_weight(NEW.f_city, NEW.f_house, '11');
-    NEW.w_dist_entertime = get_house_weight(NEW.f_city, NEW.f_house, '12');
-    NEW.w_dist_fuel = get_house_weight(NEW.f_city, NEW.f_house, '15');
-    NEW.w_dist_market = get_house_weight(NEW.f_city, NEW.f_house, '17');
-    NEW.w_dist_garag = get_house_weight(NEW.f_city, NEW.f_house, '21');
-    NEW.w_dist_pipe = get_house_weight(NEW.f_city, NEW.f_house, '22');
-    NEW.w_dist_scool = get_house_weight(NEW.f_city, NEW.f_house, '25');
-    NEW.w_dist_mall = get_house_weight(NEW.f_city, NEW.f_house, '17');
-    NEW.w_dist_farmacy = get_house_weight(NEW.f_city, NEW.f_house, '16');
-
+    NEW.w_dist_park = get_house_weigth(NEW.f_city, NEW.f_house, '29');
+    NEW.w_dist_kinder = get_house_weigth(NEW.f_city, NEW.f_house, '11');
+    NEW.w_dist_entertime = get_house_weigth(NEW.f_city, NEW.f_house, '12');
+    NEW.w_dist_fuel = get_house_weigth(NEW.f_city, NEW.f_house, '15');
+    NEW.w_dist_market = get_house_weigth(NEW.f_city, NEW.f_house, '17');
+    NEW.w_dist_garag = get_house_weigth(NEW.f_city, NEW.f_house, '21');
+    NEW.w_dist_pipe = get_house_weigth(NEW.f_city, NEW.f_house, '22');
+    NEW.w_dist_scool = get_house_weigth(NEW.f_city, NEW.f_house, '25');
+    NEW.w_dist_mall = get_house_weigth(NEW.f_city, NEW.f_house, '17');
+    NEW.w_dist_farmacy = get_house_weigth(NEW.f_city, NEW.f_house, '16');
+    NEW.w_dist_sport = get_house_weigth(NEW.f_city, NEW.f_house, '33');
     
     SELECT COUNT(*) INTO amount_ps
     FROM ps_dist_house_to_object
