@@ -27,8 +27,8 @@ BEGIN
         AND f_type_object = type_object_id 
     GROUP BY f_house;
 
-    IF weigth > 9.9 THEN 
-        weigth = 9.9;
+    IF weigth > 1 THEN 
+        weigth = 1;
     END IF;
 
     RETURN weigth;

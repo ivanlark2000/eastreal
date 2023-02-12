@@ -15,6 +15,10 @@ BEGIN
 
     IF NEW.f_type_object IN (29, 30) THEN 
         weigth_ps = (get_house_weigth(NEW.f_city, NEW.f_house, '29') + get_house_weigth(NEW.f_city, NEW.f_house, '30')) / 2;
+
+        IF weigth_ps > 1 THEN 
+            weigth_ps = 1;
+        END IF;
         
         UPDATE mn_house_metrics
         SET w_dist_ps = weigth_ps
