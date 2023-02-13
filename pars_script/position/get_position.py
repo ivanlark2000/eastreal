@@ -142,6 +142,3 @@ def add_coord():
             logger.info('inf', exc_info=True)
         finally:
             count -= 1
-
-
-add_coord()

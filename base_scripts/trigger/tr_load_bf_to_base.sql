@@ -41,6 +41,10 @@ BEGIN
         THEN
         SELECT f_flat INTO id_flat FROM INF_Sys
         WHERE inf_sys.site_id = NEW.site_id;
+        
+        UPDATE inf_sys
+        SET f_sell_status = 1
+        WHERE site_id = siteid;
 
         SELECT mn_ads_price.n_price INTO n_price
         FROM mn_ads_price

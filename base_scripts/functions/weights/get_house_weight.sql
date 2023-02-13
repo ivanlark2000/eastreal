@@ -8,12 +8,12 @@ CREATE OR REPLACE FUNCTION get_house_weigth(
     flat_id integer,
     type_object_id smallint
 )
-RETURNS numeric(3,2)
+RETURNS numeric
 AS 
 $BODY$
 
 DECLARE 
-    weigth numeric(3,2);
+    weigth numeric;
 
 BEGIN
 
@@ -27,7 +27,7 @@ BEGIN
         AND f_type_object = type_object_id 
     GROUP BY f_house;
 
-    IF weigth > 1 THEN 
+    IF weigth > 1 THEN
         weigth = 1;
     END IF;
 

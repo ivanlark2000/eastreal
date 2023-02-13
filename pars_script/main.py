@@ -2,6 +2,7 @@ from def_list import *
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
+from position.get_position import add_coord
 from load_to_base import load_to_base, get_id_in_base, load_price_to_base, logger, update_sell_status
 
 
@@ -13,6 +14,7 @@ AKTIVE_SITE_ID = []
 
 def pars():
     count = 1
+    lst_id_in_base = get_id_in_base(CITY_ID)
     for url in getting_url(city=CITY):
         try:
             html = getting_html(url)  # Получаем html стартовой страницы
@@ -21,7 +23,6 @@ def pars():
         lst_links = getting_links(html)  # получаем список ссылок квартир
         if not lst_links:
             continue
-        lst_id_in_base = get_id_in_base(CITY_ID)
         rendom_link = getting_rendom_link(lst_links)
         for ids_site in next(rendom_link):       # проверяем есть ли квартира в базе
             AKTIVE_SITE_ID.append(int(ids_site[0]))
@@ -61,6 +62,7 @@ def pars():
 
 def main():
     pars()
+    add_coord()
 
 
 if __name__ == "__main__":

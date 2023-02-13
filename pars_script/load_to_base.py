@@ -1,4 +1,5 @@
 import sys
+import psycopg2
 import configparser
 sys.path.insert(1, '/home/lark/PROJECT/RealEstate/settings')
 from config import config
@@ -51,6 +52,11 @@ lst_arg = [
 ]
 
 
+def conn_cursor() -> tuple:
+    conn = config.make_con()
+    cursor = conn.cursor()
+    return conn, cursor 
+
 
 def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
     # функция возвращает список айдишников квартир и цен на текущий момент
@@ -84,6 +90,13 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
     return ', '.join(lst_column), ', '.join(str(x) for x in lst_data_out)
 
 
+def err_to_base(dct: dict) -> None:
+    msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
+    logger.critical(msg)
+    print(msg)
+    load_miss_number(site_id=dct['site_id'], city_id=CITY_ID)
+
+
 def load_to_base(dct: dict, count: int) -> None:
     from main import CITY_ID
     conn = config.make_con()
@@ -95,11 +108,11 @@ def load_to_base(dct: dict, count: int) -> None:
             msg = f"В базу закачалось {count} квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
             conn.commit()
             print(msg)
-    except Exception as e:
-        msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
-        logger.critical(msg, exc_info=True)
-        print(msg)
-        load_miss_number(site_id=dct['site_id'], city_id=CITY_ID)
+            logger.info(msg)
+    except psycopg2.errors.CheckViolation:
+        err_to_base(dct)
+    except psycopg2.errors.SyntaxError:
+        err_to_base(dct)
     finally:
         conn.close()
 
@@ -119,6 +132,21 @@ def load_price_to_base(f_flat: int, n_price: int) -> None:
         cursor.close()
 
 
+def update_sold_id(siteid: str) -> None:
+    """Функция для апдэйта айдишника сайта из историчности в активный"""
+    conn, cursor = conn_cursor()
+    try:
+        cursor.execute(f"""
+            UPDATE inf_miss
+            SET f_sell_status = 1
+            WHERE site_id = {siteid}
+                """)
+        conn.commit()
+        logger.info(f'Перевели айдишник объявления {siteid} из историчности в опять активные')
+    except Exception as e:
+        logger.info(f'Не удалось перевести объявление {siteid} из историчности', exc_info=True)
+
+
 def load_miss_number(site_id: str, city_id: int) -> None:
     conn = config.make_con()
     cursor = conn.cursor()
@@ -128,9 +156,10 @@ def load_miss_number(site_id: str, city_id: int) -> None:
                     VALUES ({city_id}, {int(site_id)}, 1, 1);
                        """)
         conn.commit()
-        print(f'Добавили в БД айдишник {site_id} ошибочного объявления')
-    except Exception as e:
-        print(f'Не удалось добавить айдишник {site_id} ошибочного объявления' + str(e))
+        logger.info(f'Добавили в БД айдишник {site_id} ошибочного объявления')
+    except psycopg2.errors.UniqueViolation as e:
+        logger.warning(f'Был обнаружен активный айдишники в историчности {site_id}')
+        update_sold_id(site_id)
     finally:
         cursor.close()
 
@@ -143,7 +172,7 @@ def update_sell_status(city_id: int, siteids:list) -> None:
             conn.commit()
             logger.info('Айдишники проданых квартир успешно переведенны в статус проданны')
     except Exception as e:
-        logger.warning('Статусы проданыных квартир не были переведены в историчность', exc_info=True)
+        logger.warning('Статусы проданыных квартир не были переведены в историчность ', exc_info=True)
     finally:
         conn.close
     

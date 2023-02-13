@@ -7,8 +7,16 @@ RETURNS trigger
 AS 
 $BODY$
 BEGIN 
-    NEW.d_date_sell = clock_timestamp();
-    NEW.t_delta = NEW.d_date_sell - NEW.d_date_create;
+
+    CASE NEW.f_sell_status
+    WHEN 1 THEN 
+        NEW.d_date_sell = NULL;
+        NEW.t_delta = NULL;
+    WHEN 2 THEN
+        NEW.d_date_sell = clock_timestamp();
+        NEW.t_delta = NEW.d_date_sell - NEW.d_date_create;
+    END CASE;
+
     RETURN NEW;
 END;
 $BODY$
@@ -19,4 +27,4 @@ CREATE OR REPLACE TRIGGER add_delta_time
         ON public.inf_sys 
         FOR EACH ROW
         WHEN (NEW.f_sell_status = 2)
-        EXECUTE FUNCTION add_time_delta();
+       EXECUTE FUNCTION add_time_delta();
