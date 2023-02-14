@@ -12,7 +12,7 @@ $BODY$
 
 UPDATE inf_sys 
 SET f_sell_status = 2
-WHERE f_city = city_id AND site_id NOT IN (
+WHERE f_city = city_id AND f_sell_status = 1 AND site_id NOT IN (
     SELECT * FROM unnest($2)
 );
 

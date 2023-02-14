@@ -52,7 +52,7 @@ lst_arg = [
 ]
 
 
-def conn_cursor() -> tuple:
+def conn_cursor() -> tuple[object, object]:
     conn = config.make_con()
     cursor = conn.cursor()
     return conn, cursor 
@@ -90,11 +90,11 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
     return ', '.join(lst_column), ', '.join(str(x) for x in lst_data_out)
 
 
-def err_to_base(dct: dict) -> None:
+def err_to_base(dct: dict, city_id: str) -> None:
     msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
     logger.critical(msg)
     print(msg)
-    load_miss_number(site_id=dct['site_id'], city_id=CITY_ID)
+    load_miss_number(site_id=dct['site_id'], city_id=city_id)
 
 
 def load_to_base(dct: dict, count: int) -> None:
@@ -110,9 +110,9 @@ def load_to_base(dct: dict, count: int) -> None:
             print(msg)
             logger.info(msg)
     except psycopg2.errors.CheckViolation:
-        err_to_base(dct)
+        err_to_base(dct, CITY_ID)
     except psycopg2.errors.SyntaxError:
-        err_to_base(dct)
+        err_to_base(dct, CITY_ID)
     finally:
         conn.close()
 
@@ -137,7 +137,7 @@ def update_sold_id(siteid: str) -> None:
     conn, cursor = conn_cursor()
     try:
         cursor.execute(f"""
-            UPDATE inf_miss
+            UPDATE inf_miss_ads
             SET f_sell_status = 1
             WHERE site_id = {siteid}
                 """)
@@ -145,6 +145,9 @@ def update_sold_id(siteid: str) -> None:
         logger.info(f'Перевели айдишник объявления {siteid} из историчности в опять активные')
     except Exception as e:
         logger.info(f'Не удалось перевести объявление {siteid} из историчности', exc_info=True)
+    finally:
+        cursor.close()
+        conn.close()
 
 
 def load_miss_number(site_id: str, city_id: int) -> None:
@@ -166,6 +169,7 @@ def load_miss_number(site_id: str, city_id: int) -> None:
 
 def update_sell_status(city_id: int, siteids:list) -> None:
     conn = config.make_con()
+    print('активных объявлений - ', len(siteids))
     try:
         with conn.cursor() as cursor:
             cursor.execute(f"SELECT update_sell_status('{city_id}',VARIADIC ARRAY{siteids});")
@@ -174,6 +178,6 @@ def update_sell_status(city_id: int, siteids:list) -> None:
     except Exception as e:
         logger.warning('Статусы проданыных квартир не были переведены в историчность ', exc_info=True)
     finally:
-        conn.close
+        conn.close()
     
 

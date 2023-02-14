@@ -26,5 +26,4 @@ CREATE OR REPLACE TRIGGER add_delta_time
         BEFORE UPDATE 
         ON public.inf_sys 
         FOR EACH ROW
-        WHEN (NEW.f_sell_status = 2)
-       EXECUTE FUNCTION add_time_delta();
+        EXECUTE FUNCTION add_time_delta();
