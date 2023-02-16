@@ -50,7 +50,9 @@ def getting_html(url:str):
     """Получим html для дома и квартиры"""
     try:
         respose = urlopen(url).read().decode("utf-8")
-        time.sleep(5)
         return respose
     except http.client.IncompleteRead as e:
         return e.partial.decode("utf-8")
+    finally:
+        time.sleep(5)
+

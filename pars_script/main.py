@@ -20,9 +20,8 @@ def pars():
             html = getting_html(url)  # Получаем html стартовой страницы
         except HTTPError as e:
             logger.warning(f'{url} \n ', exc_info=True)
-        lst_links = getting_links(html)  # получаем список ссылок квартир
-        if not lst_links:
             continue
+        lst_links = getting_links(html)  # получаем список ссылок квартир
         rendom_link = getting_rendom_link(lst_links)
         for ids_site in next(rendom_link):       # проверяем есть ли квартира в базе
             AKTIVE_SITE_ID.append(int(ids_site[0]))

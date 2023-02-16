@@ -129,7 +129,7 @@ def add_coord():
                 else:
                     add_full_address(conn, streetid=row[1], full_adress=street)
                 street = street + ' ' + row[4].strip()
-                position = get_positin_ya(street)
+                position = get_position_ya(street)
                 if position:
                     lat, lon = position
                     add_coord_to_base(row[0], lat, lon, conn)
