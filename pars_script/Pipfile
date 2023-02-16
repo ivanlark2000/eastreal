@@ -4,20 +4,18 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-python-dotenv = "*"
 psycopg2-binary = "*"
 beautifulsoup4 = "*"
 transliterate = "*"
-requests = "*"
 selenium = "*"
+requests = "*"
 webdriver-manager = "*"
 dadata = "*"
 neovim = "*"
 black = "*"
-openai = "*"
-pillow = "*"
 
 [dev-packages]
 
 [requires]
-python_version = "3.10"
+python_version = "3.11"
+python_full_version = "3.11.2"
