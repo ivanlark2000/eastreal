@@ -1,5 +1,6 @@
 /sys/os
 /sys/time
+/log
 .idea
 settings/.env
 pars_script/__pycache__
@@ -14,7 +15,7 @@ settings/__init__.py
 /sys/chromedriver
 /__pycache__
 app/__pycache__
-/log
+/settings/__pycache__
 
 /pars_script/pars_index/PIndx01.dbf
 /pars_script/position/test.py

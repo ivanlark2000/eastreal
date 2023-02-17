@@ -2,8 +2,17 @@
 import time
 import random
 import http.client
+from dadata import Dadata
 from bs4 import BeautifulSoup
+from selenium import webdriver
 from urllib.request import urlopen
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.chrome.options import Options
+from load_to_base import get_all_street_without_coord, add_coord_to_base, add_full_address
+
+
+chrom_option = Options()
 
 
 def save_html(html: str, file_name: str) -> None:
@@ -56,3 +65,66 @@ def getting_html(url:str):
     finally:
         time.sleep(5)
 
+
+def get_right_street(street: str):
+    from main import config
+    try:
+        with Dadata(config.API_KEY_DATA, config.SECRET_KEY_DADATA) as dadata:
+            address = dadata.suggest(name='address', query=street)
+            if not address:
+                return
+            dadata.close()
+        return address[0]['value']
+    except Exception as e:
+        config.logger.warning(f'Не удалось получить данные в Дадата адрес {street} '
+                       f'ошибка {e}')
+
+
+def get_position_ya(adress: str) -> tuple[float, float]:
+    from main import logger 
+    url = 'https://yandex.ru/maps'
+    chrom_option.add_argument("--headless")
+    driver = webdriver.Chrome(options=chrom_option)
+    try:
+        driver.get(url)
+        while True:
+            try:
+                el = driver.find_element(By.TAG_NAME, 'input')
+                el.send_keys(adress, Keys.ENTER)
+                time.sleep(3)
+                break
+            except Exception as e:
+                logger.info('Обновления id элемента яндекс')
+        lst = driver.find_element(By.CLASS_NAME, 'toponym-card-title-view__coords-badge').text.split(', ')
+        return float(lst[0]), float(lst[1])
+    except Exception as e:
+        logger.warning(f'Не удалось получить координаты с яндекс улица {adress} {e}')
+
+
+def add_coord():
+    from main import logger
+    data = get_all_street_without_coord()
+    count = len(data)
+    print(f'к обновлению {count} домов')
+    for row in data:
+        try:
+            if not row[5]:
+                street = get_right_street(row[2] + " " + row[3].strip())
+                if not street:
+                    street = row[2] + " " + row[3].strip()
+                else:
+                    add_full_address(streetid=row[1], full_adress=street)
+                street = street + ' ' + row[4].strip()
+                position = get_position_ya(street)
+                if position:
+                    lat, lon = position
+                    add_coord_to_base(row[0], lat, lon)
+            else:
+                street = row[2] + ' ' + row[5] + ' ' + row[4].strip()
+                lat, lon = get_position_ya(street)
+                add_coord_to_base(row[0], lat, lon)
+            logger.info(f'Данные по координатам по адресу {street} получены успешно ')
+        except Exception as e:
+            logger.info('inf', exc_info=True)
+        finally:
+            count -= 1
