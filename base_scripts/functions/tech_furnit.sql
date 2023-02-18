@@ -1,25 +1,23 @@
---DROP FUNCTION add_technics(f_flat integer, s_items text, var integer)
+--DROP FUNCTION add_technics(f_flat integer, s_items text, vainteger)
 create or replace FUNCTION public.add_technics(
 	f_flat integer,
 	s_items text,
 	var integer)
     RETURNS void
-    LANGUAGE 'plpython3u'
-    COST 100
-    VOLATILE PARALLEL UNSAFE
 AS $BODY$
 items = s_items
 items = [i.strip() for i in items.split(',')]
 
-match var:
-    case 1:
-        table_main = 'ES_Furniture'
-        fk = 'f_furniture_types'
-        table = 'FS_Furniture_Types'
-    case 2:
-        table_main = 'ES_Technics'
-        fk = 'f_technics_type'
-        table = 'FS_Technic_Types'
+if var == 1:
+    table_main = 'ES_Furniture'
+    fk = 'f_furniture_types'
+    table = 'FS_Furniture_Types'
+
+else:
+    table_main = 'ES_Technics'
+    fk = 'f_technics_type'
+    table = 'FS_Technic_Types'
+
 
 plan = plpy.prepare(f'SELECT {fk} FROM  {table_main} WHERE f_flat = $1', ['int'])
 active = plpy.execute(plan, [f_flat])
@@ -52,7 +50,6 @@ for i in items:
 	if i not in items_active:
 		plpy.execute(plan, [f_flat, i])
 
-$BODY$;
+$BODY$
 
-alter FUNCTION public.add_technics(integer, text, integer)
-    OWNER TO ivan;
+LANGUAGE 'plpython3u'

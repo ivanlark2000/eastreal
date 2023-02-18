@@ -129,7 +129,7 @@ def load_price_to_base(f_flat: int, n_price: int) -> None:
 
 def update_sold_id(siteid: str) -> None:
     """Функция для апдэйта айдишника сайта из историчности в активный"""
-    conn, cursor, logger = config.conn_cursor()
+    conn, cursor, logger = conn_cursor()
     try:
         cursor.execute(f"""
             UPDATE inf_miss_ads

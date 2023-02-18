@@ -2,8 +2,8 @@ import sys
 
 sys.path.insert(1, '/home/lark/project/eastreal/settings')
 
-from config import Config
 from def_list import *
+from config import Config
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
@@ -25,7 +25,7 @@ def pars():
     lst_id_in_base = get_id_in_base(CITY_ID)
     for url in getting_url(city=CITY):
         try:
-            html = getting_html(url)  # Получаем html стартовой страницы
+            html = getting_html_sel(url)  # Получаем html стартовой страницы
         except HTTPError as e:
             logger.warning(f'{url} \n ', exc_info=True)
             continue
@@ -55,7 +55,7 @@ def pars():
             else:
                 url = ids_site[2]
                 try:
-                    html_flat = getting_html(url)
+                    html_flat = getting_html_sel(url)
                 except HTTPError as e:
                     logger.warning(f'{url} \nОшибка в скачке данных с Авито', exc_info=True)
                     continue
@@ -70,7 +70,7 @@ def pars():
 
 
 def main():
-    #pars()
+    pars()
     add_coord()
 
 

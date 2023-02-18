@@ -13,6 +13,8 @@ from load_to_base import get_all_street_without_coord, add_coord_to_base, add_fu
 
 
 chrom_option = Options()
+chrom_option.add_argument("--headless")
+driver = webdriver.Chrome(options=chrom_option)
 
 
 def save_html(html: str, file_name: str) -> None:
@@ -65,6 +67,20 @@ def getting_html(url:str):
     finally:
         time.sleep(5)
 
+def getting_html_sel(url: str) -> str:
+    """Возврашет htnl посредством виртуальнго браузера """
+    from main import logger 
+    try:
+        driver.get(url)
+        time.sleep(2)
+        driver.refresh()
+        time.sleep(1)
+        return driver.page_source
+    except Exception as e:
+        logger.warning(f'не удалось получить данные с сайта по ссылке {url}', exc_info=True)
+    finally:
+        time.sleep(3)
+
 
 def get_right_street(street: str):
     from main import config
@@ -83,8 +99,6 @@ def get_right_street(street: str):
 def get_position_ya(adress: str) -> tuple[float, float]:
     from main import logger 
     url = 'https://yandex.ru/maps'
-    chrom_option.add_argument("--headless")
-    driver = webdriver.Chrome(options=chrom_option)
     try:
         driver.get(url)
         while True:

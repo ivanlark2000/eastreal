@@ -1,5 +1,5 @@
 import os
-import psycopg2 
+import psycopg2
 
 
 class Config:
@@ -35,5 +35,4 @@ class Config:
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         return logger
-
 

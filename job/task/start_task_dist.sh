@@ -1,4 +1,4 @@
-#Джоб по запуску закачки дистанции пешко и на машине 
+#Джоб по запуску закачки дистанции пешком и на машине 
 #CREATE DATE 2023.01.29
 dir_project=/home/lark/PROJECT/RealEstate
 dir=${dir_project}/base_scripts/job/log/task.txt;
