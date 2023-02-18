@@ -86,7 +86,7 @@ def arg_value(arg: list, dct: dict) -> tuple[str, str]:
 
 def err_to_base(dct: dict, city_id: str) -> None:
     from main import logger 
-    msg = f"квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
+    msg = f"квартира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
     logger.critical(msg)
     print(msg)
     load_miss_number(site_id=dct['site_id'], city_id=city_id)
@@ -100,7 +100,7 @@ def load_to_base(dct: dict, count: int) -> None:
         with conn.cursor() as cursor:
             cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
                    VALUES ({atr[1]})""")
-            msg = f"В базу закачалось {count} квартрира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
+            msg = f"В базу закачалось {count} квартира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
             conn.commit()
             print(msg)
             logger.info(msg)

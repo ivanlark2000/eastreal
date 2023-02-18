@@ -78,8 +78,6 @@ def getting_html_sel(url: str) -> str:
         return driver.page_source
     except Exception as e:
         logger.warning(f'не удалось получить данные с сайта по ссылке {url}', exc_info=True)
-    finally:
-        time.sleep(3)
 
 
 def get_right_street(street: str):
