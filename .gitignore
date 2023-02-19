@@ -23,7 +23,10 @@ app/__pycache__
 /pars_script/position/__pycache__
 /pars_script/position/chromedriver
 
+#логи
 /pars_script/log/
+/job/log
+
 /pars_script/settings/__init__.py
 
 

@@ -74,6 +74,7 @@ def getting_html_sel(url: str) -> str:
     try:
         driver.get(url)
         time.sleep(3)
+        return driver.page_source   
     except selenium.common.exceptions.TimeoutException as e:
         driver.refresh()
         logger.warnin('Слишком долгое ожидвение по поводу страницы, перезагрузка страницы ')
