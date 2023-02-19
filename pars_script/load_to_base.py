@@ -108,6 +108,8 @@ def load_to_base(dct: dict, count: int) -> None:
         err_to_base(dct, CITY_ID)
     except psycopg2.errors.SyntaxError:
         err_to_base(dct, CITY_ID)
+    except psycopg2.errors.NotNullViolation:
+        err_to_base(dct, CITY_ID)
     finally:
         conn.close()
 
