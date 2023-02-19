@@ -16,6 +16,7 @@ DECLARE
 	type_bus_id smallint;
     name_type_bus varchar(100);
     name_bus varchar(100);
+    name_ varchar(100);
 
 BEGIN
     SELECT link INTO stop_id
@@ -34,9 +35,9 @@ BEGIN
 
     FOREACH  i IN ARRAY $5
         LOOP
-            name_bus := split_part(i, ' ', 2);
-            name_type_bus:= split_part(i, ' ', 1);
-
+            name_bus := reverse(split_part(reverse(i), ' ', 1));
+            name_type_bus:= replace(i, name_bus, '');
+            
             SELECT LINK INTO type_bus_id
             FROM  fs_type_bus
 			WHERE c_name = name_type_bus;

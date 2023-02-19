@@ -26,6 +26,7 @@ app/__pycache__
 #логи
 /pars_script/log/
 /job/log
+/job/log/main_script.log
 
 /pars_script/settings/__init__.py
 
@@ -40,3 +41,5 @@ app/__pycache__
 pars_script/test_main.html
 pars_script/test_one_ads.html
 
+# Запросы к деплою 
+/base_scripts/query/prepare.sql
