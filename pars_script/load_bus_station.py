@@ -74,7 +74,6 @@ def get_coords(soup: object) -> tuple[float, float]:
 
 def load_to_base(city_id: int, stop_name: str, coord: tuple, marh_list: list) -> None:
     conn = config.make_con()
-    print('Попытка загрузки дынных')
     try:
         with conn.cursor() as cursor:
             cursor.execute(f'''CALL load_bus_station(

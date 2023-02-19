@@ -5,7 +5,7 @@ CREATE OR REPLACE PROCEDURE load_bus_station(
     name_station varchar(150),
     b_lat numeric,
     b_lon numeric,
-    VARIADIC route varchar[]
+    VARIADIC route 4varchar[]
 )
 AS
 $BODY$
@@ -18,7 +18,7 @@ DECLARE
     name_bus varchar(100);
     name_ varchar(100);
 
-BEGIN
+BEGIN:
     SELECT link INTO stop_id
     FROM ps_stop_bus
     WHERE 1=1
