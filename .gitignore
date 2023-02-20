@@ -27,7 +27,7 @@ app/__pycache__
 /pars_script/log/
 /job/log
 /job/log/main_script.log
-/job/log/main_script.log
+/job/log/task_dist.log
 
 /pars_script/settings/__init__.py
 
