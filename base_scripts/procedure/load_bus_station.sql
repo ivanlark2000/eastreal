@@ -1,36 +1,38 @@
 -- Процедура по загрузке автобусов и маршрутов к ним 
 -- CREATE DATE 2023.02.15
-CREATE OR REPLACE PROCEDURE load_bus_station(
-    city_id smallint,
-    name_station varchar(150),
-    b_lat numeric,
-    b_lon numeric,
-    VARIADIC route 4varchar[]
-)
-AS
-$BODY$
+-- ALTER DATE 
+    --2023.02.15 заменили тип Link на uuid 
+
+CREATE OR REPLACE PROCEDURE public.load_bus_station(
+	IN city_id smallint,
+	IN name_station character varying,
+	IN b_lat numeric,
+	IN b_lon numeric,
+	VARIADIC route character varying[])
+LANGUAGE 'plpgsql'
+AS $BODY$
 DECLARE
     bus_id integer;
-	stop_id integer;
+	stop_id uuid:= uuid_generate_v4();
 	i varchar(150);                       --элемент цикла
 	type_bus_id smallint;
     name_type_bus varchar(100);
     name_bus varchar(100);
     name_ varchar(100);
 
-BEGIN:
-    SELECT link INTO stop_id
-    FROM ps_stop_bus
-    WHERE 1=1
-        AND f_city = city_id
-        AND c_name = name_station;
-
-    IF stop_id IS NOT NULL THEN
+BEGIN
+    IF (
+        SELECT link 
+        FROM ps_stop_bus
+        WHERE 1=1
+            AND f_city = city_id
+            AND c_name = name_station
+    ) IS NOT NULL THEN
         RETURN;
     END IF;
 
-    INSERT INTO ps_stop_bus (f_city, c_name, lat, lon)
-    VALUES (city_id, name_station, b_lat, b_lon)
+    INSERT INTO ps_stop_bus (link, f_city, c_name, lat, lon)
+    VALUES (stop_id, city_id, name_station, b_lat, b_lon)
     RETURNING link INTO stop_id;
 
     FOREACH  i IN ARRAY $5
@@ -65,7 +67,9 @@ BEGIN:
 
         END LOOP;
 END;
-$BODY$
-LANGUAGE plpgsql;
+$BODY$;
+ALTER PROCEDURE public.load_bus_station(smallint, character varying, numeric, numeric, character varying[])
+    OWNER TO lark;
 
-COMMENT ON PROCEDURE load_bus_station IS 'Процедура для загрузки остановок и маршрутов';
+COMMENT ON PROCEDURE public.load_bus_station(smallint, character varying, numeric, numeric, character varying[])
+    IS 'Процедура для загрузки остановок и маршрутов';
