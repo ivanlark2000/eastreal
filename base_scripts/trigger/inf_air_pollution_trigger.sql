@@ -9,8 +9,8 @@ BEGIN
 	FROM fs_index_pollution
 	WHERE link = NEW.f_index;
 
-	UPDATE mn_metrics
-	SET air = value
+	UPDATE mn_house_metrics
+	SET w_air = value
 	WHERE f_city = NEW.f_city;
 	
 	RETURN NEW;
