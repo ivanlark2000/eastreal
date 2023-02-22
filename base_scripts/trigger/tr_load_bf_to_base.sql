@@ -1,8 +1,12 @@
 --ALTER DATE 
-    --2023.02.02 добавили закачку данных в таблицу inf_descriotions
-
-CREATE OR REPLACE FUNCTION load_ads_to_base() RETURNS trigger
-AS $$
+    --2023.02.02 добавили закачку данных в таблицу inf_descriptions
+    --2023.02.22 добавил создание дома при его отсутствии в таблицу метрик
+CREATE OR REPLACE FUNCTION public.load_ads_to_base()
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
 DECLARE
     id_city integer := (SELECT link FROM FS_City WHERE C_Name = NEW.S_City);
     id_street integer;
@@ -142,6 +146,10 @@ BEGIN
             VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
                 id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
             RETURNING link INTO id_house;
+			
+			INSERT INTO mn_house_metrics (f_house, f_city)
+			VALUES (id_house, id_city);
+			
             END IF;
 
         IF NEW.s_qty_room IS NOT NULL
@@ -338,14 +346,16 @@ BEGIN
         
         INSERT INTO inf_descriptions (f_flat, c_name)
         VALUES (id_apartments_ads, NEW.s_description);
-
-	INSERT INTO mn_metrics (f_house, f_flat, f_city)
-	VALUES (id_house, id_apartments_ads, id_city);
+	
+	INSERT INTO mn_metrics (f_house, f_flat, f_city, b_active)
+	VALUES (id_house, id_apartments_ads, id_city, true);
 	END IF;
 	RETURN NEW;
 END;
-$$ LANGUAGE plpgsql;
+$BODY$;
 
+ALTER FUNCTION public.load_ads_to_base()
+    OWNER TO ivan;
 
 CREATE OR REPLACE TRIGGER load_ads_temp_to_mn
     BEFORE INSERT OR UPDATE 

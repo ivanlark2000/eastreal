@@ -32,11 +32,15 @@ CREATE OR REPLACE TRIGGER del_whitespace_mn_house
     EXECUTE FUNCTION public.del_whitespace_mn_house();
 
 
---2023.01.30 добавмлм срабатывание задач по дистанции в триггер 
+--2023.01.30 добавили срабатывание задач по дистанции в триггер 
+-- ALTER DATE 2023.02.14 Добавили расчет bus_station
+
 CREATE OR REPLACE FUNCTION public.add_house_metrics()
-RETURNS TRIGGER
-AS
-$BODY$
+    RETURNS trigger
+    LANGUAGE 'plpgsql'
+    COST 100
+    VOLATILE NOT LEAKPROOF
+AS $BODY$
 DECLARE
     house_id integer;
     weight numeric(4,2);
@@ -60,12 +64,13 @@ BEGIN
     WHERE f_house = NEW.link;
 	
     PERFORM add_task_distance(NEW.f_city, NEW.link, NEW.lat, NEW.lon);  
-
+	PERFORM add_task_bus(NEW.f_city, NEW.link, NEW.lat, NEW.lon);
+	
     RETURN NEW;
 
 END;
-$BODY$
-LANGUAGE plpgsql;
+$BODY$;
+
 
 CREATE OR REPLACE TRIGGER add_house_metrics
     AFTER UPDATE
