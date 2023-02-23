@@ -21,10 +21,11 @@ class Config:
 
     def make_con(self):
         return psycopg2.connect(dbname=self.NAME_DB,
-                                user=self.USERNAME_DB,
-                                password=self.PASSWORD_DB,
-                                host=self.HOST,
-                                port=self.PORT)
+                                user=self.USERNAME_DB)
+                                #,
+                                #password=self.PASSWORD_DB,
+                                #host=self.HOST,
+                                #port=self.PORT)
     
     def make_logger(self, logfile: str):
         import logging
@@ -35,4 +36,3 @@ class Config:
         handler.setFormatter(formatter)
         logger.addHandler(handler)
         return logger
-

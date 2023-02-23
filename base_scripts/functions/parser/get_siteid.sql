@@ -13,9 +13,17 @@ RETURNS TABLE (
 
 AS
 $BODY$
-SELECT s.site_id, p.n_price::money::numeric, s.f_flat
+
+SELECT 
+    s.site_id,
+    CASE
+        WHEN n_price IS NOT NULL THEN p.n_price::money::numeric
+        ELSE NULL
+    END as n_price 
+    
+    ,s.f_flat
 FROM inf_sys s
-    INNER JOIN (
+    LEFT JOIN (
         SELECT f_flat, n_price
         FROM mn_ads_price
         WHERE link IN (

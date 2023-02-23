@@ -33,9 +33,6 @@ app/__pycache__
 
 /pars_script/settings/__init__.py
 
-
-/pard_script/flat.html
-
 /base_scripts/job/log
 /base_scripts/job/date_out.txt
 /base_scripts/job/task.txt
