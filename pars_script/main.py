@@ -1,4 +1,3 @@
-
 from def_list import *
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
@@ -10,8 +9,6 @@ CITY_ID = 24741
 CITY_RUS = 'Калининград'
 CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)
 AKTIVE_SITE_ID = []
-
-
 
 
 def pars():

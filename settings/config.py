@@ -2,7 +2,7 @@ import os
 import sys
 import logging
 import psycopg2
-
+import argparse
 
 class Config:
     """Класс с настройками"""
@@ -41,3 +41,17 @@ class Config:
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
         return self.logger
+
+
+parser = argparse.ArgumentParser()
+parser.add_argument('-t', '--terminal', help='Запуск парсера с выводом логов в консоль')
+parser.add_argument('-f', '--file', help='Запуск скрипта с выводом логов в фаил')
+args = parser.parse_args()
+
+config = Config()
+
+
+if args.file:
+    logger = config.make_logger(args.file)
+else:
+    logger = config.make_logger_term()
