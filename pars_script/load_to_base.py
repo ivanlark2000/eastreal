@@ -1,6 +1,16 @@
+import sys
 import psycopg2
 
 
+sys.path.insert(1, '/home/lark/project/eastreal/settings')
+
+from config import Config
+
+
+config = Config()
+logger = config.make_logger_term()
+
+    
 lst_arg = [
     'site_id',
     'S_City',
@@ -45,16 +55,9 @@ lst_arg = [
 ]
 
 
-def conn_cursor() -> tuple[object, object, object]:
-    from main import config, logger
-    conn = config.make_con()
-    cursor = conn.cursor()
-    return conn, cursor, logger
-
-
 def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
     # функция возвращает список айдишников квартир и цен на текущий момент
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     try:
         with conn.cursor() as cursor:
             cursor.execute(f"SELECT * FROM get_siteid_price('{city_id}', '1');")
@@ -92,7 +95,7 @@ def err_to_base(dct: dict, city_id: str) -> None:
 
 def load_to_base(dct: dict, count: int) -> None:
     from main import CITY_ID
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     atr = arg_value(lst_arg, dct)
     try:
         with conn.cursor() as cursor:
@@ -112,57 +115,57 @@ def load_to_base(dct: dict, count: int) -> None:
 
 
 def load_price_to_base(f_flat: int, n_price: int) -> None:
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     try:
-        cursor.execute(f"""
-            INSERT INTO mn_ads_price (f_flat, n_price)
-            VALUES ({f_flat}, {n_price});
-            """)
-        conn.commit()
+        with conn.cursor() as cursor:
+            cursor.execute(f"""
+                INSERT INTO mn_ads_price (f_flat, n_price)
+                VALUES ({f_flat}, {n_price});
+                """)
+            conn.commit()
     except Exception as e:
-        print('Ошибка в загрузке данных по цене')
+        logger.warning('Ошибка в загрузке данных по цене')
     finally:
-        cursor.close()
         conn.close()
 
 
 def update_sold_id(siteid: str) -> None:
     """Функция для апдэйта айдишника сайта из историчности в активный"""
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     try:
-        cursor.execute(f"""
-            UPDATE inf_miss_ads
-            SET f_sell_status = 1
-            WHERE site_id = {siteid}
-                """)
-        conn.commit()
-        logger.info(f'Перевели айдишник объявления {siteid} из историчности в опять активные')
+        with conn.cursor() as cursor:
+            cursor.execute(f"""
+                UPDATE inf_miss_ads
+                SET f_sell_status = 1
+                WHERE site_id = {siteid}
+                    """)
+            conn.commit()
+            logger.info(f'Перевели айдишник объявления {siteid} из историчности в опять активные')
     except Exception as e:
         logger.info(f'Не удалось перевести объявление {siteid} из историчности', exc_info=True)
     finally:
-        cursor.close()
         conn.close()
 
 
 def load_miss_number(site_id: str, city_id: int) -> None:
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     try:
-        cursor.execute(f"""
-                    INSERT INTO inf_miss_ads (f_city, site_id, f_source, f_sell_status)
-                    VALUES ({city_id}, {int(site_id)}, 1, 1);
-                       """)
-        conn.commit()
-        logger.info(f'Добавили в БД айдишник {site_id} ошибочного объявления')
+        with conn.cursor() as cursor:
+            cursor.execute(f"""
+                        INSERT INTO inf_miss_ads (f_city, site_id, f_source, f_sell_status)
+                        VALUES ({city_id}, {int(site_id)}, 1, 1);
+                           """)
+            conn.commit()
+            logger.info(f'Добавили в БД айдишник {site_id} ошибочного объявления')
     except psycopg2.errors.UniqueViolation as e:
         logger.warning(f'Был обнаружен активный айдишники в историчности {site_id}')
         update_sold_id(site_id)
     finally:
-        cursor.close()
         conn.close()
 
 
 def update_sell_status(city_id: int, siteids:list) -> None:
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     print('активных объявлений - ', len(siteids))
     try:
         with conn.cursor() as cursor:
@@ -176,7 +179,7 @@ def update_sell_status(city_id: int, siteids:list) -> None:
     
 
 def get_all_street_without_coord():
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     sql = """SELECT 
             h.link
             ,s.link
@@ -193,49 +196,46 @@ def get_all_street_without_coord():
             AND h.lat IS NULL AND h.lon IS NULL
             AND s_number <> ''"""
     try:
-        cursor.execute(sql)
-        rez = cursor.fetchall()
-        return rez
+        with conn.cursor() as cursor:
+            cursor.execute(sql)
+            return cursor.fetchall()
     except Exception:
         logger.warning('''Не удалось получить список домов без координат с БД''', exc_info=True)
     finally:
-        cursor.close()
         conn.close()
 
 
 def add_coord_to_base(id: int, lat: float, lon: float):
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     sql = f"""UPDATE mn_house 
             SET lat = {lat}, lon = {lon}
             WHERE link = {id}"""
     try:
-        cursor.execute(sql)
-        conn.commit()
+        with conn.cursor() as cursor:
+            cursor.execute(sql)
+            conn.commit()
     except Exception:
         logger.warning(f'''Не удалось добавить координаты в БД
                             id_house = {id}
                             coord = {lat}, {lon}''',
                             exc_info=True)
     finally:
-        cursor.close()
         conn.close()
 
 
 def add_full_address(streetid: int, full_adress: str):
-    conn, cursor, logger = conn_cursor()
+    conn = config.make_con()
     sql = f"""
             UPDATE fs_street 
             SET full_address = '{full_adress}'
             WHERE link = {streetid}"""
     try:
-        cursor.execute(sql)
+        with conn.cursor() as cursor:
+            cursor.execute(sql)
     except Exception:
         logger.warning(f'''Не удалось загрузить в БД название полной улицы
                            streetid     = {streetid},
                            full_address = {full_adress}''',
                        exc_info=True)
     finally:
-        cursor.close()
         conn.close()
-
-

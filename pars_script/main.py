@@ -1,13 +1,9 @@
-import sys
-
-sys.path.insert(1, '/home/lark/project/eastreal/settings')
 
 from def_list import *
-from config import Config
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
-from load_to_base import load_to_base, get_id_in_base, load_price_to_base, update_sell_status
+from load_to_base import load_to_base, get_id_in_base, load_price_to_base, update_sell_status, logger
 
 
 CITY_ID = 24741 
@@ -16,8 +12,6 @@ CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)
 AKTIVE_SITE_ID = []
 
 
-config = Config()
-logger = config.make_logger_term()
 
 
 def pars():
