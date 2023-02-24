@@ -29,7 +29,7 @@ app/__pycache__
 /job/log/main_script.log
 /job/log/task_dist.log
 /job/task/task_air.sh
-
+job/log/task_dist.log
 
 /pars_script/settings/__init__.py
 
