@@ -62,7 +62,6 @@ def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
             return tuple([tuple([i[0], i[1], (i[2])]) for i in cursor.fetchall()])
     except Exception as e:
         msg = 'Не удалось получить айдишники кватир сайта с бд' + str(e)
-        print(msg)
         logger.critical(msg, exc_info=True)
     finally:
         conn.close()
@@ -88,7 +87,6 @@ def err_to_base(dct: dict, city_id: str) -> None:
     from main import logger 
     msg = f"квартира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
     logger.critical(msg)
-    print(msg)
     load_miss_number(site_id=dct['site_id'], city_id=city_id)
 
 
@@ -102,7 +100,6 @@ def load_to_base(dct: dict, count: int) -> None:
                    VALUES ({atr[1]})""")
             msg = f"В базу закачалось {count} квартира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
             conn.commit()
-            print(msg)
             logger.info(msg)
     except psycopg2.errors.CheckViolation:
         err_to_base(dct, CITY_ID)

@@ -16,8 +16,8 @@ CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)
 AKTIVE_SITE_ID = []
 
 
-config = Config('parsAvito.log')
-logger = config.logger
+config = Config()
+logger = config.make_logger_term()
 
 
 def pars():
@@ -38,14 +38,14 @@ def pars():
             for ids_base in lst_id_in_base:
                 if int(ids_site[0]) == ids_base[0]:
                     if int(ids_site[1]) == ids_base[1]:
-                        print(f'В БД есть квартра № {ids_site[0]} с такой же ценой')
+                        logger.info(f'В БД есть квартра № {ids_site[0]} с такой же ценой')
                     elif ids_base[2] is not None and ids_base[1] is None:
                         load_price_to_base(f_flat=ids_base[2], n_price=ids_site[1])
-                        logger.critical(f'У квартирты с ID {ids_site[0]} отсутвовала цена')
+                        logger.info(f'У квартирты с ID {ids_site[0]} отсутвовала цена')
                     elif ids_base[1]:
                         if int(ids_site[1]) > ids_base[1]:
-                            logger.info(f'''Квартира с айдишником {ids_site[0]} 
-                                      подорожала на {int(ids_site[1]) - int(ids_base[1])}''')
+                            logger.info(f'''Квартира с айдишником {ids_site[0]} \
+                                    подорожала на {int(ids_site[1]) - int(ids_base[1])}''')
                             load_price_to_base(f_flat=ids_base[2], n_price=ids_site[1])
 
                         else:

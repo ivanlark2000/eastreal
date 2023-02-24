@@ -1,4 +1,6 @@
 import os
+import sys
+import logging
 import psycopg2
 
 
@@ -15,9 +17,8 @@ class Config:
     HOST = os.environ.get('host')
     API_KEY_DADATA = os.environ.get('API_KEY_DADATA')
     SECRET_KEY_DADATA = os.environ.get('SECRET_KEY_DADATA')
-    
-    def __init__(self, logname: str):
-        self.logger = self.make_logger(logname)
+    logger = logging.getLogger('PARSER') 
+    logger.setLevel(logging.INFO)
 
     def make_con(self):
         return psycopg2.connect(dbname=self.NAME_DB,
@@ -27,12 +28,16 @@ class Config:
                                 #host=self.HOST,
                                 #port=self.PORT)
     
+    def make_logger_term(self):
+        handler = logging.StreamHandler(stream=sys.stdout)
+        formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
+        handler.setFormatter(formatter)
+        self.logger.addHandler(handler)
+        return self.logger
+
     def make_logger(self, logfile: str):
-        import logging
-        logger = logging.getLogger('PARSER') 
-        logger.setLevel(logging.INFO)
         handler = logging.FileHandler(self.LOG_DIR + '//' + logfile, 'w')
         formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
         handler.setFormatter(formatter)
-        logger.addHandler(handler)
-        return logger
+        self.logger.addHandler(handler)
+        return self.logger
