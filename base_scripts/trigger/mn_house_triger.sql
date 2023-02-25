@@ -59,8 +59,8 @@ BEGIN
     INTO weight
     FROM fact;
 	
-    UPDATE mn_metrics
-    SET factory = weight
+    UPDATE mn_house_metrics
+    SET w_factory = weight
     WHERE f_house = NEW.link;
 	
     PERFORM add_task_distance(NEW.f_city, NEW.link, NEW.lat, NEW.lon);  

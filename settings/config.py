@@ -44,7 +44,7 @@ class Config:
 
 
 parser = argparse.ArgumentParser()
-parser.add_argument('-t', '--terminal', help='Запуск парсера с выводом логов в консоль')
+parser.add_argument('-c', '--coord', help='Запуск скрипта только парсинг домов с ян-са')
 parser.add_argument('-f', '--file', help='Запуск скрипта с выводом логов в фаил')
 args = parser.parse_args()
 

@@ -40,8 +40,8 @@ def pars():
                             load_price_to_base(f_flat=ids_base[2], n_price=ids_site[1])
 
                         else:
-                            logger.info(f'''Квартира с айди {ids_site[0]} 
-                                            подешевела на {int(ids_base[1]) - int(ids_site[1])}''')
+                            logger.info(f'''Квартира с айди {ids_site[0]} \
+                                    подешевела на {int(ids_base[1]) - int(ids_site[1])}''')
                             load_price_to_base(f_flat=ids_base[2], n_price=ids_site[1])
 
                     break
@@ -64,8 +64,12 @@ def pars():
 
 
 def main():
-    pars()
-    add_coord()
+    from config import args
+    if args.coord:
+        add_coord()
+    else:
+        pars()
+        add_coord()
 
 
 if __name__ == "__main__":

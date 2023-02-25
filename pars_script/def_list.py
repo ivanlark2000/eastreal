@@ -1,10 +1,12 @@
 # coding=utf-8
 import time
 import random
+import selenium
 import http.client
 from dadata import Dadata
 from bs4 import BeautifulSoup
 from selenium import webdriver
+from load_to_base import config, logger
 from urllib.request import urlopen
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -84,9 +86,8 @@ def getting_html_sel(url: str) -> str:
 
 
 def get_right_street(street: str):
-    from main import config
     try:
-        with Dadata(config.API_KEY_DATA, config.SECRET_KEY_DADATA) as dadata:
+        with Dadata(config.API_KEY_DADATA, config.SECRET_KEY_DADATA) as dadata:
             address = dadata.suggest(name='address', query=street)
             if not address:
                 return
@@ -98,7 +99,6 @@ def get_right_street(street: str):
 
 
 def get_position_ya(adress: str) -> tuple[float, float]:
-    from main import logger 
     url = 'https://yandex.ru/maps'
     try:
         driver.get(url)
@@ -112,8 +112,10 @@ def get_position_ya(adress: str) -> tuple[float, float]:
                 logger.info('Обновления id элемента яндекс')
         lst = driver.find_element(By.CLASS_NAME, 'toponym-card-title-view__coords-badge').text.split(', ')
         return float(lst[0]), float(lst[1])
+    except selenium.common.exceptions.NoSuchElementException:
+        logger.info(f'Адресс не коректен - {adress}')
     except Exception as e:
-        logger.warning(f'Не удалось получить координаты с яндекс улица {adress} {e}')
+        logger.warning(f'Не удалось получить координаты с яндекс улица {adress} {e}', exc_info=True)
 
 
 def add_coord():
@@ -136,9 +138,10 @@ def add_coord():
                     add_coord_to_base(row[0], lat, lon)
             else:
                 street = row[2] + ' ' + row[5] + ' ' + row[4].strip()
-                lat, lon = get_position_ya(street)
-                add_coord_to_base(row[0], lat, lon)
-            logger.info(f'Данные по координатам по адресу {street} получены успешно ')
+                position = get_position_ya(street)
+                if position:
+                    lat, lon = position
+                    add_coord_to_base(row[0], lat, lon)
         except Exception as e:
             logger.info('inf', exc_info=True)
         finally:
