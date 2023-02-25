@@ -228,6 +228,7 @@ def add_full_address(streetid: int, full_adress: str):
     try:
         with conn.cursor() as cursor:
             cursor.execute(sql)
+            logger.info(f'Данные по координатам по адресу {full_address} успешно загруженны')
     except Exception:
         logger.warning(f'''Не удалось загрузить в БД название полной улицы
                            streetid     = {streetid},
