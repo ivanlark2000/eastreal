@@ -19,17 +19,17 @@ def sess_uuid() -> None:
     G_SESS = uuid.uuid4()
     time_start = datetime.now()
     mark_start_sess(G_SESS, time_start)
-    #pars(G_SESS)
-    total_ads, miss_load, history = 0, 0, 0
+    total_ads, miss_load, new_load = pars(G_SESS)
     time_end = datetime.now()
     update_end_sess(
             g_sess=G_SESS, d_date_end=time_end,
-            n_total_count=total_ads, n_miss=miss_load, n_history=history
+            n_total_count=total_ads, n_miss=miss_load, n_new=new_load
             )
 
 
-def pars(g_sess: str) -> None:
-    count = 1
+def pars(g_sess: str) -> tuple[int, int, int]:
+    count_new = 0
+    count_miss = 0
     lst_id_in_base = get_id_in_base(CITY_ID)
     for url in getting_url(city=CITY):
         try:
@@ -72,12 +72,15 @@ def pars(g_sess: str) -> None:
                     continue
                 try:
                     flat_in_avito = parsAvitoFlat(html_flat, url=url, city=CITY_RUS)
-                    load_to_base(flat_in_avito, count)
-                    count += 1
-                except Exception as e: 
+                    count_new, count_miss = load_to_base(
+                            dct=flat_in_avito, count_new=count_new, count_miss=count_miss
+                            )
+                except Exception as e:
                     logger.warning(f'{url} \nNot correct data from site', exc_info=True)
-
+    
+                logger.debug(f'count_new = {count_new}, count_miss = {count_miss}')
     update_sell_status(city_id=CITY_ID, siteids=AKTIVE_SITE_ID)
+    return len(AKTIVE_SITE_ID), count_new,  count_miss
 
 
 def main():

@@ -19,6 +19,12 @@ class Config:
     SECRET_KEY_DADATA = os.environ.get('SECRET_KEY_DADATA')
     logger = logging.getLogger('PARSER') 
     logger.setLevel(logging.INFO)
+    
+    def __init__(self, level: str='DeBug'):
+        if level.lower() == 'debug':
+            self.logger.setLevel(logging.DEBUG)
+        elif level.lower() == 'info':
+            self.logger.setLevel(logging.INFO)
 
     def make_con(self):
         return psycopg2.connect(dbname=self.NAME_DB,
@@ -27,7 +33,7 @@ class Config:
                                 #password=self.PASSWORD_DB,
                                 #host=self.HOST,
                                 #port=self.PORT)
-    
+
     def make_logger_term(self):
         handler = logging.StreamHandler(stream=sys.stdout)
         formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
@@ -44,12 +50,17 @@ class Config:
 
 
 parser = argparse.ArgumentParser()
+parser.add_argument('-d', '--debug', action='store_const', const='d', help='Запуск в режиме дебаг')
 parser.add_argument('-c', '--coord', help='Запуск скрипта только парсинг домов с ян-са')
 parser.add_argument('-f', '--file', help='Запуск скрипта с выводом логов в фаил')
 args = parser.parse_args()
 
-config = Config()
 
+if args.debug:
+    config = Config()
+else:
+    config = Config('info')
+    
 
 if args.file:
     logger = config.make_logger(args.file)

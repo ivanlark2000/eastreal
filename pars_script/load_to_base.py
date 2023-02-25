@@ -89,7 +89,7 @@ def err_to_base(dct: dict, city_id: str) -> None:
     load_miss_number(site_id=dct['site_id'], city_id=city_id)
 
 
-def load_to_base(dct: dict, count: int) -> None:
+def load_to_base(dct: dict, count_new: int, count_miss: int) -> tuple[int, int]:
     from main import CITY_ID
     conn = config.make_con()
     atr = arg_value(lst_arg, dct)
@@ -97,17 +97,22 @@ def load_to_base(dct: dict, count: int) -> None:
         with conn.cursor() as cursor:
             cursor.execute(f"""INSERT INTO BF_Temp_Apartments_Ads ({atr[0]})
                    VALUES ({atr[1]})""")
-            msg = f"В базу закачалось {count} квартира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
+            msg = f"В базу закачалось {count_new + 1} квартира с айдишником {dct['site_id']} c адресом {dct['S_Street']}"
             conn.commit()
             logger.info(msg)
+            count_new += 1
     except psycopg2.errors.CheckViolation:
         err_to_base(dct, CITY_ID)
+        count_miss += 1
     except psycopg2.errors.SyntaxError:
         err_to_base(dct, CITY_ID)
+        count_miss += 1
     except psycopg2.errors.NotNullViolation:
         err_to_base(dct, CITY_ID)
+        count_miss += 1
     finally:
         conn.close()
+        return count_new, count_miss
 
 
 def load_price_to_base(f_flat: int, n_price: int) -> None:
@@ -254,7 +259,7 @@ def mark_start_sess(g_sess: str, d_date_start: object) -> None:
         conn.close()
 
 
-def update_end_sess(g_sess: str, n_total_count: int, n_miss: int, n_history: int, d_date_end: object) -> None:
+def update_end_sess(g_sess: str, n_total_count: int, n_miss: int, n_new: int, d_date_end: object) -> None:
     conn = config.make_con()
     try:
         with conn.cursor() as cursor:
@@ -263,7 +268,7 @@ def update_end_sess(g_sess: str, n_total_count: int, n_miss: int, n_history: int
                 SET 
                     n_total_count = {n_total_count}
                     ,n_miss = {n_miss}
-                    ,n_history = {n_history}
+                    ,n_new = {n_new}
                     ,d_date_end = '{d_date_end}'
                 WHERE g_sess = '{g_sess}'             
             """)
