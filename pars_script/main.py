@@ -1,8 +1,12 @@
+import uuid
 from def_list import *
-from avito_pars import parsAvitoFlat
+from datetime import datetime
 from urllib.error import HTTPError
 from transliterate import translit
-from load_to_base import load_to_base, get_id_in_base, load_price_to_base, update_sell_status, logger
+from avito_pars import parsAvitoFlat
+from load_to_base import load_to_base, get_id_in_base
+from load_to_base import mark_start_sess, update_end_sess
+from load_to_base import load_price_to_base, update_sell_status, logger
 
 
 CITY_ID = 24741 
@@ -11,7 +15,20 @@ CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)
 AKTIVE_SITE_ID = []
 
 
-def pars():
+def sess_uuid() -> None:
+    G_SESS = uuid.uuid4()
+    time_start = datetime.now()
+    mark_start_sess(G_SESS, time_start)
+    #pars(G_SESS)
+    total_ads, miss_load, history = 0, 0, 0
+    time_end = datetime.now()
+    update_end_sess(
+            g_sess=G_SESS, d_date_end=time_end,
+            n_total_count=total_ads, n_miss=miss_load, n_history=history
+            )
+
+
+def pars(g_sess: str) -> None:
     count = 1
     lst_id_in_base = get_id_in_base(CITY_ID)
     for url in getting_url(city=CITY):
@@ -68,9 +85,7 @@ def main():
     if args.coord:
         add_coord()
     else:
-        pars()
-        add_coord()
-
+        sess_uuid()
 
 if __name__ == "__main__":
     main()

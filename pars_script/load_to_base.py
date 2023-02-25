@@ -236,3 +236,40 @@ def add_full_address(streetid: int, full_adress: str):
                        exc_info=True)
     finally:
         conn.close()
+
+
+def mark_start_sess(g_sess: str, d_date_start: object) -> None:
+    conn = config.make_con()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(f"""
+                INSERT INTO log_session_pars (g_sess, d_date_start)
+                VALUES ('{g_sess}', '{d_date_start}')             
+    """)
+            conn.commit()
+            logger.info(f'Добаили запись о начале {g_sess} в БД')
+    except Exception as e:
+        logger.critica(f'Не удалось отправить данные в БД о начале сессии {g_sess}')
+    finally:
+        conn.close()
+
+
+def update_end_sess(g_sess: str, n_total_count: int, n_miss: int, n_history: int, d_date_end: object) -> None:
+    conn = config.make_con()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(f"""
+                UPDATE log_session_pars
+                SET 
+                    n_total_count = {n_total_count}
+                    ,n_miss = {n_miss}
+                    ,n_history = {n_history}
+                    ,d_date_end = '{d_date_end}'
+                WHERE g_sess = '{g_sess}'             
+            """)
+            conn.commit()
+            logger.info(f'Добаили запись об окончании работы сессии {g_sess}')
+    except Exception as e:
+        logger.critica(f'Не удалось обновить даные об окончании сессии {g_sess}')
+    finally:
+        conn.close()
