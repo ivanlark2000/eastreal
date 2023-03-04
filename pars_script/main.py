@@ -19,7 +19,7 @@ def sess_uuid() -> None:
     G_SESS = uuid.uuid4()
     time_start = datetime.now()
     mark_start_sess(G_SESS, time_start)
-    total_ads, miss_load, new_load = pars(G_SESS)
+    total_ads, new_load, miss_load = pars(G_SESS)
     time_end = datetime.now()
     update_end_sess(
             g_sess=G_SESS, d_date_end=time_end,
