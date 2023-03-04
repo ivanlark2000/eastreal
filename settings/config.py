@@ -4,6 +4,7 @@ import logging
 import psycopg2
 import argparse
 
+
 class Config:
     """Класс с настройками"""
     userAgent = '''Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36

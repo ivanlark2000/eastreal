@@ -71,7 +71,7 @@ def pars(g_sess: str) -> tuple[int, int, int]:
                     logger.warning(f'{url} \nОшибка в скачке данных с Авито', exc_info=True)
                     continue
                 try:
-                    flat_in_avito = parsAvitoFlat(html_flat, url=url, city=CITY_RUS)
+                    flat_in_avito = parsAvitoFlat(html_flat, url=url, city=CITY_RUS, guid=g_sess)
                     count_new, count_miss = load_to_base(
                             dct=flat_in_avito, count_new=count_new, count_miss=count_miss
                             )
@@ -79,7 +79,7 @@ def pars(g_sess: str) -> tuple[int, int, int]:
                     logger.warning(f'{url} \nNot correct data from site', exc_info=True)
     
                 logger.debug(f'count_new = {count_new}, count_miss = {count_miss}')
-    update_sell_status(city_id=CITY_ID, siteids=AKTIVE_SITE_ID)
+    update_sell_status(sessid=g_sess, city_id=CITY_ID, siteids=AKTIVE_SITE_ID)
     return len(AKTIVE_SITE_ID), count_new,  count_miss
 
 

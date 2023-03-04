@@ -1,6 +1,7 @@
 --ALTER DATE 
     --2023.02.02 добавили закачку данных в таблицу inf_descriptions
     --2023.02.22 добавил создание дома при его отсутствии в таблицу метрик
+    --2023.03.04 добавили сессии в информационую даблицу при добавлении новой квартиры 
 CREATE OR REPLACE FUNCTION public.load_ads_to_base()
     RETURNS trigger
     LANGUAGE 'plpgsql'
@@ -341,8 +342,8 @@ BEGIN
         INSERT INTO mn_ads_price (f_flat, n_price)
         VALUES (id_apartments_ads, NEW.n_price);
 
-        INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id, f_city, f_sell_status)
-        VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, NEW.site_id, id_city, 1);
+        INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id, f_city, f_sell_status, g_sess_create)
+        VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, NEW.site_id, id_city, 1, NEW.g_sess);
         
         INSERT INTO inf_descriptions (f_flat, c_name)
         VALUES (id_apartments_ads, NEW.s_description);

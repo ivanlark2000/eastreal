@@ -1,10 +1,12 @@
-ALTER TABLE fs_bus ADD COLUMN d_date_create timestamp;
-ALTER TABLE ps_stop_bus ADD COLUMN d_date_create timestamp;
+ALTER TABLE inf_sys ADD COLUMN g_sess_create uuid;
+COMMENT ON COLUMN inf_sys.g_sess_create IS 'сессия которая добавила запись';
 
-CREATE trigger add_create_data
-BEFORE INSERT ON public.fs_bus
-FOR EACH ROW EXECUTE FUNCTION add_create_date();
+ALTER TABLE bf_temp_apartments_ads ADD COLUMN g_sess uuid;
+COMMENT ON COLUMN bf_temp_apartments_ads.g_sess IS 'сессия которая добавила запись';
+ALTER TABLE inf_sys ADD COLUMN g_sess_modif uuid;
+COMMENT ON COLUMN inf_sys.g_sess_modif IS 'сессия которая изменила  запись';
+ALTER TABLE inf_miss_ads ADD COLUMN g_sess_modif uuid;
+ALTER TABLE inf_miss_ads ADD COLUMN g_sess_create uuid;
+COMMENT ON COLUMN inf_miss_ads.g_sess_modif IS 'сессия которая изменила  запись';
+COMMENT ON COLUMN inf_miss_ads.g_sess_create IS 'сессия которая создала  запись';
 
-CREATE trigger add_create_data
-BEFORE INSERT ON public.ps_stop_bus
-FOR EACH ROW EXECUTE FUNCTION add_create_date();

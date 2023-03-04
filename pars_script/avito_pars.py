@@ -396,7 +396,7 @@ def get_full_street(soup, city) -> str:
     return ', '.join(lst)
 
 
-def parsAvitoFlat(html: str, url: str, city: str) -> dict:
+def parsAvitoFlat(html: str, url: str, city: str, guid: str) -> dict:
     soup = Bs(html, 'html.parser')
     price = soup.find('span', itemprop="price")
     price = int(price['content'])
@@ -442,5 +442,6 @@ def parsAvitoFlat(html: str, url: str, city: str) -> dict:
         'D_Deadline_for_Delivery': deadline(soup),
         'S_Site_Links': url,
         'F_Source': 1,
+        'G_Sess': guid, 
         **seller(soup),
     }

@@ -48,6 +48,7 @@ lst_arg = [
     'F_Source',
     'S_Seller',
     'S_Seller_Type',
+    'G_Sess'
 ]
 
 
@@ -165,12 +166,12 @@ def load_miss_number(site_id: str, city_id: int) -> None:
         conn.close()
 
 
-def update_sell_status(city_id: int, siteids:list) -> None:
+def update_sell_status(sessid: str, city_id: int, siteids:list) -> None:
     conn = config.make_con()
     print('активных объявлений - ', len(siteids))
     try:
         with conn.cursor() as cursor:
-            cursor.execute(f"SELECT update_sell_status('{city_id}',VARIADIC ARRAY{siteids});")
+            cursor.execute(f"SELECT update_sell_status('{sessid}', '{city_id}',VARIADIC ARRAY{siteids});")
             conn.commit()
             logger.info('Айдишники проданых квартир успешно переведенны в статус проданны')
     except Exception as e:
