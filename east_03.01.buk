@@ -1,0 +1,7640 @@
+--
+-- PostgreSQL database cluster dump
+--
+
+SET default_transaction_read_only = off;
+
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+
+--
+-- Roles
+--
+
+CREATE ROLE ivan;
+ALTER ROLE ivan WITH NOSUPERUSER INHERIT NOCREATEROLE NOCREATEDB NOLOGIN NOREPLICATION NOBYPASSRLS;
+CREATE ROLE lark;
+ALTER ROLE lark WITH SUPERUSER INHERIT NOCREATEROLE NOCREATEDB LOGIN NOREPLICATION NOBYPASSRLS PASSWORD;
+CREATE ROLE postgres;
+ALTER ROLE postgres WITH SUPERUSER INHERIT CREATEROLE CREATEDB LOGIN REPLICATION BYPASSRLS;
+
+--
+-- User Configurations
+--
+--
+-- Databases
+--
+
+--
+-- Database "template1" dump
+--
+
+\connect template1
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.2 (Debian 15.2-1.pgdg110+1)
+-- Dumped by pg_dump version 15.2 (Debian 15.2-1.pgdg110+1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- PostgreSQL database dump complete
+--
+
+--
+-- Database "eastreal" dump
+--
+
+--
+-- PostgreSQL database dump
+--
+
+-- Dumped from database version 15.2 (Debian 15.2-1.pgdg110+1)
+-- Dumped by pg_dump version 15.2 (Debian 15.2-1.pgdg110+1)
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: eastreal; Type: DATABASE; Schema: -; Owner: postgres
+--
+
+CREATE DATABASE eastreal WITH TEMPLATE = template0 ENCODING = 'UTF8' LOCALE_PROVIDER = libc LOCALE = 'ru_RU.utf8';
+
+
+ALTER DATABASE eastreal OWNER TO postgres;
+
+\connect eastreal
+
+SET statement_timeout = 0;
+SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
+SET client_encoding = 'UTF8';
+SET standard_conforming_strings = on;
+SELECT pg_catalog.set_config('search_path', '', false);
+SET check_function_bodies = false;
+SET xmloption = content;
+SET client_min_messages = warning;
+SET row_security = off;
+
+--
+-- Name: minghk; Type: SCHEMA; Schema: -; Owner: lark
+--
+
+CREATE SCHEMA minghk;
+
+
+ALTER SCHEMA minghk OWNER TO lark;
+
+--
+-- Name: SCHEMA minghk; Type: COMMENT; Schema: -; Owner: lark
+--
+
+COMMENT ON SCHEMA minghk IS 'Схема загрузки зданий с мингхк';
+
+
+--
+-- Name: plpython3u; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS plpython3u WITH SCHEMA pg_catalog;
+
+
+--
+-- Name: EXTENSION plpython3u; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION plpython3u IS 'PL/Python3U untrusted procedural language';
+
+
+--
+-- Name: uuid-ossp; Type: EXTENSION; Schema: -; Owner: -
+--
+
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp" WITH SCHEMA public;
+
+
+--
+-- Name: EXTENSION "uuid-ossp"; Type: COMMENT; Schema: -; Owner: 
+--
+
+COMMENT ON EXTENSION "uuid-ossp" IS 'generate universally unique identifiers (UUIDs)';
+
+
+--
+-- Name: add_buff_value(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.add_buff_value() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+
+	IF NEW.D_Date IS NULL
+		THEN NEW.D_Date  := current_timestamp;
+	END IF;
+
+	IF NEW.B_Balcony IS NULL
+		THEN NEW.B_Balcony = False;
+	END IF;
+
+	IF NEW.B_loggia IS NULL
+		THEN NEW.B_Loggia = False;
+	END IF;
+
+	IF NEW.B_Heating IS NULL
+		THEN NEW.B_Heating = False;
+	END IF;
+
+	IF NEW.B_Passenger_Elevator IS NULL
+		THEN NEW.B_Passenger_Elevator = False;
+	END IF;
+
+	IF NEW.B_Freight_elevator IS NULL
+		THEN NEW.B_Freight_elevator = False;
+	END IF;
+	
+	NEW.f_type_street = get_id_type_street(NEW.s_street);
+	
+	NEW.s_street = del_type_street(NEW.s_street);
+	
+	NEW.s_street = replace(NEW.s_street, 'корп. ', 'к');
+	
+	NEW.s_street = replace(NEW.s_street, 'д. ', '');
+	
+	NEW.n_street = get_string_number_street(NEW.s_street);
+	
+	NEW.s_street = get_string_street(NEW.s_street);
+	
+	RETURN NEW;
+
+END;
+
+$$;
+
+
+ALTER FUNCTION public.add_buff_value() OWNER TO ivan;
+
+--
+-- Name: add_create_date(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.add_create_date() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+
+	IF NEW.D_Date_Create IS NULL
+		THEN NEW.D_Date_Create  := current_timestamp;
+	END IF;
+
+	RETURN NEW;
+
+END;
+
+$$;
+
+
+ALTER FUNCTION public.add_create_date() OWNER TO ivan;
+
+--
+-- Name: add_date(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.add_date() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+
+	IF NEW.D_Date IS NULL
+		THEN NEW.D_Date  := current_timestamp;
+	END IF;
+
+	RETURN NEW;
+
+END;
+
+$$;
+
+
+ALTER FUNCTION public.add_date() OWNER TO ivan;
+
+--
+-- Name: add_guid(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.add_guid() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.link = uuid_generate_v4();
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.add_guid() OWNER TO lark;
+
+--
+-- Name: add_house_metrics(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.add_house_metrics() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    house_id integer;
+    weight numeric(4,2);
+
+BEGIN
+    WITH fact (distance)
+    AS
+    (
+        SELECT calculation_position(NEW.lat, NEW.lon, f.latitude, f.longitude)
+        FROM inf_factory f
+        WHERE f_city = NEW.f_city
+    )
+
+    SELECT
+        get_weight_factory(MIN(distance))
+    INTO weight
+    FROM fact;
+	
+    UPDATE mn_house_metrics
+    SET w_factory = weight
+    WHERE f_house = NEW.link;
+	
+    PERFORM add_task_distance(NEW.f_city, NEW.link, NEW.lat, NEW.lon);  
+	PERFORM add_task_bus(NEW.f_city, NEW.link, NEW.lat, NEW.lon);
+	
+    RETURN NEW;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.add_house_metrics() OWNER TO ivan;
+
+--
+-- Name: add_task_bus(integer, integer, numeric, numeric); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.add_task_bus(city_id integer, house_id integer, lat1 numeric, lon1 numeric) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE
+    id_dist integer;
+    value record;
+    query varchar(500);
+
+BEGIN
+	
+    FOR value IN
+        SELECT
+            lat, lon, 13 AS objects_type ,c_name, link
+        FROM ps_stop_bus
+        WHERE 1=1
+            AND f_city = city_id
+            AND calculation_position(lat1, lon1, lat, lon) < 1000
+	
+    LOOP
+
+        SELECT link INTO id_dist
+        FROM ps_dist_house_to_object
+        WHERE f_house = house_id AND object_id = CAST(value.link AS VARCHAR);
+
+        IF id_dist IS NULL THEN
+            query = format('CALL load_end_dist(''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'')',
+                city_id, house_id, value.link, value.objects_type, lat1, lon1, value.lat, value.lon);
+            INSERT INTO ts_dist_task (f_status, query)
+            VALUES (1, query);
+
+        RAISE NOTICE 'Запись успешно добавлена № % и объекту "bus_station" № %', house_id, value.link;
+        END IF;
+
+    END LOOP;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.add_task_bus(city_id integer, house_id integer, lat1 numeric, lon1 numeric) OWNER TO lark;
+
+--
+-- Name: add_task_distance(integer, integer, numeric, numeric); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.add_task_distance(city_id integer, house_id integer, lat1 numeric, lon1 numeric) RETURNS void
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE 
+    id_dist integer;
+    value record;
+    foot_dist integer;
+    car_dist integer;
+    query varchar(500);
+
+BEGIN
+    
+    FOR value IN 
+        SELECT 
+            latitude AS lat
+            ,longitude AS lon
+            ,f_objects_type AS objects_type
+            ,object_id
+            ,name_obj
+        FROM ps_object_position 
+        WHERE 1=1
+            AND f_city = city_id 
+            AND calculation_position(lat1, lon1, latitude, longitude) < 1000
+    LOOP
+        
+        SELECT link INTO id_dist
+        FROM ps_dist_house_to_object
+        WHERE f_house = house_id AND object_id = value.object_id;
+
+        IF id_dist IS NULL THEN
+            query = format('CALL load_end_dist(''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'', ''%s'')',
+                city_id, house_id, value.object_id, value.objects_type, lat1, lon1, value.lat, value.lon);    
+            INSERT INTO ts_dist_task (f_status, query)
+            VALUES (1, query);
+
+        RAISE NOTICE 'Запись успешно добавлена по дому № % и объекту № %', house_id, value.object_id;
+        END IF;
+            
+    END LOOP;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.add_task_distance(city_id integer, house_id integer, lat1 numeric, lon1 numeric) OWNER TO lark;
+
+--
+-- Name: FUNCTION add_task_distance(city_id integer, house_id integer, lat1 numeric, lon1 numeric); Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON FUNCTION public.add_task_distance(city_id integer, house_id integer, lat1 numeric, lon1 numeric) IS 'Процедура для добавления в таблицу тасков остановок';
+
+
+--
+-- Name: add_technics(integer, text, integer); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.add_technics(f_flat integer, s_items text, var integer) RETURNS void
+    LANGUAGE plpython3u
+    AS $_$
+items = s_items
+items = [i.strip() for i in items.split(',')]
+
+if var == 1:
+    table_main = 'ES_Furniture'
+    fk = 'f_furniture_types'
+    table = 'FS_Furniture_Types'
+
+else:
+    table_main = 'ES_Technics'
+    fk = 'f_technics_type'
+    table = 'FS_Technic_Types'
+
+
+plan = plpy.prepare(f'SELECT {fk} FROM  {table_main} WHERE f_flat = $1', ['int'])
+active = plpy.execute(plan, [f_flat])
+
+items_active = [i[fk] for i in active]
+
+response = plpy.execute(f'SELECT link, C_Name FROM {table}')
+
+plan = plpy.prepare(f'INSERT INTO {table} (C_Name) VALUES ($1)', ['text'])
+for item in items:
+    if item not in [i['c_name'] for i in response]:
+        plpy.execute(plan, [item])
+
+lst = []
+response = plpy.execute(f'SELECT link, C_Name FROM {table}')
+#plpy.notice(response)
+for i in response:
+	for r in items:
+		if r == i['c_name']:
+			lst.append(i['link'])
+
+items = lst
+plan = plpy.prepare(f'DELETE FROM {table_main} WHERE F_Flat = $1 AND {fk} = $2', ['int', 'int'])
+for i in items_active:
+    if i not in items:
+        plpy.execute(plan, [f_flat, i])
+
+plan = plpy.prepare(f'INSERT INTO {table_main} (f_flat, {fk}) VALUES ($1, $2)', ['int', 'int'])
+for i in items:
+	if i not in items_active:
+		plpy.execute(plan, [f_flat, i])
+
+$_$;
+
+
+ALTER FUNCTION public.add_technics(f_flat integer, s_items text, var integer) OWNER TO ivan;
+
+--
+-- Name: add_time_add_dist(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.add_time_add_dist() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.d_date_add:= NOW();
+    RETURN NEW;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.add_time_add_dist() OWNER TO lark;
+
+--
+-- Name: add_time_delta(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.add_time_delta() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN 
+
+    CASE NEW.f_sell_status
+    WHEN 1 THEN 
+        NEW.d_date_sell = NULL;
+        NEW.t_delta = NULL;
+    WHEN 2 THEN
+        NEW.d_date_sell = clock_timestamp();
+        NEW.t_delta = NEW.d_date_sell - NEW.d_date_create;
+    END CASE;
+
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.add_time_delta() OWNER TO lark;
+
+--
+-- Name: air_pollution(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.air_pollution() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+	value numeric(3,2);
+BEGIN
+	SELECT weight INTO value
+	FROM fs_index_pollution
+	WHERE link = NEW.f_index;
+
+	UPDATE mn_house_metrics
+	SET w_air = value
+	WHERE f_city = NEW.f_city;
+	
+	RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.air_pollution() OWNER TO ivan;
+
+--
+-- Name: calculation_position(numeric, numeric, numeric, numeric); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.calculation_position(lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    fi1 numeric := lat1 * pi() / 180;
+    fi2 numeric := lat2 * pi() / 180;
+    lam1 numeric := lon1 * pi() / 180;
+    lam2 numeric := lon2 * pi() / 180;
+    part1 numeric;
+
+BEGIN
+
+    part1 = sqrt(sin((fi1-fi2)/2)^2 + cos(fi1) * cos(fi2) * sin((lam2 - lam1)/2)^2);
+    RETURN 2 * asin(part1) * 6372795;
+END;
+$$;
+
+
+ALTER FUNCTION public.calculation_position(lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric) OWNER TO ivan;
+
+--
+-- Name: cor_street(character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.cor_street(street character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+    BEGIN
+        CASE street
+            WHEN 'улица' THEN street := 'ул.';
+                        ELSE
+        END CASE;
+        RETURN street;
+    END;
+
+$$;
+
+
+ALTER FUNCTION public.cor_street(street character varying) OWNER TO ivan;
+
+--
+-- Name: cor_street_tr(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.cor_street_tr() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+
+    NEW.S_Type_Street := cor_street(NEW.S_Type_Street);
+
+	RETURN NEW;
+
+END;
+
+$$;
+
+
+ALTER FUNCTION public.cor_street_tr() OWNER TO ivan;
+
+--
+-- Name: count_object(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.count_object() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE 
+    amount integer;       --количество пакров и скверов
+    weight numeric(3,2);  -- вес
+    col_name varchar(100);
+
+BEGIN
+
+    CASE NEW.f_type_object
+
+        WHEN 33 THEN 
+            SELECT COUNT(*) INTO amount
+            FROM ps_dist_house_to_object
+            WHERE f_type_object = 33 AND f_house = NEW.f_house;
+            
+            col_name = 'w_amount_sport';
+           
+        WHEN 18 THEN 
+            SELECT COUNT(*) INTO amount
+            FROM ps_dist_house_to_object
+            WHERE f_type_object = 18 AND f_house = NEW.f_house;
+            
+            col_name = 'w_amount_prod';
+
+        WHEN 29, 30 THEN 
+            SELECT COUNT(*) INTO amount
+            FROM ps_dist_house_to_object
+            WHERE f_type_object IN (29, 30) AND f_house = NEW.f_house;
+          
+            col_name = 'w_amount_ps';
+            
+    END CASE;
+    
+        weight = 0.5 - ( 0.5 / amount);
+
+    EXECUTE format('update mn_house_metrics set %s = $1 where f_house = $2;', col_name)
+            USING weight, new.f_house;
+
+    RETURN NEW;
+
+    EXCEPTION 
+        WHEN division_by_zero THEN 
+            RAISE NOTICE 'Перехватли ошибку division_by_zero';
+
+    EXECUTE format('update mn_house_metrics set %s = 0 where f_house = $1;', col_name)
+            USING new.f_house;
+
+    RETURN NEW;
+END;
+$_$;
+
+
+ALTER FUNCTION public.count_object() OWNER TO lark;
+
+--
+-- Name: date_deadline(integer, text); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.date_deadline(f_house integer, d_date text) RETURNS integer
+    LANGUAGE plpython3u
+    AS $_$
+
+plan =  plpy.prepare('SELECT * FROM MN_Period_Deadline WHERE F_House = $1 ORDER BY D_Date_Create', ['int'])
+response = plpy.execute(plan, [f_house])
+
+date = d_date  
+if not date:
+	return
+
+date = date.strip().split(' ')
+if len(date) == 1:
+    return	
+
+year = int(date[2])
+
+d_date_start = None
+d_date_end = None
+
+match int(date[0]):
+    case 1:
+        d_date_start = f'{year}-01-01 00:00:00'
+        d_date_end =   f'{year}-03-31 00:00:00'
+    case 2:
+        d_date_start = f'{year}-03-01 00:00:00'
+        d_date_end = f'{year}-06-30 00:00:00'
+    case 3:
+        d_date_start = f'{year}-06-01 00:00:00'
+        d_date_end = f'{year}-09-30 00:00:00'
+    case 4:
+        d_date_start = f'{year}-09-01 00:00:00'
+        d_date_end = f'{year + 1}-01-01 00:00:00'
+
+if response:
+	if str(response[0]['d_date_start']) == d_date_start or  str(response[0]['d_date_end']) == d_date_end:
+		return
+
+plan = plpy.prepare('INSERT INTO MN_Period_Deadline (F_House, D_Date_Start, D_Date_End) VALUES ($1, $2, $3)', ['int', 'timestamp', 'timestamp'])
+plpy.execute(plan, [f_house, d_date_start, d_date_end])
+return 
+
+$_$;
+
+
+ALTER FUNCTION public.date_deadline(f_house integer, d_date text) OWNER TO ivan;
+
+--
+-- Name: del_type_street(character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.del_type_street(street character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    type RECORD;
+    s_street varchar(200);
+BEGIN
+    FOR type IN
+        SELECT
+            link   AS id,
+            c_name AS name,
+            short_name AS s_name
+        FROM fs_street_type
+    LOOP
+        IF POSITION(type.name IN street) > 0 THEN
+            s_street = replace(street, type.name, '');
+            RETURN s_street;
+
+        ELSEIF POSITION(type.s_name IN street) > 0 THEN
+            s_street = replace(street, type.s_name, '');
+            RETURN s_street;
+        END IF;
+    END LOOP;
+    RETURN street;
+END;
+$$;
+
+
+ALTER FUNCTION public.del_type_street(street character varying) OWNER TO ivan;
+
+--
+-- Name: del_whitespace_fs_street(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.del_whitespace_fs_street() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.c_name := RTRIM(LTRIM(NEW.c_name));
+RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.del_whitespace_fs_street() OWNER TO ivan;
+
+--
+-- Name: del_whitespace_mn_house(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.del_whitespace_mn_house() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+	N_House integer;	
+
+BEGIN
+    	NEW.s_number := RTRIM(LTRIM(NEW.s_number));
+	
+	SELECT COUNT(*)
+	INTO N_House
+	FROM mn_house b
+	WHERE 1=1  
+		AND f_city = NEW.f_city
+		AND calculation_position(NEW.lat, NEW.lon, b.lat, b.lon) < 200;
+	
+	NEW.N_Count_House = N_House;
+
+	RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.del_whitespace_mn_house() OWNER TO ivan;
+
+--
+-- Name: format_street(character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.format_street(street character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+
+    DECLARE
+        value1 varchar(250)[] := STRING_TO_ARRAY(street, ' ');
+		rez varchar(250);
+		i varchar(30);
+
+    BEGIN
+		value1 = array_replace(value1, 'улица', 'ул.');
+		value1 = array_replace(value1, 'бульвар', 'б-р.');
+		WITH str (street_column)
+		AS (
+		SELECT UNNEST(value1)
+		ORDER BY 1 DESC
+		)
+		SELECT string_agg(ltrim(street_column), ' ') a
+		FROM str
+
+		INTO rez;
+
+        RETURN rez;
+    END;
+
+$$;
+
+
+ALTER FUNCTION public.format_street(street character varying) OWNER TO ivan;
+
+--
+-- Name: get_car_distance(numeric, numeric, numeric, numeric); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.get_car_distance(lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric) RETURNS integer
+    LANGUAGE plpython3u
+    AS $$
+
+import requests
+
+url = f'https://routing.openstreetmap.de/routed-car/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?'
+
+try:
+    response = requests.get(url).json()
+    return int(response['routes'][0]['distance'])
+
+except Exception as Error:
+    plpy.notice(f'Не уалось получить дистанцию между домом № {f_house} и объектом № {f_object}\n {Error}')    
+
+$$;
+
+
+ALTER FUNCTION public.get_car_distance(lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric) OWNER TO lark;
+
+--
+-- Name: get_car_distance(integer, character varying, numeric, numeric, numeric, numeric); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.get_car_distance(f_house integer, f_object character varying, lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric) RETURNS integer
+    LANGUAGE plpython3u
+    AS $$
+
+import requests
+
+url = f'https://routing.openstreetmap.de/routed-car/route/v1/driving/{lat1},{lon1};{lat2},{lon2}?'
+
+try:
+    response = requests.get(url).json()
+    return int(response['routes'][0]['distance'])
+
+except Exception as Error:
+    plpy.notice(f'Не уалось получить дистанцию между домом № {f_house} и объектом № {f_object}\n {Error}')    
+
+$$;
+
+
+ALTER FUNCTION public.get_car_distance(f_house integer, f_object character varying, lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric) OWNER TO lark;
+
+--
+-- Name: get_floor_weight(smallint); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_floor_weight(flat_id smallint) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+	floor smallint;
+BEGIN 
+	SELECT c_name 
+	INTO floor
+	FROM mn_apartments_ads ap 
+		INNER JOIN fs_floor fl 
+			ON ap.f_floor = fl.link
+	WHERE link = flat_id;
+
+	CASE 
+		WHEN floor = 1 THEN 
+			RETURN 1.00;
+		WHEN floor in (2, 3) THEN 
+			RETURN 0.90;
+		WHEN floor in (4, 5) THEN
+			RETURN 0.80;
+		WHEN floor >= 6 & floor =< 12 THEN 
+			RETURN 0.5;
+		ELSE 
+			RETURN 0.25;
+		END CASE;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_floor_weight(flat_id smallint) OWNER TO ivan;
+
+--
+-- Name: get_floor_weight(integer); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_floor_weight(flat_id integer) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+	floor smallint;
+BEGIN 
+	SELECT fl.c_name 
+	INTO floor
+	FROM fs_floor fl, mn_apartments_ads ads
+	WHERE ads.link = flat_id AND fl.link = ads.f_floor;
+
+	CASE 
+		WHEN floor = 1 THEN 
+			RETURN 1.00;
+		WHEN floor in (2, 3) THEN 
+			RETURN 0.90;
+		WHEN floor in (4, 5) THEN
+			RETURN 0.80;
+		WHEN (floor >= 6 AND floor <= 12) THEN 
+			RETURN 0.5;
+		ELSE 
+			RETURN 0.25;
+		END CASE;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_floor_weight(flat_id integer) OWNER TO ivan;
+
+--
+-- Name: get_foot_distance(numeric, numeric, numeric, numeric); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.get_foot_distance(lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric) RETURNS integer
+    LANGUAGE plpython3u
+    AS $$
+
+import requests
+
+url = f'https://routing.openstreetmap.de/routed-foot/route/v1/driving/{lon1},{lat1};{lon2},{lat2}?'
+
+try:
+    response = requests.get(url).json()
+    return int(response['routes'][0]['distance'])
+
+except Exception as Error:
+    plpy.notice(f'Не уалось получить дистанцию  пешком между домом № {f_house} и объектом № {f_object}\n {Error}')    
+
+$$;
+
+
+ALTER FUNCTION public.get_foot_distance(lat1 numeric, lon1 numeric, lat2 numeric, lon2 numeric) OWNER TO lark;
+
+--
+-- Name: get_house_weigth(smallint, integer, smallint); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.get_house_weigth(city_id smallint, flat_id integer, type_object_id smallint) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE 
+    weigth numeric;
+
+BEGIN
+
+    SELECT 
+        50 * (0.5 / ( AVG(n_short_dist) / COUNT(*)))
+    INTO weigth
+    FROM ps_dist_house_to_object
+    WHERE 1=1
+        AND f_city = city_id 
+        AND f_house = flat_id 
+        AND f_type_object = type_object_id 
+    GROUP BY f_house;
+
+    IF weigth > 1 THEN
+        weigth = 1;
+    END IF;
+
+    RETURN weigth;
+
+END;
+
+$$;
+
+
+ALTER FUNCTION public.get_house_weigth(city_id smallint, flat_id integer, type_object_id smallint) OWNER TO lark;
+
+--
+-- Name: get_id_type_street(character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_id_type_street(street character varying) RETURNS smallint
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    type RECORD;
+BEGIN
+
+    FOR type IN
+        SELECT
+            link   AS id,
+            c_name AS name,
+            short_name AS s_name
+        FROM fs_street_type
+    LOOP
+        IF POSITION(type.name in street) > 0 OR POSITION(type.s_name in street) > 0 THEN
+            RETURN type.id;
+        END IF;
+    END LOOP;
+    RETURN NULL;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_id_type_street(street character varying) OWNER TO ivan;
+
+--
+-- Name: get_json_air_polution(numeric, numeric); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_json_air_polution(lat numeric, lon numeric) RETURNS json
+    LANGUAGE plpython3u
+    AS $$
+
+import requests
+import json
+
+API = '93b8d924fc1e41a8990ef37df207753e'
+url = f"http://api.openweathermap.org/data/2.5/air_pollution?"
+
+
+param = {
+    'lat': lat,
+    'lon': lon,
+    'appid': API
+}
+
+
+r = requests.get(url, params=param)
+rez = json.dumps(r.json()['list'][0])
+return rez
+
+
+$$;
+
+
+ALTER FUNCTION public.get_json_air_polution(lat numeric, lon numeric) OWNER TO ivan;
+
+--
+-- Name: get_n_street(character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_n_street(street character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+        DECLARE
+                total text array := string_to_array(street, NULL);
+                i varchar(1);
+                n_house varchar(50);
+
+        BEGIN
+                foreach i in array total
+                LOOP
+                        IF i ~ '^[0-9]' = true
+                        THEN EXIT;
+                        END IF;
+
+
+                END LOOP;
+                IF i ~ '^[0-9]' = false
+                        THEN n_house = LTRIM(REVERSE(SPLIT_PART(REVERSE(street), ',', 1)));
+                ELSE n_house = SUBSTRING(street, position(i in street), 10);
+                END IF;
+        RETURN n_house;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_n_street(street character varying) OWNER TO ivan;
+
+--
+-- Name: get_position_house(character varying, character varying, character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_position_house(city character varying, street character varying, n_house character varying) RETURNS character varying[]
+    LANGUAGE plpython3u
+    AS $$
+
+from dadata import Dadata
+
+LST_KEY = ('postal_code', 'city_district_with_type', 'city_district_type_full', 'city_district', 'street_fias_id',
+    'street_type', 'street_type_full', 'street', 'house_fias_id', 'house_type', 'house_type_full', 'geo_lat', 'geo_lon')
+
+lst_rez = []
+
+
+dadata = Dadata(token, secret)
+result = dadata.clean("address", f"{city} {street} {n_house}")
+
+for i in result:
+    for key in LST_KEY:
+        if i == key:
+            lst_rez.append(result[i])
+            break
+
+return lst_rez
+
+$$;
+
+
+ALTER FUNCTION public.get_position_house(city character varying, street character varying, n_house character varying) OWNER TO ivan;
+
+--
+-- Name: get_siteid_price(smallint, smallint); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.get_siteid_price(city_id smallint, source_id smallint) RETURNS TABLE(site_id bigint, n_price integer, f_flat integer)
+    LANGUAGE sql
+    AS $$
+
+SELECT 
+    s.site_id,
+    CASE
+        WHEN n_price IS NOT NULL THEN p.n_price::money::numeric
+        ELSE NULL
+    END as n_price 
+    
+    ,s.f_flat
+FROM inf_sys s
+    LEFT JOIN (
+        SELECT f_flat, n_price
+        FROM mn_ads_price
+        WHERE link IN (
+            SElECT MAX(link)
+            FROM mn_ads_price
+            GROUP BY f_flat
+        )
+    ) p
+        ON s.f_flat = p.f_flat
+WHERE s.f_sell_status = 1 AND f_city = city_id AND f_source = source_id
+
+UNION
+
+SELECT site_id, NULL, NULL
+FROM inf_miss_ads
+WHERE f_sell_status = 1 AND f_city = city_id AND f_source = source_id
+
+$$;
+
+
+ALTER FUNCTION public.get_siteid_price(city_id smallint, source_id smallint) OWNER TO lark;
+
+--
+-- Name: get_string_number_street(character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_string_number_street(full_street character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    street varchar(200);
+    count smallint := 0;
+    rez varchar := '';
+BEGIN
+    FOREACH street IN ARRAY string_to_array(full_street, ',')
+    LOOP
+        IF POSITION('оч.' IN street) > 0 OR POSITION('стр. ' IN street) > 0 OR
+            POSITION('жилой дом' IN street) > 0 OR POSITION('этап' IN street) > 0 OR
+            POSITION('жилые дома' IN street) > 0 OR POSITION('подъезд' IN street) > 0
+            THEN
+            street = '';
+            END IF;
+        IF length(street) > 1 THEN
+            count = count + 1;
+            IF count > 1 THEN
+                rez = rez||street;
+                END IF;
+        END IF;
+    END LOOP;
+
+    IF SPLIT_PART(rez, 'к', 2) = '' THEN
+            rez = SPLIT_PART(rez, 'к', 1);
+    ELSE
+        rez = SPLIT_PART(rez, 'к', 1)||' к'||SPLIT_PART(rez, 'к', 2);
+    END IF;
+
+    RETURN rez;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_string_number_street(full_street character varying) OWNER TO ivan;
+
+--
+-- Name: get_string_street(character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_string_street(full_street character varying) RETURNS character varying
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    street varchar(200);
+BEGIN
+    FOREACH street IN ARRAY string_to_array(full_street, ',')
+    LOOP
+        IF length(street) > 1 THEN
+            RETURN street;
+        END IF;
+    END LOOP;
+	RETURN full_street;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_string_street(full_street character varying) OWNER TO ivan;
+
+--
+-- Name: get_weight_factory(integer); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_weight_factory(distance integer, OUT weight numeric) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+    CASE
+        WHEN distance BETWEEN 0 AND 20 THEN
+            weight := 0.7;
+        WHEN distance BETWEEN 21 AND 100 THEN
+            weight := 0.5;
+        WHEN distance BETWEEN 100 AND 299 THEN
+            weight := 0.25;
+        WHEN distance BETWEEN 300 AND 499 THEN
+            weight := 0.10;
+        WHEN distance BETWEEN 500 AND 699 THEN
+            weight := 0.05;
+        WHEN distance BETWEEN 700 AND 999 THEN
+            weight := 0.03;
+        ELSE
+            weight := 0;
+    END CASE;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_weight_factory(distance integer, OUT weight numeric) OWNER TO ivan;
+
+--
+-- Name: get_weight_factory(numeric); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_weight_factory(distance numeric, OUT weight numeric) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN
+    CASE
+        WHEN distance BETWEEN 0 AND 20 THEN
+            weight := 0.7;
+        WHEN distance BETWEEN 21 AND 100 THEN
+            weight := 0.5;
+        WHEN distance BETWEEN 100 AND 299 THEN
+            weight := 0.25;
+        WHEN distance BETWEEN 300 AND 499 THEN
+            weight := 0.10;
+        WHEN distance BETWEEN 500 AND 699 THEN
+            weight := 0.05;
+        WHEN distance BETWEEN 700 AND 999 THEN
+            weight := 0.03;
+        ELSE
+            weight := 0;
+    END CASE;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_weight_factory(distance numeric, OUT weight numeric) OWNER TO ivan;
+
+--
+-- Name: get_weight_factory_floor(integer, numeric); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.get_weight_factory_floor(flat_id integer, weight_total numeric) RETURNS numeric
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+	n_floor smallint;
+BEGIN
+	SELECT f.c_name
+	INTO n_floor
+	FROM fs_floor f, mn_apartments_ads ad
+	WHERE ad.f_floor = f.link;
+
+	CASE 
+		WHEN (n_floor = 1 OR (n_floor >= 6 AND n_floor <= 12)) THEN 
+			RETURN weight_total * 0.9;
+		WHEN (n_floor >= 2 AND n_floor <= 5) THEN 
+			RETURN weight_total * 1;
+		ELSE
+			RETURN weight_total * 5;
+	END CASE;
+END;
+$$;
+
+
+ALTER FUNCTION public.get_weight_factory_floor(flat_id integer, weight_total numeric) OWNER TO ivan;
+
+--
+-- Name: load_ads_bf_to_mn(); Type: PROCEDURE; Schema: public; Owner: ivan
+--
+
+CREATE PROCEDURE public.load_ads_bf_to_mn()
+    LANGUAGE plpgsql
+    AS $$
+
+DECLARE
+    D_Start timestamp := clock_timestamp();
+    D_End timestamp;
+    sess smallint;
+
+BEGIN
+    INSERT INTO LG_Procedure_Session (F_Session, D_Date_Start)
+    VALUES (2, D_Start)
+    RETURNING LINK INTO sess;
+			
+	UPDATE bf_apartments_ads
+	SET n_street = REPLACE(n_street, 'д. ', '');
+
+	UPDATE bf_apartments_ads
+	SET n_street = REPLACE(n_street, '- корп. ', 'к');
+	
+	UPDATE bf_apartments_ads
+	SET n_street = REPLACE(n_street, ' этап', '');
+	
+	DELETE FROM BF_apartments_ads
+    WHERE s_type_street ~ '[0-9]' OR s_type_street LIKE 'СНТ';
+
+    UPDATE bf_apartments_ads
+    SET s_type_street = rtrim(ltrim(s_type_street));
+
+    UPDATE bf_apartments_ads
+    SET s_type_street =
+	    (CASE
+	    WHEN position('пp.'in s_type_street) > 0 THEN 'пр-д'
+		WHEN position('переулок'in s_type_street) > 0 THEN 'пер.'
+		WHEN position('проспект'in s_type_street) > 0 THEN 'пр-т'
+		ELSE s_type_street
+		END);
+
+	DROP TABLE IF EXISTS Ads;
+    CREATE TEMPORARY TABLE Ads (
+		LINK int,
+        S_Area varchar(150),
+        S_City varchar(150),
+        S_District varchar(150),
+        S_Street_Type varchar(150),
+        S_Street varchar(150),
+        N_Street varchar(30),
+        F_Qty_Room varchar(25),
+        N_Qty_Total_Space decimal(6,2),
+        N_Qty_Living_Space decimal(6,2),
+        N_Qty_Kitchen_Space decimal(6,2),
+        M_Price money,
+        N_Floor smallint,
+        B_Balcony boolean,
+        B_Loggia boolean,
+        S_Type_Of_Room Varchar(150),
+        S_Ads_Type varchar(30),
+        N_Ceiling_Height decimal(4,2),
+        S_Type_Bathroom Varchar(150),
+        S_Window varchar(150),
+        S_Kind_Of_Repair Varchar(150),
+        B_Heating boolean,
+        S_Furniture varchar(500),
+        S_Technics varchar(500),
+        S_Decorating varchar(150),
+        S_Method_Of_Sale Varchar(150),
+        S_Type_Of_Transaction Varchar(150),
+        S_Description varchar,
+        S_Type_House Varchar(150),
+        N_Year_Building smallint,
+        N_Floor_In_House smallint,
+        B_Passenger_Elevator boolean,
+        B_Freight_Elevator boolean,
+        S_Yard varchar(500),
+        S_Parking varchar(500),
+        S_Name_New_Building varchar(150),
+        S_Official_Builder Varchar(150),
+        S_Type_of_Participation varchar(200),
+        D_Deadline_for_Delivery varchar(150),
+        S_Name_Company Varchar(150),
+        S_Name_Seller Varchar(150),
+        S_Type_Of_Seller varchar(150),
+        S_Site_Links varchar,
+        F_Source smallint,
+        D_Date timestamp,
+        F_Procedure_Session int
+    );
+
+    INSERT INTO Ads (
+				LINK,
+				S_Area,
+				S_City,
+				S_District,
+				S_Street_Type,
+				S_Street,
+				N_Street,
+				F_Qty_Room,
+				N_Qty_Total_Space,
+				N_Qty_Living_Space,
+				N_Qty_Kitchen_Space,
+				M_Price,
+				N_Floor,
+				B_Balcony,
+				B_Loggia,
+				S_Type_Of_Room,
+				S_Ads_Type,
+				N_Ceiling_Height,
+				S_Type_Bathroom,
+				S_Window,
+				S_Kind_Of_Repair,
+				B_Heating,
+				S_Furniture,
+				S_Technics,
+				S_Decorating,
+				S_Method_Of_Sale,
+				S_Type_Of_Transaction,
+				S_Description,
+				S_Type_House,
+				N_Year_Building,
+				N_Floor_In_House,
+				B_Passenger_Elevator,
+				B_Freight_Elevator,
+				S_Yard,
+				S_Parking,
+				S_Name_New_Building,
+				S_Official_Builder,
+				S_Type_of_Participation,
+				D_Deadline_for_Delivery,
+				S_Name_Company,
+				S_Name_Seller,
+				S_Type_Of_Seller,
+				S_Site_Links,
+				F_Source,
+				D_Date
+		)
+    SELECT 
+		LINK,
+        S_Area,
+        S_City,
+        S_District,
+        S_Type_Street,
+        S_Street,
+        N_Street,
+        S_Qty_Room,
+        N_Qty_Total_Space,
+        N_Qty_Living_Space,
+        N_Qty_Kitchen_Space,
+        n_Price,
+        N_Floor,
+        B_Balkony,
+        B_Loggia,
+        S_Type_Of_Room,
+        S_Ads_Type,
+        N_Ceiling_Height,
+        S_Type_Bathroom,
+        S_Window,
+        S_Kind_Of_Repair,
+        B_Heating,
+        S_Furniture,
+        S_Technics,
+        S_Decorating,
+        S_Method_Of_Sale,
+        S_Type_Of_Transaction,
+        S_Description,
+        S_Type_House,
+        N_Year_Building,
+        N_Floor_In_House,
+        B_Passenger_Elevator,
+        B_Freight_Elevator,
+        S_Yard,
+        S_Parking,
+        S_Name_New_Building,
+        S_Official_Builder,
+        S_Type_of_Participation,
+        D_Deadline_for_Delivery,
+        S_Name_Company,
+        S_Name_Seller,
+        S_Type_Of_Seller,
+        S_Site_Links,
+        F_Source,
+        D_Date
+	FROM BF_Apartments_Ads
+	WHERE f_procedure_session IN (
+		SELECT MAX(F_Procedure_Session) FROM BF_Apartments_Ads
+		);
+
+	DELETE FROM ads
+	WHERE n_street LIKE 'стр%' OR n_street LIKE 'жилые дома' OR n_street LIKE 'жилой дом';
+	
+	UPDATE ads
+	SET F_Procedure_Session = sess;
+
+    UPDATE ads
+    SET s_street = rtrim(replace(s_street, s_street_type, ''));
+	
+    UPDATE ads
+    SET n_street = SUBSTRING(n_street, 1, position('-' in n_street) - 1)
+	WHERE position('-' in n_street) > 1;
+	
+	UPDATE ads
+	SET n_street = 	
+	CASE 
+		WHEN split_part(n_street, 'к', 2) = '' THEN split_part(n_street, 'к', 1)
+		ELSE split_part(n_street, 'к', 1)||' к'||split_part(n_street, 'к', 2)
+		END;
+	
+    UPDATE ads a
+    SET s_city = c.link
+    FROM fs_city c
+    WHERE  c.c_name = a.s_city;
+
+    ALTER TABLE ads ALTER COLUMN s_city TYPE int USING s_city::int;
+
+    UPDATE ads a
+    SET s_area = d.f_area
+    FROM FS_City d
+    WHERE d.link = a.s_city;
+
+    UPDATE ads a
+    SET s_district = d.link
+    FROM FS_District d
+    WHERE d.C_name = a.s_district;
+	
+	INSERT INTO FS_Street_Type (C_Name, short_name)
+	SELECT S_Type_Street, S_Type_Street FROM bf_apartments_ads 
+	WHERE S_Type_Street NOT IN (
+		SELECT short_name FROM FS_street_type
+	) AND S_Type_street NOT IN (
+		SELECT c_name FROM FS_street_type
+	) AND s_type_street ~ '[0-9]' = false
+	GROUP BY s_type_street;
+
+    UPDATE Ads a
+    SET S_Street_Type = d.LINK
+    FROM FS_Street_Type d
+    WHERE a.S_Street_Type = d.Short_Name;
+	
+	UPDATE Ads a
+    SET S_Street_Type = d.LINK
+    FROM FS_Street_Type d
+    WHERE a.S_Street_Type = d.c_name;
+	
+    ALTER TABLE ads ALTER COLUMN S_District TYPE int USING S_District::int;
+    ALTER TABLE ads ALTER COLUMN S_Street_Type TYPE int USING S_Street_Type::int;
+
+    INSERT INTO FS_Street (F_District, F_Type_Street, C_Name, f_city)
+    SELECT S_District, S_Street_Type, S_Street, s_City
+    FROM Ads
+    WHERE S_Street||' '||s_city  NOT IN (
+             SELECT C_Name||' '||f_city
+             FROM FS_Street
+            )
+    GROUP BY S_City, S_District, S_Street_Type, S_Street;
+
+	UPDATE ads a
+	SET s_street = s.link
+	FROM fs_street s
+	WHERE s.f_city = a.s_city AND a.s_street = s.c_name;
+
+    INSERT INTO FS_Type_House (C_Name)
+    SELECT S_Type_House FROM Ads
+    WHERE S_Type_House NOT IN (
+        SELECT C_Name FROM FS_Type_House
+    )
+    GROUP BY S_Type_House;
+
+	UPDATE Ads
+    SET S_Type_House = t.LINK
+    FROM FS_Type_House t
+	WHERE t.C_Name = ads.S_Type_House;
+
+    ALTER TABLE ads ALTER COLUMN S_Street TYPE int USING S_Street::int;
+
+	DROP TABLE IF EXISTS House;
+    CREATE TEMPORARY TABLE House (
+       link int,
+       F_Street smallint,
+       N_Qty_Floor varchar(10),
+       S_Number varchar(30),
+       N_Year_Building smallint,
+       B_Passenger_Elevator boolean,
+       B_Freight_Elevator boolean,
+       F_Parking varchar(500),
+       F_Yard varchar(500),
+       F_Type_House varchar(50),
+       F_Official_Builder varchar(150),
+       S_Name_New_Building varchar(150),
+       D_Deadline_for_Delivery varchar(150)
+    );
+
+    INSERT INTO House
+    SELECT
+       link
+       ,S_Street
+       ,N_Floor_in_House
+       ,N_Street
+       ,N_Year_Building
+       ,B_Passenger_Elevator
+       ,B_Freight_Elevator
+       ,S_Parking
+       ,S_Yard
+       ,S_Type_House
+       ,S_Official_Builder
+       ,S_Name_New_Building
+       ,D_Deadline_for_Delivery
+    FROM ads;
+
+    INSERT INTO FS_Parking (c_name)
+    SELECT DISTINCT House.F_Parking
+	FROM House
+    WHERE F_Parking IS NOT NULL AND F_Parking NOT IN (
+        SELECT C_Name FROM FS_Parking
+    );
+
+	INSERT INTO FS_Yard (c_name)
+    SELECT DISTINCT F_Yard FROM House
+    WHERE F_Yard IS NOT NULL AND F_Yard NOT IN (
+        SELECT C_Name FROM FS_Yard
+    );
+
+    INSERT INTO MN_Official_Builder (C_Name)
+    SELECT DISTINCT F_Official_Builder FROM House
+    WHERE F_Official_Builder NOT IN (
+        SELECT C_Name FROM MN_Official_Builder
+        ) AND F_Official_Builder IS NOT NULL;
+
+    UPDATE House h
+    SET F_Official_Builder = m.link
+    FROM MN_Official_Builder m
+    WHERE m.C_Name = h.F_Official_Builder;
+	
+    ALTER TABLE House ALTER COLUMN F_Official_Builder TYPE smallint USING F_Official_Builder::smallint;
+
+	UPDATE house h
+	SET F_Parking = p.LINK
+	FROM FS_Parking p
+	WHERE p.c_name = h.F_Parking;
+
+	UPDATE house h
+	SET F_Yard = y.link
+	FROM FS_Yard y
+	WHERE y.c_name = h.F_Yard;
+
+	ALTER TABLE house ALTER COLUMN F_Parking TYPE int USING F_Parking::int;
+	ALTER TABLE house ALTER COLUMN F_Yard TYPE int USING F_Yard::int;
+	ALTER TABLE house ALTER COLUMN F_Type_House TYPE int USING F_Type_House::int;
+
+    UPDATE MN_House mh
+    SET
+        N_Year_Building = CASE
+                            WHEN h.N_Year_Building IS NOT  NULL THEN h.N_Year_Building
+                            ELSE mh.N_Year_Building END
+        ,B_Passenger_Elevator = h.B_Passenger_Elevator
+        ,B_Freight_Elevator = h.B_Freight_Elevator
+        ,F_Parking = CASE
+                            WHEN h.F_Parking IS NOT NULL THEN h.F_Parking
+                            ELSE mh.F_Parking END
+        ,F_Yard = CASE
+                            WHEN h.F_Yard IS NOT NULL THEN h.F_Yard
+                            ELSE mh.F_Yard END
+        ,F_Type_House = CASE
+                            WHEN h.F_Type_House IS NOT NULL THEN h.F_Type_House
+                            ELSE mh.F_Type_House END
+        ,F_Official_Builder = CASE
+                            WHEN h.F_Official_Builder IS NOT NULL THEN h.F_Official_Builder
+                            ELSE mh.F_Official_Builder END
+        ,S_Name_New_Building = CASE
+                            WHEN h.S_Name_New_Building IS NOT NULL THEN h.S_Name_New_Building
+                            ELSE mh.S_Name_New_Building END
+    FROM House h
+    WHERE mh.F_Street = h.F_Street AND mh.S_Number = h.S_Number AND mh.N_Qty_Floor = h.N_Qty_Floor;
+
+    INSERT INTO MN_House (
+		F_Street
+       ,N_Qty_Floor
+       ,S_Number
+       ,N_Year_Building
+       ,B_Passenger_Elevator
+       ,B_Freight_Elevator
+       ,F_Parking
+       ,F_Yard
+       ,F_Type_House
+       ,F_Official_Builder
+       ,S_Name_New_Building
+	)
+	WITH h (
+			n_n
+		   ,F_Street
+		   ,N_Qty_Floor
+		   ,S_Number
+		   ,N_Year_Building
+		   ,B_Passenger_Elevator
+		   ,B_Freight_Elevator
+		   ,F_Parking
+		   ,F_Yard
+		   ,F_Type_House
+		   ,F_Official_Builder
+		   ,S_Name_New_Building
+		)
+	AS (
+		SELECT
+			ROW_NUMBER() OVER (PARTITION BY F_Street, S_Number ORDER BY N_Year_Building DESC) 
+		   ,F_Street
+		   ,N_Qty_Floor
+		   ,S_Number
+		   ,N_Year_Building
+		   ,B_Passenger_Elevator
+		   ,B_Freight_Elevator
+		   ,F_Parking
+		   ,F_Yard
+		   ,F_Type_House
+		   ,F_Official_Builder
+		   ,S_Name_New_Building
+		FROM House
+    )
+	SELECT 
+		   F_Street
+		   ,N_Qty_Floor
+		   ,S_Number
+		   ,N_Year_Building
+		   ,B_Passenger_Elevator
+		   ,B_Freight_Elevator
+		   ,F_Parking
+		   ,F_Yard
+		   ,F_Type_House
+		   ,F_Official_Builder
+		   ,S_Name_New_Building	
+	FROM h
+    WHERE F_Street||' '||S_Number NOT IN (
+        SELECT F_Street||' '||S_Number
+		FROM MN_House
+   		) AND n_n = 1;
+		
+    ALTER TABLE ads ADD COLUMN F_House int;
+
+	ALTER TABLE Ads ALTER COLUMN n_floor_in_house TYPE varchar(10) USING n_floor_in_house::varchar;
+
+    UPDATE ads a
+    SET F_House = m.link
+    FROM MN_House m
+    WHERE a.s_Street =  m.F_Street AND a.n_street = m.S_Number;
+
+    INSERT INTO FS_Qty_room (c_name)
+    SELECT F_Qty_room
+    FROM ads
+    WHERE F_Qty_room NOT IN (
+        SELECT C_Name FROM FS_Qty_room
+    )
+    GROUP BY 1;
+
+    UPDATE ads
+    SET F_Qty_room = m.LINK
+    FROM FS_Qty_room m
+    WHERE m.C_Name = ads.F_Qty_Room;
+
+    ALTER TABLE ads ALTER COLUMN F_Qty_room TYPE smallint USING F_Qty_room::smallint;
+	ALTER TABLE ads ALTER COLUMN n_floor TYPE varchar(10) USING n_floor::varchar(10);
+
+    INSERT INTO FS_Floor (c_name)
+    SELECT n_Floor
+    FROM ads
+    WHERE n_Floor NOT IN (
+        SELECT C_Name FROM FS_Floor
+    )
+    GROUP BY 1;
+
+    UPDATE ads a
+    SET n_Floor = m.LINK
+    FROM FS_Floor m
+    WHERE m.C_Name = a.n_Floor;
+
+    ALTER TABLE ads ALTER COLUMN n_Floor TYPE smallint USING n_Floor::smallint;
+	
+	UPDATE ads
+	SET D_Deadline_for_Delivery = date_deadline(F_House, D_Deadline_for_Delivery);
+
+	DROP TABLE IF EXISTS apartments;
+	CREATE TEMPORARY TABLE apartments (
+		link integer,
+		f_house integer,
+		f_qty_room smallint,
+		n_qty_total_space numeric(6,2),
+		n_qty_living_space numeric(6,2),
+		n_qty_kitchen_space numeric(6,2),
+		m_price money,
+		f_floor smallint,
+		f_technics varchar(500),
+		f_furniture varchar(500),
+		f_decorating varchar(250),
+		b_loggia boolean,
+		b_balcony boolean,
+		f_type_of_room varchar(150),
+		f_ads_type varchar(100),
+		n_ceiling_height numeric(4,2),
+		f_type_bathroom varchar(150),
+		f_window varchar(150),
+		f_kind_of_repaire varchar(150),
+		b_heating boolean,
+		f_method_of_sale varchar(150),
+		f_type_of_transaction varchar(150),
+		s_description character varying,
+		f_seller character varying(150),
+		f_type_of_seller varchar(150),
+		f_link_site varchar(300),
+		f_procedure_session smallint,
+		f_sourse smallint,
+		d_date timestamp
+	);
+
+	INSERT INTO apartments
+	SELECT
+		link,
+		f_house,
+		f_qty_room,
+		n_qty_total_space,
+		n_qty_living_space,
+		n_qty_kitchen_space,
+		m_price,
+		n_floor,
+		s_technics,
+		s_furniture,
+		s_decorating,
+		b_loggia,
+		b_balcony,
+		s_type_of_room,
+		s_ads_type,
+		n_ceiling_height,
+		s_type_bathroom,
+		s_window ,
+		s_kind_of_repair,
+		b_heating,
+		s_method_of_sale,
+		s_type_of_transaction,
+		s_description,
+		s_name_seller,
+		s_type_of_seller,
+		s_site_links,
+		f_procedure_session,
+		f_source,
+		d_date
+	FROM ads;
+
+	INSERT INTO FS_Decorating_Type (C_Name)
+	SELECT f_decorating
+	FROM apartments
+	WHERE f_decorating NOT IN (
+		SELECT C_Name FROM FS_Decorating_Type
+	) AND f_decorating IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_decorating = d.link
+	FROM FS_Decorating_Type d
+	WHERE d.C_Name = a.f_decorating;
+
+	ALTER TABLE apartments ALTER COLUMN F_Decorating TYPE smallint USING F_Decorating::smallint;
+
+	INSERT INTO FS_Ads_Type (C_Name)
+	SELECT f_ads_type
+	FROM apartments
+	WHERE f_ads_type NOT IN (
+		SELECT C_Name FROM FS_Ads_Type
+	) AND f_ads_type IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_ads_type = d.link
+	FROM FS_Ads_Type d
+	WHERE d.C_Name = a.f_ads_type;
+
+	ALTER TABLE apartments ALTER COLUMN F_Ads_Type TYPE smallint USING F_Ads_Type::smallint;
+
+	INSERT INTO FS_Type_of_Room (C_Name)
+	SELECT f_type_of_room
+	FROM apartments
+	WHERE f_type_of_room NOT IN (
+		SELECT C_Name FROM FS_Type_Of_Room
+	) AND f_type_of_room IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_type_of_room = d.link
+	FROM FS_Type_of_Room d
+	WHERE d.C_Name = a.f_type_of_room;
+
+	ALTER TABLE apartments ALTER COLUMN F_Type_Of_Room TYPE smallint USING F_Type_Of_Room::smallint;
+
+	INSERT INTO FS_Type_Bathroom (C_Name)
+	SELECT f_type_bathroom
+	FROM apartments
+	WHERE f_type_bathroom NOT IN (
+		SELECT C_Name FROM FS_Type_Bathroom
+	) AND f_type_bathroom IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_type_bathroom = d.link
+	FROM FS_Type_Bathroom d
+	WHERE d.C_Name = a.f_type_Bathroom;
+
+	ALTER TABLE apartments ALTER COLUMN F_Type_Bathroom TYPE smallint USING F_Type_Bathroom::smallint;
+
+	INSERT INTO FS_Type_of_Transaction (C_Name)
+	SELECT f_type_of_transaction
+	FROM apartments
+	WHERE f_type_of_transaction NOT IN (
+		SELECT C_Name FROM FS_Type_OF_Transaction
+	) AND f_type_of_transaction IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_type_of_transaction = d.link
+	FROM FS_Type_Of_Transaction d
+	WHERE d.C_Name = a.f_type_of_transaction;
+
+	ALTER TABLE apartments ALTER COLUMN F_Type_Of_Transaction TYPE smallint USING F_Type_Of_Transaction::smallint;
+
+	INSERT INTO FS_Kind_Of_Repaire (C_Name)
+	SELECT f_kind_of_repaire
+	FROM apartments
+	WHERE f_kind_of_repaire NOT IN (
+		SELECT C_Name FROM FS_Kind_Of_Repaire
+	) AND f_kind_of_repaire IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_kind_of_repaire = d.link
+	FROM FS_Kind_Of_Repaire d
+	WHERE d.C_Name = a.f_kind_of_repaire;
+
+	ALTER TABLE apartments ALTER COLUMN F_Kind_of_repaire TYPE smallint USING F_Kind_of_Repaire::smallint;
+
+	INSERT INTO FS_Method_of_Sale (C_Name)
+	SELECT f_method_of_sale
+	FROM apartments
+	WHERE f_method_of_sale NOT IN (
+		SELECT C_Name FROM FS_Method_of_sale
+	) AND f_method_of_sale IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_method_of_sale = d.link
+	FROM FS_Method_of_sale d
+	WHERE d.C_Name = a.f_method_of_sale;
+
+	ALTER TABLE apartments ALTER COLUMN F_Method_Of_Sale TYPE smallint USING F_Method_Of_Sale::smallint;
+
+	UPDATE apartments a
+	SET f_type_of_seller = NULL
+	WHERE f_type_of_seller ~ '[0-9]';
+
+	INSERT INTO FS_Type_Of_Seller (C_Name)
+	SELECT f_type_of_seller
+	FROM apartments
+	WHERE f_type_of_seller NOT IN (
+		SELECT C_Name FROM FS_TYpe_Of_Seller
+	) AND f_type_of_seller IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_type_of_seller = d.link
+	FROM FS_Type_of_Seller d
+	WHERE d.C_Name = a.f_type_of_seller;
+
+	ALTER TABLE apartments ALTER COLUMN F_Type_Of_Seller TYPE smallint USING F_Type_Of_Seller::smallint;
+
+	INSERT INTO FS_Window (C_Name)
+	SELECT f_window
+	FROM apartments
+	WHERE f_window NOT IN (
+		SELECT C_Name FROM FS_Window
+	) AND f_window IS NOT NULL
+	GROUP BY 1;
+
+	UPDATE apartments a
+	SET f_window = d.link
+	FROM FS_Window d
+	WHERE d.C_Name = a.f_window;
+
+	ALTER TABLE apartments ALTER COLUMN F_Window TYPE smallint USING F_window::smallint;
+	
+	
+	UPDATE apartments
+	SET f_seller = replace(f_seller, '"', '');
+	
+	INSERT INTO MN_Seller (C_Full_Name)
+	SELECT f_seller
+	FROM apartments
+	WHERE f_seller NOT IN (
+		SELECT C_Full_Name FROM MN_Seller
+	) AND f_seller IS NOT NULL
+	GROUP BY 1;
+	
+	UPDATE apartments a
+	SET f_seller = s.link
+	FROM MN_Seller s
+	WHERE s.C_Full_name = a.f_seller;
+	
+	ALTER TABLE apartments ALTER COLUMN F_Seller TYPE smallint USING F_Seller::smallint;
+	
+	DROP TABLE IF EXISTS templ_flat;
+	CREATE TEMPORARY TABLE templ_flat (
+				f_house int
+				,f_qty_room smallint
+				,n_qty_total_space numeric(6,2)
+				,n_qty_living_space numeric(6,2)
+				,n_qty_kitchen_space numeric(6,2) 
+				,f_floor smallint
+				,f_decorating smallint
+				,b_loggia boolean 
+				,b_balcony boolean
+				,f_ads_type smallint
+				,f_type_of_room smallint
+				,n_ceiling_height numeric(4,2)
+				,f_type_bathroom smallint
+				,f_window smallint
+				,f_kind_of_repaire smallint
+				,b_heating boolean
+				,m_price money
+				,f_method_of_sale smallint
+				,f_type_of_transaction smallint
+				,f_seller int 
+				,d_date timestamp
+				);
+	WITH templ (
+					n_n
+					,f_house
+					,f_qty_room
+					,n_qty_total_space
+					,n_qty_living_space
+					,n_qty_kitchen_space
+					,f_floor
+					,f_decorating
+					,b_loggia
+					,b_balcony
+					,f_ads_type
+					,f_type_of_room
+					,n_ceiling_height
+					,f_type_bathroom
+					,f_window
+					,f_kind_of_repaire
+					,b_heating
+					,m_price
+					,f_method_of_sale
+					,f_type_of_transaction
+					,f_seller
+					,d_date
+					)
+				AS (
+				SELECT
+						ROW_NUMBER() OVER (PARTITION BY f_house, f_qty_room, n_qty_total_space, f_floor)
+						,f_house
+						,f_qty_room
+						,n_qty_total_space
+						,n_qty_living_space
+						,n_qty_kitchen_space
+						,f_floor
+						,f_decorating
+						,b_loggia
+						,b_balcony
+						,f_ads_type
+						,f_type_of_room
+						,n_ceiling_height
+						,f_type_bathroom
+						,f_window
+						,f_kind_of_repaire
+						,b_heating
+						,m_price
+						,f_method_of_sale
+						,f_type_of_transaction
+						,f_seller
+						,d_date
+				FROM apartments
+				)
+			INSERT INTO templ_flat (
+					f_house
+					,f_qty_room
+					,n_qty_total_space
+					,n_qty_living_space
+					,n_qty_kitchen_space
+					,f_floor
+					,f_decorating
+					,b_loggia
+					,b_balcony
+					,f_ads_type
+					,f_type_of_room
+					,n_ceiling_height
+					,f_type_bathroom
+					,f_window
+					,f_kind_of_repaire
+					,b_heating
+					,m_price
+					,f_method_of_sale
+					,f_type_of_transaction
+					,f_seller
+					,d_date
+					)
+			SELECT 
+					f_house
+					,f_qty_room
+					,n_qty_total_space
+					,n_qty_living_space
+					,n_qty_kitchen_space
+					,f_floor
+					,f_decorating
+					,b_loggia
+					,b_balcony
+					,f_ads_type
+					,f_type_of_room
+					,n_ceiling_height
+					,f_type_bathroom
+					,f_window
+					,f_kind_of_repaire
+					,b_heating
+					,m_price
+					,f_method_of_sale
+					,f_type_of_transaction
+					,f_seller
+					,d_date
+			FROM templ 
+			WHERE n_n = 1;
+	
+	INSERT INTO MN_Apartments_Ads (
+		f_house
+		,f_qty_room
+		,n_qty_total_space
+		,n_qty_living_space
+		,n_qty_kitchen_space
+		,f_floor
+		,f_decorating
+		,b_loggia
+		,b_balcony
+		,f_ads_type
+		,f_type_of_room
+		,n_ceiling_height
+		,f_type_bathroom
+		,f_window
+		,f_kind_of_repaire
+		,b_heating
+		,f_method_of_sale
+		,f_type_of_transaction
+		,f_seller
+		,d_date
+	)
+	SELECT 
+		f_house
+		,f_qty_room
+		,n_qty_total_space
+		,n_qty_living_space
+		,n_qty_kitchen_space
+		,f_floor
+		,f_decorating
+		,b_loggia
+		,b_balcony
+		,f_ads_type
+		,f_type_of_room
+		,n_ceiling_height
+		,f_type_bathroom
+		,f_window
+		,f_kind_of_repaire
+		,b_heating
+		,f_method_of_sale
+		,f_type_of_transaction
+		,f_seller
+		,d_date
+	FROM templ_flat
+	WHERE f_house||' '||f_floor||' '||n_qty_total_space||' '||f_qty_room NOT IN (
+		SELECT f_house||' '||f_floor||' '||n_qty_total_space||' '||f_qty_room
+		FROM MN_Apartments_Ads
+	);
+	
+	
+	/*
+	SELECT * 
+	FROM templ_flat t LEFT JOIN MN_apartments_Ads d 
+		ON d.f_house = t.f_house 
+		AND d.f_qty_room = t.f_qty_room
+		AND d.n_qty_total_space = t.n_qty_total_space
+		AND d.f_floor = t.f_floor
+	WHERE d.f_house IS NULL
+	
+	SELECT * FROM apartments WHERE f_house = 5995*/
+	
+
+	ALTER TABLE apartments ADD COLUMN f_flat int;
+
+	UPDATE apartments a
+	SET f_flat = m.link
+	FROM MN_Apartments_Ads m
+	WHERE  a.f_floor = m.f_floor AND a.n_qty_total_space = m.n_qty_total_space
+		AND a.f_qty_room = m.f_qty_room AND m.f_house = a.f_house;
+	
+	DELETE FROM apartments WHERE f_flat IS NULL;
+	
+	UPDATE apartments 
+	SET 
+		f_technics = add_technics(f_flat, f_technics, 2)
+		,f_furniture = add_technics(f_flat, f_furniture, 1);
+
+	INSERT INTO INF_Descriptions (f_apatments_ads, s_descriptions)
+	SELECT f_flat, s_description
+	FROM apartments a
+	WHERE f_flat||' '||s_description NOT IN (
+		SELECT f_apatments_ads||' '||S_Descriptions FROM INF_Descriptions
+	);
+
+	INSERT INTO mn_ads_price (f_flat, n_price)
+	WITH current_price (n_n, f_flat, n_price) AS 
+	(
+		SELECT 
+			row_number() OVER (PARTITION BY f_flat ORDER BY d_date DESC)
+			,f_flat
+			,n_price
+		FROM mn_ads_price
+		)
+	SELECT a.f_flat, a.m_price
+	FROM apartments a
+		INNER JOIN current_price p
+			USING(f_flat)
+	WHERE n_n = 1 AND a.m_price <> p.n_price;
+
+	INSERT INTO mn_ads_price (f_flat, n_price)
+	SELECT f_flat, m_price
+	FROM apartments
+	WHERE f_flat NOT IN (
+		SELECT F_flat FROM mn_ads_price
+		);
+	
+	DELETE FROM inf_sys WHERE f_flat IN (
+		SELECT f_flat FROM apartments
+	);
+	
+	INSERT INTO inf_sys (f_flat, s_site_link, f_source, f_procedure_session)
+	SELECT f_flat, f_link_site, f_sourse, f_procedure_session
+	FROM apartments;
+
+	UPDATE LG_Procedure_Session
+	SET D_Date_End = clock_timestamp()
+	WHERE  link = sess;
+
+END;
+$$;
+
+
+ALTER PROCEDURE public.load_ads_bf_to_mn() OWNER TO ivan;
+
+--
+-- Name: load_ads_to_base(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.load_ads_to_base() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    id_city integer := (SELECT link FROM FS_City WHERE C_Name = NEW.S_City);
+    id_street integer;
+    street_name varchar(150);
+    id_type_street smallint;
+    siteid bigint;
+    id_house integer;
+    id_flat integer;
+    n_price money;
+    id_parking smallint;
+    id_yard smallint;
+    id_type_house smallint;
+    id_official_builder smallint;
+    id_qty_room smallint;
+    id_floor smallint;
+    id_technics integer;
+    id_furniture integer;
+    id_decoration smallint;
+    id_type_room smallint;
+    id_bathroom_type smallint;
+    id_window smallint;
+    id_repair_type smallint;
+    id_method_of_sale smallint;
+    id_transaction_type smallint;
+    id_seller integer;
+    id_seller_type smallint;
+    id_ads_type smallint;
+    id_apartments_ads integer;
+
+BEGIN
+
+    SELECT inf_sys.site_id INTO siteid FROM INF_Sys
+    WHERE inf_sys.site_id = NEW.site_id;
+
+    IF siteid IS NOT NULL
+        THEN
+        SELECT f_flat INTO id_flat FROM INF_Sys
+        WHERE inf_sys.site_id = NEW.site_id;
+        
+        UPDATE inf_sys
+        SET f_sell_status = 1
+        WHERE site_id = siteid;
+
+        SELECT mn_ads_price.n_price INTO n_price
+        FROM mn_ads_price
+        WHERE f_flat = id_flat
+        ORDER BY D_Date DESC LIMIT 1;
+
+        IF n_price <> NEW.n_price
+            THEN
+            INSERT INTO mn_ads_price (f_flat, n_price)
+            VALUES (id_flat, NEW.n_price);
+            END IF;
+
+    ELSE
+        SELECT link INTO id_street FROM fs_street
+        WHERE C_Name = RTRIM(LTRIM(NEW.s_street)) AND f_city = id_city
+        LIMIT 1;
+
+        IF id_street IS NULL
+            THEN
+
+            INSERT INTO fs_street (C_Name, f_type_street, f_city)
+            VALUES (NEW.s_street, NEW.f_type_street, id_city)
+            RETURNING link INTO id_street;
+            END IF;
+
+        SELECT link INTO id_house FROM MN_House
+        WHERE 1=1
+            AND s_number = LTRIM(RTRIM(NEW.n_street))
+            AND f_street = id_street
+        LIMIT 1;
+
+        IF id_house IS NULL THEN
+
+            IF street_name <> NEW.s_street THEN
+                UPDATE fs_street
+                SET c_name2 = street_name
+                WHERE link = id_street;
+            END IF;
+
+            IF NEW.s_parking IS NOT NULL
+                THEN
+                SELECT link INTO id_parking FROM FS_Parking
+                WHERE C_Name = NEW.s_parking;
+
+                IF id_parking IS NULL
+                    THEN
+                    INSERT INTO fs_parking (c_name)
+                    VALUES (NEW.s_parking)
+                    RETURNING link INTO id_parking;
+                    END IF;
+                END IF;
+
+            IF NEW.s_yard IS NOT NULL
+                THEN
+                SELECT link INTO id_yard FROM FS_Yard
+                WHERE C_Name = NEW.s_yard;
+
+                IF id_yard IS NULL
+                    THEN
+                    INSERT INTO fs_yard (C_Name)
+                    VALUES (NEW.s_yard)
+                    RETURNING link INTO id_yard;
+                    END IF;
+                END IF;
+
+            IF NEW.s_type_house IS NOT NULL
+                THEN
+                SELECT link INTO id_type_house
+                FROM fs_type_house
+                WHERE c_name = NEW.s_type_house;
+
+                IF id_type_house IS NULL
+                    THEN
+                    INSERT INTO fs_type_house (c_name)
+                    VALUES (NEW.s_type_house);
+                    END IF;
+                END IF;
+
+            IF NEW.s_official_builder IS NOT NULL
+                THEN
+                SELECT link INTO id_official_builder
+                FROM mn_official_builder
+                WHERE c_name = NEW.s_official_builder;
+
+                IF id_official_builder IS NULL
+                    THEN
+                    INSERT INTO mn_official_builder (c_name)
+                    VALUES (NEW.s_official_builder)
+                    RETURNING link AS id_official_builder;
+                    END IF;
+                END IF;
+
+            INSERT INTO mn_house (f_street, n_qty_floor, n_year_building, b_passenger_elevator, b_freight_elevator,
+                f_parking, f_yard, f_type_house, f_official_builder, s_name_new_building, s_number, f_city)
+            VALUES (id_street, NEW.s_qty_floor, NEW.n_year_building, NEW.b_passenger_elevator, NEW.b_freight_elevator,
+                id_parking, id_yard, id_type_house, id_official_builder, NEW.s_name_new_building, NEW.n_street, id_city)
+            RETURNING link INTO id_house;
+			
+			INSERT INTO mn_house_metrics (f_house, f_city)
+			VALUES (id_house, id_city);
+			
+            END IF;
+
+        IF NEW.s_qty_room IS NOT NULL
+            THEN
+            SELECT link INTO id_qty_room
+            FROM fs_qty_room
+            WHERE C_Name = NEW.s_qty_room;
+
+            IF id_qty_room IS NULL
+                THEN
+                INSERT INTO fs_qty_room (c_name)
+                VALUES (NEW.s_qty_room)
+                RETURNING link AS id_qty_room;
+                END IF;
+            END IF;
+
+        IF NEW.n_floor IS NOT NULL
+            THEN
+            SELECT link INTO id_floor
+            FROM FS_Floor
+            WHERE c_name = NEW.n_floor;
+
+            IF id_floor IS NULL
+				THEN
+                INSERT INTO fs_floor (c_name)
+                VALUES (NEW.n_floor)
+                RETURNING link AS n_floor;
+                END IF;
+            END IF;
+
+        IF NEW.s_decoration IS NOT NULL
+            THEN
+            SELECT link INTO id_decoration
+            FROM FS_Decoration_Type
+            WHERE c_name = NEW.s_decoration;
+
+            IF id_decoration IS NULL
+                THEN
+                INSERT INTO fs_decoration_type (c_name)
+                VALUES (NEW.s_decoration)
+                RETURNING link INTO id_decoration;
+                END IF;
+            END IF;
+
+        IF NEW.s_type_room IS NOT NULL
+            THEN
+            SELECT link INTO id_type_room
+            FROM fs_type_room
+            WHERE c_name = NEW.s_type_room;
+
+            IF id_type_room IS NULL
+                THEN
+                INSERT INTO fs_type_room (c_name)
+                VALUES (NEW.s_type_street)
+                RETURNING link INTO id_type_room;
+                END IF;
+            END IF;
+
+        IF NEW.s_ads_type IS NOT NULL
+            THEN
+            SELECT link INTO id_ads_type
+            FROM FS_ads_type
+            WHERE c_name = NEW.s_ads_type;
+
+            IF id_ads_type IS NULL
+                THEN
+                INSERT INTO fs_ads_type (c_name)
+                VALUES (NEW.s_ads_type)
+                RETURNING link AS id_ads_type;
+                END IF;
+            END IF;
+
+        IF NEW.s_bathroom_type IS NOT NULL
+            THEN
+            SELECT link INTO id_bathroom_type
+            FROM fs_bathroom_type
+            WHERE c_name = NEW.s_bathroom_type;
+
+            IF id_bathroom_type IS NULL
+                THEN
+                INSERT INTO fs_bathroom_type (c_name)
+                VALUES (NEW.s_bathroom_type)
+                RETURNING link INTO id_bathroom_type;
+                END IF;
+            END IF;
+
+        IF NEW.s_window IS NOT NULL
+            THEN
+            SELECT link INTO id_window
+            FROM fs_window
+            WHERE c_name = NEW.s_window;
+
+            IF id_window IS NULL
+                THEN
+                INSERT INTO fs_window (c_name)
+                VALUES (NEW.s_window)
+                RETURNING link INTO id_window;
+                END IF;
+            END IF;
+
+        IF NEW.s_repair_type IS NOT NULL
+            THEN
+            SELECT link INTO id_repair_type
+            FROM fs_repair_type
+            WHERE c_name = NEW.s_repair_type;
+
+            IF id_repair_type IS NULL
+                THEN
+                INSERT INTO fs_repair_type (c_name)
+                VALUES (NEW.s_repair_type);
+                END IF;
+            END IF;
+
+        IF NEW.s_seller IS NOT NULL
+            THEN
+            SELECT link INTO id_seller
+            FROM fs_seller
+            WHERE c_full_name = NEW.s_seller;
+
+            IF NEW.s_seller_type IS NOT NULL
+                THEN
+                SELECT link INTO id_seller_type
+                FROM fs_seller_type
+                WHERE c_name = NEW.s_seller_type;
+
+                IF id_seller_type IS NULL
+                    THEN
+                    INSERT INTO fs_seller_type (c_name)
+                    VALUES (NEW.s_seller_type)
+                    RETURNING link INTO id_seller_type;
+                    END IF;
+                END IF;
+
+            IF id_seller IS NULL
+                THEN
+                INSERT INTO FS_Seller (c_full_name, f_seller_type)
+                VALUES (NEW.s_seller, id_seller_type)
+                RETURNING link INTO id_seller;
+                END IF;
+            END IF;
+
+        IF NEW.s_method_of_sale IS NOT NULL
+            THEN
+            SELECT link INTO id_method_of_sale
+            FROM fs_method_of_sale
+            WHERE c_name = NEW.s_method_of_sale;
+
+            IF id_method_of_sale IS NULL
+                THEN
+                INSERT INTO fs_method_of_sale (c_name)
+                VALUES (NEW.s_method_of_sale)
+                RETURNING link INTO id_method_of_sale;
+                END IF;
+            END IF;
+
+        IF NEW.s_transaction_type IS NOT NULL
+            THEN
+            SELECT link INTO id_transaction_type
+            FROM fs_transaction_type
+            WHERE c_name = NEW.s_transaction_type;
+
+            IF id_transaction_type IS NULL
+                THEN
+                INSERT INTO fs_transaction_type (c_name)
+                VALUES (NEW.s_transaction_type)
+                RETURNING link INTO id_transaction_type;
+                END IF;
+            END IF;
+        
+        INSERT INTO mn_apartments_ads (
+            f_house, f_qty_room, f_ads_type, n_qty_total_space, n_qty_living_space, n_qty_kitchen_space,
+            f_floor, f_decorating, B_Loggia, B_Balcony, f_room_type, n_ceiling_height, b_heating,
+            f_bathroom_type, f_window, f_repair_type, f_seller, f_method_of_sale, f_transaction_type
+        )
+        VALUES (id_house, id_qty_room, id_ads_type, NEW.n_qty_total_space, NEW.n_qty_living_space,
+             NEW.n_qty_kitchen_space, id_floor, id_decoration, NEW.b_loggia, NEW.b_balcony,
+             id_type_room, NEW.n_ceiling_height, NEW.b_heating, id_bathroom_type, id_window,
+             id_repair_type, id_seller, id_method_of_sale, id_transaction_type)
+        RETURNING link INTO id_apartments_ads;
+
+        IF NEW.s_furniture IS NOT NULL THEN
+            PERFORM add_technics(id_apartments_ads, NEW.s_furniture, 1);
+            END IF;
+
+        IF NEW.s_technics IS NOT NULL THEN
+            PERFORM add_technics(id_apartments_ads, NEW.s_technics, 2);
+            END IF;
+
+        INSERT INTO mn_ads_price (f_flat, n_price)
+        VALUES (id_apartments_ads, NEW.n_price);
+
+        INSERT INTO inf_sys (f_flat, s_site_link, f_source, site_id, f_city, f_sell_status)
+        VALUES (id_apartments_ads, NEW.s_site_links, NEW.f_source, NEW.site_id, id_city, 1);
+        
+        INSERT INTO inf_descriptions (f_flat, c_name)
+        VALUES (id_apartments_ads, NEW.s_description);
+	
+	INSERT INTO mn_metrics (f_house, f_flat, f_city)
+	VALUES (id_house, id_apartments_ads, id_city);
+	END IF;
+	RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.load_ads_to_base() OWNER TO ivan;
+
+--
+-- Name: load_air_polution(integer); Type: PROCEDURE; Schema: public; Owner: lark
+--
+
+CREATE PROCEDURE public.load_air_polution(IN city_id integer)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    INSERT INTO inf_air_pollution (f_city, json)
+    SELECT
+        link
+        ,get_json_air_polution(lat::numeric, lon::numeric)::json
+    FROM fs_city
+    WHERE link = city_id;
+
+END;
+$$;
+
+
+ALTER PROCEDURE public.load_air_polution(IN city_id integer) OWNER TO lark;
+
+--
+-- Name: load_bus_station(smallint, character varying, numeric, numeric, character varying[]); Type: PROCEDURE; Schema: public; Owner: lark
+--
+
+CREATE PROCEDURE public.load_bus_station(IN city_id smallint, IN name_station character varying, IN b_lat numeric, IN b_lon numeric, VARIADIC route character varying[])
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    bus_id integer;
+	stop_id uuid:= uuid_generate_v4();
+	i varchar(150);                       --элемент цикла
+	type_bus_id smallint;
+    name_type_bus varchar(100);
+    name_bus varchar(100);
+    name_ varchar(100);
+
+BEGIN
+    IF (
+        SELECT link 
+        FROM ps_stop_bus
+        WHERE 1=1
+            AND f_city = city_id
+            AND c_name = name_station
+    ) IS NOT NULL THEN
+        RETURN;
+    END IF;
+
+    INSERT INTO ps_stop_bus (link, f_city, c_name, lat, lon)
+    VALUES (stop_id, city_id, name_station, b_lat, b_lon)
+    RETURNING link INTO stop_id;
+
+    FOREACH  i IN ARRAY $5
+        LOOP
+            name_bus := reverse(split_part(reverse(i), ' ', 1));
+            name_type_bus:= replace(i, name_bus, '');
+            
+            SELECT LINK INTO type_bus_id
+            FROM  fs_type_bus
+			WHERE c_name = name_type_bus;
+
+            IF type_bus_id IS NULL THEN
+                INSERT INTO fs_type_bus (c_name)
+                VALUES (name_type_bus)
+                RETURNING link INTO type_bus_id;
+
+            END IF;
+
+            SELECT link
+            INTO bus_id
+            FROM fs_bus
+            WHERE f_city = city_id AND c_name = name_bus;
+
+            IF bus_id is NULL THEN
+                INSERT INTO fs_bus (f_city, f_type_bus, c_name)
+                VALUES (city_id, type_bus_id, name_bus)
+                RETURNING link INTO bus_id;
+            END IF;
+			
+			INSERT INTO ref_stop_and_bus (f_stop, f_bus)
+			VALUES (stop_id, bus_id);
+
+        END LOOP;
+END;
+$_$;
+
+
+ALTER PROCEDURE public.load_bus_station(IN city_id smallint, IN name_station character varying, IN b_lat numeric, IN b_lon numeric, VARIADIC route character varying[]) OWNER TO lark;
+
+--
+-- Name: PROCEDURE load_bus_station(IN city_id smallint, IN name_station character varying, IN b_lat numeric, IN b_lon numeric, VARIADIC route character varying[]); Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON PROCEDURE public.load_bus_station(IN city_id smallint, IN name_station character varying, IN b_lat numeric, IN b_lon numeric, VARIADIC route character varying[]) IS 'Процедура для загрузки остановок и маршрутов';
+
+
+--
+-- Name: load_end_dist(integer, integer, character varying, smallint, numeric, numeric, numeric, numeric); Type: PROCEDURE; Schema: public; Owner: lark
+--
+
+CREATE PROCEDURE public.load_end_dist(IN city_id integer, IN house_id integer, IN object_id character varying, IN id_type_object smallint, IN lat1 numeric, IN lon1 numeric, IN lat2 numeric, IN lon2 numeric)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+    short_dist integer:= calculation_position(lat1, lon1, lat2, lon2);
+    foot_dist integer:= get_foot_distance(lat1, lon1, lat2, lon2);
+    car_dist integer;
+
+BEGIN 
+    PERFORM pg_sleep(1);
+
+    car_dist = get_car_distance(lat1, lon1, lat2, lon2);
+
+    PERFORM pg_sleep(1);
+    
+    INSERT INTO ps_dist_house_to_object (f_city, f_house, object_id, f_type_object, n_short_dist, n_car_dist, n_foot_dist)
+    VALUES (city_id, house_id, object_id, id_type_object, short_dist, car_dist, foot_dist);
+    
+    RAISE NOTICE 'Данные по дисатнции от дома №% до обьекта №% успешно загружены', house_id, object_id;
+    
+END;
+$$;
+
+
+ALTER PROCEDURE public.load_end_dist(IN city_id integer, IN house_id integer, IN object_id character varying, IN id_type_object smallint, IN lat1 numeric, IN lon1 numeric, IN lat2 numeric, IN lon2 numeric) OWNER TO lark;
+
+--
+-- Name: load_gis_ghk(character varying); Type: PROCEDURE; Schema: public; Owner: lark
+--
+
+CREATE PROCEDURE public.load_gis_ghk(IN path character varying)
+    LANGUAGE plpgsql
+    AS $$    
+
+BEGIN
+
+    DROP TABLE IF EXISTS gis_ghk_temp;
+
+    CREATE TEMPORARY TABLE gis_ghk_temp (
+        addres varchar(1000),
+        id_gis char(36),
+        gl_id_fias char(36),
+        oktmo varchar(250),
+        control_method varchar(200),
+        ogrn varchar(200),
+        kpp varchar(200),
+        org_control_house varchar(1000),
+        type_house varchar(200),
+        condition varchar(200),
+        total_area varchar(200),
+        living_area varchar(200),
+        some_col  varchar(500),
+        some_col1 varchar(500),
+        some_col2 varchar(500),
+        type_block varchar(500),
+        some_col4 varchar(500),
+        some_col5 varchar(500),
+        some_col8 varchar(500),
+        kadastr_number varchar(250),
+        global_id_house char(36),
+        global_id_pom char(36),
+        some_col7 varchar(500)
+    );
+
+    RAISE NOTICE 'Созданна временная таблица';
+    
+    EXECUTE 'COPY gis_ghk_temp FROM '''||path||''' DELIMITER '';'' CSV HEADER;';   
+    
+    RAISE NOTICE 'Загруженны данные с .csv файла';
+
+    ALTER TABLE gis_ghk_temp DROP COLUMN some_col;
+    ALTER TABLE gis_ghk_temp DROP COLUMN some_col1;
+    ALTER TABLE gis_ghk_temp DROP COLUMN some_col2;
+    ALTER TABLE gis_ghk_temp DROP COLUMN some_col4;
+    ALTER TABLE gis_ghk_temp DROP COLUMN some_col5;
+    ALTER TABLE gis_ghk_temp DROP COLUMN some_col8;
+    ALTER TABLE gis_ghk_temp DROP COLUMN some_col7;
+    ALTER TABLE gis_ghk_temp DROP COLUMN kadastr_number;
+    ALTER TABLE gis_ghk_temp DROP COLUMN ogrn;
+    ALTER TABLE gis_ghk_temp DROP COLUMN kpp;
+    ALTER TABLE gis_ghk_temp DROP COLUMN org_control_house;
+    ALTER TABLE gis_ghk_temp DROP COLUMN condition;
+    ALTER TABLE gis_ghk_temp DROP COLUMN oktmo;
+    ALTER TABLE gis_ghk_temp DROP COLUMN control_method;
+
+    UPDATE gis_ghk_temp
+    SET total_area = REPLACE(total_area, ',', '.'),
+        living_area = REPLACE(living_area, ',', '.');
+
+    DELETE FROM gis_ghk_temp
+    WHERE type_house <> 'Многоквартирный' OR type_block <> 'Жилое';
+    
+    ALTER TABLE gis_ghk_temp ALTER COLUMN total_area TYPE numeric USING total_area::numeric;
+    ALTER TABLE gis_ghk_temp ALTER COLUMN living_area TYPE numeric USING living_area::numeric;
+    ALTER TABLE gis_ghk_temp ADD COLUMN post_index integer;
+    ALTER TABLE gis_ghk_temp ADD COLUMN f_city integer;
+    
+
+    UPDATE gis_ghk_temp 
+    SET post_index = CAST(SPLIT_PART(addres, ',', 1) AS integer)  
+    WHERE SPLIT_PART(addres, ',', 1) ~ '[0-9]';
+    
+    RAISE NOTICE 'Создали почтовые индексы';
+    
+    DELETE FROM  gis_ghk_temp
+    WHERE post_index IS NULL;
+
+    DROP TABLE IF EXISTS gis_ghk_temp2;
+    CREATE TEMPORARY TABLE gis_ghk_temp2 (
+        f_city smallint,
+        post_index integer,
+        addres varchar(1000),
+        id_gis char(36),
+        gl_id_fias char(36),
+        total_area varchar(200),
+        living_area varchar(200),
+        N_flat_house smallint
+);
+
+    INSERT INTO gis_ghk_temp2
+    SELECT 
+        i.f_city
+        ,CAST(SPLIT_PART(addres, ',', 1) AS integer)
+        ,addres
+        ,id_gis
+        ,gl_id_fias
+        ,MAX(total_area) as total_area
+        ,MAX(living_area) as living_area
+        ,COUNT(global_id_pom)
+    FROM gis_ghk_temp g
+        INNER JOIN fs_post_index i
+            ON i.n_index = g.post_index 
+    GROUP BY 1, 3, 4, 5;
+            
+
+    INSERT INTO inf_gis_ghk (f_city, post_index, addres, id_gis, id_fias, total_area, living_area, n_flat_house) 
+    SELECT f_city, post_index, addres, id_gis, gl_id_fias
+        ,CAST(total_area AS numeric)
+        ,CAST(living_area AS numeric)
+        ,n_flat_house
+
+    FROM gis_ghk_temp2;
+    
+    RAISE NOTICE 'Процедура выполнена';
+
+END;
+$$;
+
+
+ALTER PROCEDURE public.load_gis_ghk(IN path character varying) OWNER TO lark;
+
+--
+-- Name: load_json_object(integer, integer); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.load_json_object(f_city integer, f_object integer) RETURNS boolean
+    LANGUAGE plpython3u
+    AS $$
+
+import requests
+import json
+
+overpass_url = "http://overpass-api.de/api/interpreter"
+
+city = plpy.execute(f'SELECT c_name FROM fs_city WHERE link = {f_city}')[0]
+
+tags = plpy.execute(f'SELECT tags FROM fs_object_type WHERE link = {f_object}')[0]
+
+for tag in tags:
+    overpass_query = f"""
+                    [out:json];
+                    area[name="{city}"];
+                    nwr{tag}(area);
+                    out center;
+                    """
+
+    response = requests.get(overpass_url, params={'data': overpass_query})
+
+    j = response.json()
+    for i in j['elements']:
+        i = json.dumps(i)
+        try:
+            plpy.execute(f'''INSERT INTO mn_json_object (f_city, f_object, json)
+                        VALUES ({f_city}, {f_object}, '{i}'::jsonb)''')
+        except:
+            continue
+
+return 1
+
+END;
+$$;
+
+
+ALTER FUNCTION public.load_json_object(f_city integer, f_object integer) OWNER TO ivan;
+
+--
+-- Name: load_json_object(integer, integer, character varying); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.load_json_object(f_city integer, f_object integer, table_name character varying) RETURNS void
+    LANGUAGE plpython3u
+    AS $$
+
+import requests
+import json
+import time 
+
+overpass_url = "http://overpass-api.de/api/interpreter"
+
+
+def get_json(qvr: str):
+    while True:
+        response = requests.get(overpass_url, params={'data': qvr})
+        try:
+            return response.json()
+        except:
+            time.sleep(5)
+            plpy.notice('Ошибка в обрабоке Json')
+            continue
+
+
+city = plpy.execute(f'SELECT c_name FROM fs_city WHERE link = {f_city}')[0]['c_name']
+
+tags = plpy.execute(f'SELECT tags FROM fs_objects_type WHERE link = {f_object}')[0]['tags']
+
+for tag in tags:
+    overpass_query = f"""
+                    [out:json];
+                    area[name="{city}"];
+                    nwr{tag}(area);
+                    out center;
+                    """
+    
+    j = get_json(overpass_query)
+    for i in j['elements']:
+        i = json.dumps(i)
+        try:
+            plpy.execute(f'''INSERT INTO {table_name} (f_city, f_objects_type, json)
+                        VALUES ({f_city}, {f_object}, '{i}'::jsonb)''')
+
+        except Exception as e:
+            plpy.notice(f'Ошибка при загрузке данных в БД с ОСМ {e}')
+            continue
+
+
+$$;
+
+
+ALTER FUNCTION public.load_json_object(f_city integer, f_object integer, table_name character varying) OWNER TO ivan;
+
+--
+-- Name: load_object_from_osm(smallint); Type: PROCEDURE; Schema: public; Owner: lark
+--
+
+CREATE PROCEDURE public.load_object_from_osm(IN city_id smallint)
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+    object record;    
+    city_name varchar(150);
+
+BEGIN
+    
+    SELECT c_name INTO city_name 
+    FROM fs_city
+    WHERE link = city_id;
+    
+    DELETE FROM ps_object_position 
+    WHERE f_city = city_id;
+
+    RAISE NOTICE 'Произвели очишение старых данных по городу %', city_name;
+
+    FOR object IN 
+           SELECT link, c_name, tags
+            FROM fs_objects_type
+            WHERE  load_dist = true
+    LOOP
+        PERFORM load_json_object(city_id, object.Link, 'ps_object_position');
+        
+        RAISE NOTICE 'Произвели загрузку данных тип объекта % город %', object.c_name, city_name;
+
+    END LOOP;
+
+    RAISE NOTICE 'Все обьекты успешно загружены';
+        
+END;
+$$;
+
+
+ALTER PROCEDURE public.load_object_from_osm(IN city_id smallint) OWNER TO lark;
+
+--
+-- Name: pars_buildings(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.pars_buildings() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.object_id := NEW.json::json ->> 'id';
+    NEW.latitude := NEW.json::json #> '{center, lat}';
+    NEW.longitude := NEW.json::json #> '{center, lon}';
+    NEW.name_obj := NEW.json::json #> '{tags, name}';
+    NEW.operator_obj := NEW.json::json #> '{tags, operator}';
+    NEW.street := NEW.json::json #> '{tags, addr:street}';
+    NEW.street = replace(NEW.street, '"', '');
+    NEW.n_house := NEW.json::json #> '{tags, addr:housenumber}';
+    NEW.n_house = replace(NEW.n_house, '"', '');
+    NEW.D_Date := NOW();
+    NEW.f_type_street := get_id_type_street(NEW.street);
+    NEW.street = del_type_street(NEW.street);
+RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.pars_buildings() OWNER TO ivan;
+
+--
+-- Name: pars_json(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.pars_json() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.object_id := NEW.json::json ->> 'id';
+    NEW.latitude := NEW.json::json #> '{center, lat}';
+    NEW.longitude := NEW.json::json #> '{center, lon}';
+    NEW.name_obj := NEW.json::json #> '{tags, name}';
+    NEW.operator_obj := NEW.json::json #> '{tags, operator}';
+    NEW.street := NEW.json::json #> '{tags, addr:street}';
+    NEW.street = replace(NEW.street, '"', '');
+    NEW.n_house := NEW.json::json #> '{tags, addr:housenumber}';
+    NEW.n_house = replace(NEW.n_house, '"', '');
+    NEW.D_Date := NOW();
+    NEW.f_type_street := get_id_type_street(NEW.street);
+    NEW.street = del_type_street(NEW.street);
+RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.pars_json() OWNER TO ivan;
+
+--
+-- Name: pars_json_air_pollution(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.pars_json_air_pollution() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.f_index := NEW.json::json #> '{main, aqi}';
+    NEW.n_co := NEW.json::json #> '{components, co}';
+    NEW.n_no := NEW.json::json #> '{components, no}';
+    NEW.n_o3 := NEW.json::json #> '{components, o3}';
+    NEW.n_no2 := NEW.json::json #> '{components, no2}';
+    NEW.n_so2 := NEW.json::json #> '{components, so2}';
+    NEW.n_pm2_5 := NEW.json::json #> '{components, pm2_5}';
+    NEW.n_pm10 := NEW.json::json #> '{components, pm10}';
+    NEW.n_nh3 := NEW.json::json #> '{components, nh3}';
+    NEW.D_Date := NOW();
+RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.pars_json_air_pollution() OWNER TO ivan;
+
+--
+-- Name: pars_obj_json(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.pars_obj_json() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.object_id := NEW.json::json ->> 'id';
+    NEW.latitude := NEW.json::json #> '{center, lat}';
+    NEW.longitude := NEW.json::json #> '{center, lon}';
+    NEW.name_obj := NEW.json::json #> '{tags, name}';
+    NEW.street := NEW.json::json #> '{tags, addr:street}';
+    NEW.D_Date := NOW();
+RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.pars_obj_json() OWNER TO lark;
+
+--
+-- Name: start_task_dist(); Type: PROCEDURE; Schema: public; Owner: lark
+--
+
+CREATE PROCEDURE public.start_task_dist()
+    LANGUAGE plpgsql
+    AS $$
+DECLARE 
+    proc record;   
+    active_proc integer;
+
+BEGIN
+
+    SELECT COUNT(pid) INTO active_proc
+    FROM pg_stat_activity
+    WHERE state = 'active' AND query = 'CALL start_task_dist();';
+
+    IF active_proc < 2 THEN 
+        FOR proc IN
+            SELECT link, query 
+            FROM ts_dist_task 
+            WHERE f_status = 1
+            ORDER BY d_date_add
+            LIMIT 119
+
+        LOOP
+            EXECUTE(proc.query);
+            UPDATE ts_dist_task SET f_status = 2 WHERE link = proc.link;
+        
+            RAISE NOTICE 'Запрос №%I выполнен успешно', proc.link;
+        END LOOP;
+    ELSE 
+        RAISE NOTICE 'В БД данный запрос уже активирован';
+        END IF;
+
+END;
+$$;
+
+
+ALTER PROCEDURE public.start_task_dist() OWNER TO lark;
+
+--
+-- Name: task_dist_compl(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.task_dist_compl() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+
+BEGIN 
+    NEW.d_date_compl = clock_timestamp();
+    RETURN NEW;
+END;
+
+$$;
+
+
+ALTER FUNCTION public.task_dist_compl() OWNER TO lark;
+
+--
+-- Name: task_dist_time(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.task_dist_time() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+BEGIN
+    NEW.d_date_add = clock_timestamp();
+    RETURN NEW;
+END;
+$$;
+
+
+ALTER FUNCTION public.task_dist_time() OWNER TO lark;
+
+--
+-- Name: tr_house_metrics(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.tr_house_metrics() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+	value numeric(3,2);
+	w_fact numeric(3,2);
+	temperature numeric(3,2);
+    amount_ps smallint;
+    amount_prod smallint;
+    amount_sport smallint;
+
+BEGIN
+	WITH fact (distance)
+    	AS
+    	(
+        SELECT calculation_position(h.lat, h.lon, f.latitude, f.longitude)
+        FROM inf_factory f, mn_house h
+        WHERE h.link = NEW.f_house AND h.f_city = f.f_city  
+    	)
+    SELECT
+        get_weight_factory(MIN(distance))
+   	INTO w_fact
+	FROM fact;
+	
+	NEW.w_factory = w_fact;
+
+	SELECT weight INTO value
+	FROM fs_index_pollution i
+        INNER JOIN inf_air_pollution p
+            ON i.link = p.f_index 
+	WHERE p.f_city = NEW.f_city
+    ORDER BY d_date
+    LIMIT 1;
+	
+	NEW.w_air = value;
+	
+	SELECT weigth INTO temperature
+	FROM inf_temperature
+	WHERE f_city = NEW.f_city;
+
+    NEW.w_temp = temperature;
+    
+    NEW.w_dist_park = get_house_weigth(NEW.f_city, NEW.f_house, '29');
+    NEW.w_dist_kinder = get_house_weigth(NEW.f_city, NEW.f_house, '11');
+    NEW.w_dist_entertime = get_house_weigth(NEW.f_city, NEW.f_house, '12');
+    NEW.w_dist_fuel = get_house_weigth(NEW.f_city, NEW.f_house, '15');
+    NEW.w_dist_market = get_house_weigth(NEW.f_city, NEW.f_house, '17');
+    NEW.w_dist_garag = get_house_weigth(NEW.f_city, NEW.f_house, '21');
+    NEW.w_dist_pipe = get_house_weigth(NEW.f_city, NEW.f_house, '22');
+    NEW.w_dist_scool = get_house_weigth(NEW.f_city, NEW.f_house, '25');
+    NEW.w_dist_mall = get_house_weigth(NEW.f_city, NEW.f_house, '17');
+    NEW.w_dist_farmacy = get_house_weigth(NEW.f_city, NEW.f_house, '16');
+    NEW.w_dist_sport = get_house_weigth(NEW.f_city, NEW.f_house, '33');
+    
+    SELECT COUNT(*) INTO amount_ps
+    FROM ps_dist_house_to_object
+    WHERE f_type_object IN (29, 30) AND f_house = NEW.f_house;
+
+    IF amount_ps = 0 THEN 
+        NEW.w_amount_ps = 0;
+    ELSE
+        NEW.w_amount_ps = (0.5 - ( 0.5 / amount_ps));
+    END IF;
+
+    SELECT COUNT(*) INTO amount_sport
+    FROM ps_dist_house_to_object
+    WHERE f_type_object = 33 AND f_house = NEW.f_house;
+
+    IF amount_sport = 0 THEN 
+        NEW.w_amount_sport = 0;
+    ELSE
+        NEW.w_amount_sport = (0.5 - ( 0.5 / amount_sport));
+    END IF;
+
+    SELECT COUNT(*) INTO amount_prod
+    FROM ps_dist_house_to_object
+    WHERE f_type_object = 18 AND f_house = NEW.f_house;
+
+    IF amount_prod = 0 THEN 
+        NEW.w_amount_prod = 0;
+    ELSE
+        NEW.w_amount_prod = (0.5 - ( 0.5 / amount_prod));
+    END IF;
+
+	RETURN NEW;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.tr_house_metrics() OWNER TO lark;
+
+--
+-- Name: tr_metrics(); Type: FUNCTION; Schema: public; Owner: ivan
+--
+
+CREATE FUNCTION public.tr_metrics() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+DECLARE
+	house_metr record;
+
+BEGIN
+    SELECT *
+    INTO house_metr
+    FROM mn_house_metrics
+    WHERE 1=1
+        AND f_city = NEW.f_city
+        AND f_house = NEW.f_house;
+
+	NEW.w_floor = get_floor_weight(NEW.f_flat);
+
+	IF (NEW.w_floor IS NOT NULL AND house_metr.w_air IS NOT NULL) THEN
+		NEW.w_air_floor = NEW.w_floor * house_metr.w_air;
+	END IF;
+
+	IF house_metr.w_factory IS NOT NULL THEN
+		NEW.w_factory_floor = get_weight_factory_floor(NEW.f_flat, house_metr.w_factory);
+	END IF;
+
+	RETURN NEW;
+
+END;
+$$;
+
+
+ALTER FUNCTION public.tr_metrics() OWNER TO ivan;
+
+--
+-- Name: trans_temp_to_const(); Type: PROCEDURE; Schema: public; Owner: ivan
+--
+
+CREATE PROCEDURE public.trans_temp_to_const()
+    LANGUAGE plpgsql
+    AS $$
+-- CREATE DATE 2022-08-12
+-- Процедура для перемещения данных квартир с временного буфера и сортировкой адреса
+
+DECLARE
+    time_Start timestamp := current_timestamp;
+    id int;
+
+BEGIN
+
+    INSERT INTO LG_Procedure_Session (F_Session, D_Date_Start)
+    VALUES (1, time_Start)
+    RETURNING link INTO id;
+
+UPDATE bf_temp_apartments_ads
+SET s_full_street = (
+	CASE
+		WHEN POSITION('улица' in s_full_street) > 0 THEN REPLACE(s_full_street, 'улица' , 'ул.')
+		ELSE s_full_street
+	END);
+
+INSERT INTO bf_apartments_ads (
+		link,
+		s_city,
+		s_district,
+		s_type_street,
+		s_street,
+		n_street,
+		s_qty_room,
+		n_qty_total_space,
+		n_qty_living_space,
+		n_qty_kitchen_space,
+		n_price,
+		n_floor,
+		b_balkony,
+		b_loggia,
+		s_type_of_room,
+		s_ads_type,
+		n_ceiling_height,
+		s_type_bathroom,
+		s_window,
+		s_kind_of_repair,
+		b_heating,
+		s_furniture,
+		s_technics,
+		s_decorating,
+		s_method_of_sale,
+		s_type_of_transaction,
+		s_description,
+		s_type_house,
+		n_year_building,
+		n_floor_in_house,
+		b_passenger_elevator,
+		b_freight_elevator,
+		s_yard,
+		s_parking,
+		s_name_new_building,
+		s_official_builder,
+		s_type_of_participation,
+		d_deadline_for_delivery,
+		s_name_company,
+		s_name_seller,
+		s_type_of_seller,
+		s_site_links,
+		f_source,
+		d_date,
+		f_procedure_session
+)
+
+SELECT
+		link,
+		s_city,
+		s_district,
+		split_part(s_full_street, ' ', 1) as s_type_street,
+		split_part(s_full_street, ', ', 1) as s_street,
+		CASE
+			WHEN split_part(s_full_street, ', ', 3) = '' THEN split_part(s_full_street, ', ', 2)
+			ELSE split_part(s_full_street, ', ', 2)||' - '||split_part(s_full_street, ', ', 3)
+			END as n_street,
+		s_qty_room,
+		n_qty_total_space,
+		n_qty_living_space,
+		n_qty_kitchen_space,
+		n_price,
+		n_floor,
+		b_balcony,
+		b_loggia,
+		s_type_of_room,
+		s_ads_type,
+		n_ceiling_height,
+		s_type_bathroom,
+		s_window,
+		s_kind_of_repair,
+		b_heating,
+		s_furniture,
+		s_technics,
+		s_decorating,
+		s_method_of_sale,
+		s_type_of_transaction,
+		s_description,
+		s_type_house,
+		n_year_building,
+		n_floor_in_house,
+		b_passenger_elevator,
+		b_freight_elevator,
+		s_yard,
+		s_parking,
+		s_name_new_building,
+		s_official_builder,
+		s_type_of_participation,
+		d_deadline_for_delivery,
+		s_name_company,
+		s_name_seller,
+		s_type_of_seller,
+		s_site_links,
+		f_source,
+		d_date,
+		id AS f_procedure_session
+
+FROM bf_temp_apartments_ads;
+
+UPDATE LG_Procedure_Session
+SET D_Date_End = current_timestamp
+WHERE id = link;
+
+DELETE FROM BF_Temp_Apartments_Ads
+WHERE LINK IN (
+	select link from BF_Apartments_Ads
+	WHERE F_Procedure_session = id
+);
+
+END;
+$$;
+
+
+ALTER PROCEDURE public.trans_temp_to_const() OWNER TO ivan;
+
+--
+-- Name: update_openstreet_objects(smallint); Type: PROCEDURE; Schema: public; Owner: ivan
+--
+
+CREATE PROCEDURE public.update_openstreet_objects(IN city_id smallint)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN 
+	SELECT load_json_object(city_id, 28, 'mn_json_building');
+
+END;
+$$;
+
+
+ALTER PROCEDURE public.update_openstreet_objects(IN city_id smallint) OWNER TO ivan;
+
+--
+-- Name: update_openstreet_objects(integer); Type: PROCEDURE; Schema: public; Owner: ivan
+--
+
+CREATE PROCEDURE public.update_openstreet_objects(IN city_id integer)
+    LANGUAGE plpgsql
+    AS $$
+BEGIN 
+	PERFORM load_json_object(city_id, 28, 'mn_json_building');
+
+END;
+$$;
+
+
+ALTER PROCEDURE public.update_openstreet_objects(IN city_id integer) OWNER TO ivan;
+
+--
+-- Name: update_sell_status(smallint, bigint[]); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.update_sell_status(city_id smallint, VARIADIC sitids bigint[]) RETURNS void
+    LANGUAGE sql
+    AS $_$
+
+UPDATE inf_sys 
+SET f_sell_status = 2
+WHERE f_city = city_id AND f_sell_status = 1 AND site_id NOT IN (
+    SELECT * FROM unnest($2)
+);
+
+UPDATE inf_miss_ads
+SET f_sell_status = 2
+WHERE f_city = city_id AND site_id NOT IN (
+    SELECT * FROM unnest($2)
+);
+
+$_$;
+
+
+ALTER FUNCTION public.update_sell_status(city_id smallint, VARIADIC sitids bigint[]) OWNER TO lark;
+
+--
+-- Name: weigth_dist(); Type: FUNCTION; Schema: public; Owner: lark
+--
+
+CREATE FUNCTION public.weigth_dist() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $_$
+DECLARE
+    weigth numeric(3,2);
+    weigth_ps numeric(3,2);
+    c_col_name varchar(100); -- перменная с названием колонки в таблице метрик 
+
+BEGIN
+
+    IF NEW.f_type_object IN (29, 30) THEN 
+        weigth_ps = (get_house_weigth(NEW.f_city, NEW.f_house, '29') + get_house_weigth(NEW.f_city, NEW.f_house, '30')) / 2;
+
+        UPDATE mn_house_metrics
+        SET w_dist_ps = weigth_ps
+        WHERE f_house = NEW.f_house;
+        
+    END IF;
+
+    IF NEW.f_type_object IN (
+        SELECT link 
+        FROM fs_objects_type
+        WHERE col_name IS NOT NULL
+        ) THEN 
+            weigth:= get_house_weigth(NEW.f_city, NEW.f_house, NEW.f_type_object);
+            
+        SELECT col_name INTO c_col_name 
+        
+        FROM fs_objects_type
+        WHERE link = NEW.f_type_object;
+
+        EXECUTE 
+        'UPDATE mn_house_metrics SET '||c_col_name||' = $1 WHERE f_house = $2;'
+        USING weigth, NEW.f_house;
+
+    END IF;
+
+    RETURN NEW;
+
+END;
+
+$_$;
+
+
+ALTER FUNCTION public.weigth_dist() OWNER TO lark;
+
+SET default_tablespace = '';
+
+SET default_table_access_method = heap;
+
+--
+-- Name: fs_area; Type: TABLE; Schema: minghk; Owner: lark
+--
+
+CREATE TABLE minghk.fs_area (
+    link smallint NOT NULL,
+    c_name character varying(150),
+    t_href character varying(150)
+);
+
+
+ALTER TABLE minghk.fs_area OWNER TO lark;
+
+--
+-- Name: TABLE fs_area; Type: COMMENT; Schema: minghk; Owner: lark
+--
+
+COMMENT ON TABLE minghk.fs_area IS 'Таблица районов';
+
+
+--
+-- Name: fs_area_link_seq; Type: SEQUENCE; Schema: minghk; Owner: lark
+--
+
+CREATE SEQUENCE minghk.fs_area_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE minghk.fs_area_link_seq OWNER TO lark;
+
+--
+-- Name: fs_area_link_seq; Type: SEQUENCE OWNED BY; Schema: minghk; Owner: lark
+--
+
+ALTER SEQUENCE minghk.fs_area_link_seq OWNED BY minghk.fs_area.link;
+
+
+--
+-- Name: fs_city; Type: TABLE; Schema: minghk; Owner: lark
+--
+
+CREATE TABLE minghk.fs_city (
+    link smallint NOT NULL,
+    f_area smallint,
+    c_name character varying(150),
+    t_href character varying(150)
+);
+
+
+ALTER TABLE minghk.fs_city OWNER TO lark;
+
+--
+-- Name: TABLE fs_city; Type: COMMENT; Schema: minghk; Owner: lark
+--
+
+COMMENT ON TABLE minghk.fs_city IS 'Таблица населенных пунктов';
+
+
+--
+-- Name: fs_city_link_seq; Type: SEQUENCE; Schema: minghk; Owner: lark
+--
+
+CREATE SEQUENCE minghk.fs_city_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE minghk.fs_city_link_seq OWNER TO lark;
+
+--
+-- Name: fs_city_link_seq; Type: SEQUENCE OWNED BY; Schema: minghk; Owner: lark
+--
+
+ALTER SEQUENCE minghk.fs_city_link_seq OWNED BY minghk.fs_city.link;
+
+
+--
+-- Name: mn_buildings; Type: TABLE; Schema: minghk; Owner: lark
+--
+
+CREATE TABLE minghk.mn_buildings (
+    link uuid NOT NULL,
+    f_city smallint,
+    c_address character varying(200),
+    n_year_build smallint,
+    n_floor smallint,
+    n_squarer numeric(8,1),
+    lat numeric,
+    lon numeric
+);
+
+
+ALTER TABLE minghk.mn_buildings OWNER TO lark;
+
+--
+-- Name: TABLE mn_buildings; Type: COMMENT; Schema: minghk; Owner: lark
+--
+
+COMMENT ON TABLE minghk.mn_buildings IS 'Таблица зданий';
+
+
+--
+-- Name: bf_avito_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.bf_avito_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.bf_avito_seq OWNER TO ivan;
+
+--
+-- Name: bf_temp_ads_houses; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.bf_temp_ads_houses (
+    link integer NOT NULL,
+    s_area character varying(150) NOT NULL,
+    s_city character varying(150) NOT NULL,
+    s_street character varying(150) NOT NULL,
+    s_type_street character varying(100) NOT NULL,
+    n_street smallint NOT NULL,
+    f_qty_room smallint NOT NULL,
+    n_house_space smallint NOT NULL,
+    s_ads_type character varying(20) NOT NULL,
+    n_yard_space smallint NOT NULL,
+    n_ceiling_height numeric(6,2) NOT NULL,
+    s_floor smallint NOT NULL,
+    s_technics character varying(20),
+    s_category_ground character varying(150) NOT NULL,
+    s_materrial_of_walls character varying(150) NOT NULL,
+    s_parking character varying(150) NOT NULL,
+    s_kind_of_repair character varying(150) NOT NULL,
+    s_transport_accessibility character varying(150) NOT NULL,
+    s_district character varying(200) NOT NULL,
+    s_descriptions character varying NOT NULL,
+    s_type_of_seller character varying(150) NOT NULL,
+    s_name_company character varying(150) NOT NULL,
+    s_name_seller character varying(150) NOT NULL,
+    s_site_links character varying NOT NULL,
+    d_date timestamp without time zone,
+    f_sourse smallint NOT NULL,
+    s_decorating integer NOT NULL
+);
+
+
+ALTER TABLE public.bf_temp_ads_houses OWNER TO ivan;
+
+--
+-- Name: bf_temp_ads_houses_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.bf_temp_ads_houses_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.bf_temp_ads_houses_link_seq OWNER TO ivan;
+
+--
+-- Name: bf_temp_ads_houses_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.bf_temp_ads_houses_link_seq OWNED BY public.bf_temp_ads_houses.link;
+
+
+--
+-- Name: bf_temp_apartments_ads; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.bf_temp_apartments_ads (
+    link integer NOT NULL,
+    s_city character varying(150),
+    s_district character varying(150),
+    s_qty_room character varying(20) NOT NULL,
+    n_qty_total_space numeric(6,2) NOT NULL,
+    n_qty_living_space numeric(6,2),
+    n_qty_kitchen_space numeric(6,2),
+    n_price money,
+    n_floor character varying(10),
+    b_balcony boolean,
+    b_loggia boolean,
+    s_type_room character varying(150),
+    s_ads_type character varying(20) NOT NULL,
+    n_ceiling_height numeric(4,2),
+    s_bathroom_type character varying(150),
+    s_window character varying(150),
+    s_repair_type character varying(150),
+    b_heating boolean,
+    s_furniture character varying(500),
+    s_technics character varying(500),
+    s_decoration character varying(150),
+    s_method_of_sale character varying(150),
+    s_transaction_type character varying(150),
+    s_description character varying NOT NULL,
+    s_type_house character varying(150),
+    n_year_building smallint,
+    s_qty_floor smallint,
+    b_passenger_elevator boolean,
+    b_freight_elevator boolean,
+    s_yard character varying(500),
+    s_parking character varying(500),
+    s_name_new_building character varying(150),
+    s_official_builder character varying(150),
+    s_type_of_participation character varying(200),
+    d_deadline_for_delivery character varying(100),
+    s_site_links character varying NOT NULL,
+    s_name_company character varying(150),
+    s_seller character varying(150),
+    s_seller_type character varying(150),
+    f_source smallint NOT NULL,
+    d_date timestamp without time zone,
+    s_street character varying(500),
+    site_id bigint,
+    f_type_street smallint,
+    n_street character varying(20)
+);
+
+
+ALTER TABLE public.bf_temp_apartments_ads OWNER TO ivan;
+
+--
+-- Name: bf_temp_apartments_ads_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.bf_temp_apartments_ads_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.bf_temp_apartments_ads_link_seq OWNER TO ivan;
+
+--
+-- Name: bf_temp_apartments_ads_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.bf_temp_apartments_ads_link_seq OWNED BY public.bf_temp_apartments_ads.link;
+
+
+--
+-- Name: bf_temp_commercial_real_estate; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.bf_temp_commercial_real_estate (
+    link integer NOT NULL,
+    f_kinde_of_repaire smallint NOT NULL,
+    s_area character varying(150) NOT NULL,
+    s_city character varying(150),
+    s_district character varying(150) NOT NULL,
+    s_type_street smallint NOT NULL,
+    n_street smallint NOT NULL,
+    f_floor smallint NOT NULL,
+    n_ceiling_height numeric(6,2) NOT NULL,
+    f_power_grid_capacity smallint NOT NULL,
+    f_type_of_transaction smallint NOT NULL,
+    f_readings smallint NOT NULL,
+    f_type_house smallint NOT NULL,
+    f_distance_from_road smallint NOT NULL,
+    f_parking smallint NOT NULL,
+    n_qty_parking_place smallint NOT NULL,
+    f_type_of_seller smallint NOT NULL,
+    s_name_company character varying(150) NOT NULL,
+    s_name_seller character varying(150) NOT NULL,
+    d_date timestamp without time zone,
+    f_sourse smallint NOT NULL,
+    s_site_links character varying NOT NULL
+);
+
+
+ALTER TABLE public.bf_temp_commercial_real_estate OWNER TO ivan;
+
+--
+-- Name: bf_temp_commercial_real_estate_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.bf_temp_commercial_real_estate_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.bf_temp_commercial_real_estate_link_seq OWNER TO ivan;
+
+--
+-- Name: bf_temp_commercial_real_estate_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.bf_temp_commercial_real_estate_link_seq OWNED BY public.bf_temp_commercial_real_estate.link;
+
+
+--
+-- Name: es_furniture; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.es_furniture (
+    link integer NOT NULL,
+    f_flat integer,
+    f_furniture_types smallint,
+    d_date_create timestamp without time zone
+);
+
+
+ALTER TABLE public.es_furniture OWNER TO ivan;
+
+--
+-- Name: TABLE es_furniture; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.es_furniture IS 'Таблица с наличием мебели у квартиры';
+
+
+--
+-- Name: es_furniture_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.es_furniture_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.es_furniture_link_seq OWNER TO ivan;
+
+--
+-- Name: es_furniture_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.es_furniture_link_seq OWNED BY public.es_furniture.link;
+
+
+--
+-- Name: es_technics; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.es_technics (
+    link integer NOT NULL,
+    f_flat integer,
+    f_technics_type smallint,
+    d_date_create timestamp without time zone
+);
+
+
+ALTER TABLE public.es_technics OWNER TO ivan;
+
+--
+-- Name: TABLE es_technics; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.es_technics IS 'Таблица с наличием техники';
+
+
+--
+-- Name: es_technics_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.es_technics_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.es_technics_link_seq OWNER TO ivan;
+
+--
+-- Name: es_technics_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.es_technics_link_seq OWNED BY public.es_technics.link;
+
+
+--
+-- Name: fs_ads_type; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_ads_type (
+    link smallint NOT NULL,
+    c_name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.fs_ads_type OWNER TO ivan;
+
+--
+-- Name: fs_ads_object_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_ads_object_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_ads_object_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_ads_object_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_ads_object_link_seq OWNED BY public.fs_ads_type.link;
+
+
+--
+-- Name: fs_announcement; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_announcement (
+    link smallint NOT NULL,
+    c_name character varying(150)
+);
+
+
+ALTER TABLE public.fs_announcement OWNER TO ivan;
+
+--
+-- Name: fs_announcement_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_announcement_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_announcement_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_announcement_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_announcement_link_seq OWNED BY public.fs_announcement.link;
+
+
+--
+-- Name: fs_area; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_area (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.fs_area OWNER TO ivan;
+
+--
+-- Name: fs_area_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_area_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_area_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_area_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_area_link_seq OWNED BY public.fs_area.link;
+
+
+--
+-- Name: fs_bathroom_type; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_bathroom_type (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_bathroom_type OWNER TO ivan;
+
+--
+-- Name: fs_bus; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.fs_bus (
+    link integer NOT NULL,
+    f_city smallint,
+    f_type_bus smallint,
+    c_name character varying(200),
+    d_date_create timestamp without time zone
+);
+
+
+ALTER TABLE public.fs_bus OWNER TO lark;
+
+--
+-- Name: TABLE fs_bus; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.fs_bus IS 'Таблица с маршрутами';
+
+
+--
+-- Name: fs_bus_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.fs_bus_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_bus_link_seq OWNER TO lark;
+
+--
+-- Name: fs_bus_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.fs_bus_link_seq OWNED BY public.fs_bus.link;
+
+
+--
+-- Name: fs_category_ground; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_category_ground (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_category_ground OWNER TO ivan;
+
+--
+-- Name: fs_category_ground_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_category_ground_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_category_ground_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_category_ground_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_category_ground_link_seq OWNED BY public.fs_category_ground.link;
+
+
+--
+-- Name: fs_city; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_city (
+    link smallint NOT NULL,
+    n_code smallint,
+    c_name character varying(200) NOT NULL,
+    f_area smallint NOT NULL,
+    lat numeric,
+    lon numeric
+);
+
+
+ALTER TABLE public.fs_city OWNER TO ivan;
+
+--
+-- Name: fs_city_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_city_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_city_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_city_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_city_link_seq OWNED BY public.fs_city.link;
+
+
+--
+-- Name: fs_decoration_type; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_decoration_type (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.fs_decoration_type OWNER TO ivan;
+
+--
+-- Name: TABLE fs_decoration_type; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_decoration_type IS 'Таблица с видами отделки';
+
+
+--
+-- Name: fs_decorating_type_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_decorating_type_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_decorating_type_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_decorating_type_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_decorating_type_link_seq OWNED BY public.fs_decoration_type.link;
+
+
+--
+-- Name: fs_distance_from_road; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_distance_from_road (
+    link smallint NOT NULL,
+    c_name character varying(250) NOT NULL
+);
+
+
+ALTER TABLE public.fs_distance_from_road OWNER TO ivan;
+
+--
+-- Name: fs_distance_from_road_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_distance_from_road_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_distance_from_road_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_distance_from_road_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_distance_from_road_link_seq OWNED BY public.fs_distance_from_road.link;
+
+
+--
+-- Name: fs_district; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_district (
+    link smallint NOT NULL,
+    n_code smallint,
+    c_name character varying(150) NOT NULL,
+    f_city smallint NOT NULL
+);
+
+
+ALTER TABLE public.fs_district OWNER TO ivan;
+
+--
+-- Name: fs_district_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_district_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_district_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_district_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_district_link_seq OWNED BY public.fs_district.link;
+
+
+--
+-- Name: fs_floor; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_floor (
+    link smallint NOT NULL,
+    n_code integer,
+    c_name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.fs_floor OWNER TO ivan;
+
+--
+-- Name: fs_floor_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_floor_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_floor_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_floor_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_floor_link_seq OWNED BY public.fs_floor.link;
+
+
+--
+-- Name: fs_furniture; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_furniture (
+    link smallint NOT NULL,
+    c_name character varying(400) NOT NULL
+);
+
+
+ALTER TABLE public.fs_furniture OWNER TO ivan;
+
+--
+-- Name: fs_furniture_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_furniture_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_furniture_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_furniture_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_furniture_link_seq OWNED BY public.fs_furniture.link;
+
+
+--
+-- Name: fs_furniture_types; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_furniture_types (
+    link smallint NOT NULL,
+    c_name character varying(250)
+);
+
+
+ALTER TABLE public.fs_furniture_types OWNER TO ivan;
+
+--
+-- Name: TABLE fs_furniture_types; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_furniture_types IS 'Таблица с видами мебели';
+
+
+--
+-- Name: fs_furniture_types_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_furniture_types_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_furniture_types_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_furniture_types_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_furniture_types_link_seq OWNED BY public.fs_furniture_types.link;
+
+
+--
+-- Name: fs_index_pollution; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_index_pollution (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL,
+    weight numeric(3,2)
+);
+
+
+ALTER TABLE public.fs_index_pollution OWNER TO ivan;
+
+--
+-- Name: TABLE fs_index_pollution; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_index_pollution IS 'Справочная таблица с индексами загрязнения воздуха
+';
+
+
+--
+-- Name: fs_index_pollution_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_index_pollution_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_index_pollution_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_index_pollution_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_index_pollution_link_seq OWNED BY public.fs_index_pollution.link;
+
+
+--
+-- Name: fs_materrial_of_walls; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_materrial_of_walls (
+    link smallint NOT NULL,
+    c_name character varying(150)
+);
+
+
+ALTER TABLE public.fs_materrial_of_walls OWNER TO ivan;
+
+--
+-- Name: TABLE fs_materrial_of_walls; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_materrial_of_walls IS 'Справочная таблица о материале стен
+';
+
+
+--
+-- Name: fs_materrial_of_walls_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_materrial_of_walls_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_materrial_of_walls_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_materrial_of_walls_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_materrial_of_walls_link_seq OWNED BY public.fs_materrial_of_walls.link;
+
+
+--
+-- Name: fs_method_of_sale; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_method_of_sale (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_method_of_sale OWNER TO ivan;
+
+--
+-- Name: fs_method_of_sale_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_method_of_sale_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_method_of_sale_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_method_of_sale_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_method_of_sale_link_seq OWNED BY public.fs_method_of_sale.link;
+
+
+--
+-- Name: fs_objects_type; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_objects_type (
+    link smallint NOT NULL,
+    c_name character varying(20) NOT NULL,
+    tags text[],
+    load_dist boolean NOT NULL,
+    col_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_objects_type OWNER TO ivan;
+
+--
+-- Name: TABLE fs_objects_type; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_objects_type IS 'таблицца с типами обьектов';
+
+
+--
+-- Name: COLUMN fs_objects_type.col_name; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON COLUMN public.fs_objects_type.col_name IS 'название столбца в таблице метрик';
+
+
+--
+-- Name: fs_objects_type_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_objects_type_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_objects_type_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_objects_type_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_objects_type_link_seq OWNED BY public.fs_objects_type.link;
+
+
+--
+-- Name: fs_optional_field; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_optional_field (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.fs_optional_field OWNER TO ivan;
+
+--
+-- Name: fs_optional_field_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_optional_field_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_optional_field_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_optional_field_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_optional_field_link_seq OWNED BY public.fs_optional_field.link;
+
+
+--
+-- Name: fs_options; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_options (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_options OWNER TO ivan;
+
+--
+-- Name: fs_options_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_options_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_options_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_options_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_options_link_seq OWNED BY public.fs_options.link;
+
+
+--
+-- Name: fs_parking; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_parking (
+    link smallint NOT NULL,
+    c_name character varying(500) NOT NULL
+);
+
+
+ALTER TABLE public.fs_parking OWNER TO ivan;
+
+--
+-- Name: TABLE fs_parking; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_parking IS 'Справочная таблица о видах парковки';
+
+
+--
+-- Name: fs_parking_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_parking_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_parking_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_parking_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_parking_link_seq OWNED BY public.fs_parking.link;
+
+
+--
+-- Name: fs_parking_space; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_parking_space (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.fs_parking_space OWNER TO ivan;
+
+--
+-- Name: fs_parking_space_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_parking_space_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_parking_space_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_parking_space_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_parking_space_link_seq OWNED BY public.fs_parking_space.link;
+
+
+--
+-- Name: fs_post_index; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.fs_post_index (
+    link smallint NOT NULL,
+    f_city smallint NOT NULL,
+    n_index integer NOT NULL
+);
+
+
+ALTER TABLE public.fs_post_index OWNER TO lark;
+
+--
+-- Name: TABLE fs_post_index; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.fs_post_index IS 'Таблица с индексами';
+
+
+--
+-- Name: fs_post_index_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.fs_post_index_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_post_index_link_seq OWNER TO lark;
+
+--
+-- Name: fs_post_index_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.fs_post_index_link_seq OWNED BY public.fs_post_index.link;
+
+
+--
+-- Name: fs_power_grid_capacity; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_power_grid_capacity (
+    link smallint NOT NULL,
+    n_qty smallint NOT NULL,
+    f_unit smallint NOT NULL
+);
+
+
+ALTER TABLE public.fs_power_grid_capacity OWNER TO ivan;
+
+--
+-- Name: fs_power_grid_capacity_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_power_grid_capacity_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_power_grid_capacity_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_power_grid_capacity_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_power_grid_capacity_link_seq OWNED BY public.fs_power_grid_capacity.link;
+
+
+--
+-- Name: fs_qty_room; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_qty_room (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_qty_room OWNER TO ivan;
+
+--
+-- Name: fs_qty_room_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_qty_room_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_qty_room_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_qty_room_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_qty_room_link_seq OWNED BY public.fs_qty_room.link;
+
+
+--
+-- Name: fs_readings; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_readings (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.fs_readings OWNER TO ivan;
+
+--
+-- Name: fs_readings_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_readings_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_readings_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_readings_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_readings_link_seq OWNED BY public.fs_readings.link;
+
+
+--
+-- Name: fs_repair_type; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_repair_type (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_repair_type OWNER TO ivan;
+
+--
+-- Name: fs_sell_status; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_sell_status (
+    link smallint NOT NULL,
+    n_code character varying(10),
+    c_name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.fs_sell_status OWNER TO ivan;
+
+--
+-- Name: TABLE fs_sell_status; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_sell_status IS 'Справочная таблица о статусах объявлений';
+
+
+--
+-- Name: fs_seller; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_seller (
+    link smallint NOT NULL,
+    f_seller_type smallint,
+    c_full_name character varying(200),
+    c_name1 character varying(150),
+    c_name2 character varying(150)
+);
+
+
+ALTER TABLE public.fs_seller OWNER TO ivan;
+
+--
+-- Name: TABLE fs_seller; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_seller IS ' Таблица с продовцами';
+
+
+--
+-- Name: fs_seller_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_seller_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_seller_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_seller_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_seller_link_seq OWNED BY public.fs_seller.link;
+
+
+--
+-- Name: fs_seller_type; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_seller_type (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_seller_type OWNER TO ivan;
+
+--
+-- Name: fs_seller_type_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_seller_type_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_seller_type_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_seller_type_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_seller_type_link_seq OWNED BY public.fs_seller_type.link;
+
+
+--
+-- Name: fs_session; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_session (
+    link integer NOT NULL,
+    s_sourcename character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.fs_session OWNER TO ivan;
+
+--
+-- Name: TABLE fs_session; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_session IS 'Таблица с типами сессии';
+
+
+--
+-- Name: fs_session_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_session_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_session_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_session_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_session_link_seq OWNED BY public.fs_session.link;
+
+
+--
+-- Name: fs_source; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_source (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL,
+    c_const character varying(50) NOT NULL,
+    s_domen character varying(250) NOT NULL
+);
+
+
+ALTER TABLE public.fs_source OWNER TO ivan;
+
+--
+-- Name: fs_source_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_source_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_source_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_source_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_source_link_seq OWNED BY public.fs_source.link;
+
+
+--
+-- Name: fs_status_of_ads_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_status_of_ads_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_status_of_ads_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_status_of_ads_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_status_of_ads_link_seq OWNED BY public.fs_sell_status.link;
+
+
+--
+-- Name: fs_status_task; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.fs_status_task (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_status_task OWNER TO lark;
+
+--
+-- Name: TABLE fs_status_task; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.fs_status_task IS 'таблица со статусами о выполнении задач';
+
+
+--
+-- Name: fs_status_task_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.fs_status_task_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_status_task_link_seq OWNER TO lark;
+
+--
+-- Name: fs_status_task_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.fs_status_task_link_seq OWNED BY public.fs_status_task.link;
+
+
+--
+-- Name: fs_street; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_street (
+    link integer NOT NULL,
+    f_district smallint,
+    f_type_street smallint NOT NULL,
+    c_name character varying(150) NOT NULL,
+    s_index character varying(6),
+    f_city smallint,
+    full_address character varying(250)
+);
+
+
+ALTER TABLE public.fs_street OWNER TO ivan;
+
+--
+-- Name: fs_street_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_street_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_street_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_street_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_street_link_seq OWNED BY public.fs_street.link;
+
+
+--
+-- Name: fs_street_type; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_street_type (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL,
+    short_name character varying(50) NOT NULL
+);
+
+
+ALTER TABLE public.fs_street_type OWNER TO ivan;
+
+--
+-- Name: fs_streets_type_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_streets_type_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_streets_type_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_streets_type_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_streets_type_link_seq OWNED BY public.fs_street_type.link;
+
+
+--
+-- Name: fs_technic_types; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_technic_types (
+    link smallint NOT NULL,
+    c_name character varying(250)
+);
+
+
+ALTER TABLE public.fs_technic_types OWNER TO ivan;
+
+--
+-- Name: TABLE fs_technic_types; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_technic_types IS 'Таблица с типами техники';
+
+
+--
+-- Name: fs_technics_type_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_technics_type_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_technics_type_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_technics_type_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_technics_type_link_seq OWNED BY public.fs_technic_types.link;
+
+
+--
+-- Name: fs_transport_accessibility; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_transport_accessibility (
+    link smallint NOT NULL,
+    c_name character varying(250)
+);
+
+
+ALTER TABLE public.fs_transport_accessibility OWNER TO ivan;
+
+--
+-- Name: fs_transport_accessibility_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_transport_accessibility_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_transport_accessibility_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_transport_accessibility_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_transport_accessibility_link_seq OWNED BY public.fs_transport_accessibility.link;
+
+
+--
+-- Name: fs_type_bathroom_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_type_bathroom_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_bathroom_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_type_bathroom_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_type_bathroom_link_seq OWNED BY public.fs_bathroom_type.link;
+
+
+--
+-- Name: fs_type_bus; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.fs_type_bus (
+    link smallint NOT NULL,
+    c_name character varying(200)
+);
+
+
+ALTER TABLE public.fs_type_bus OWNER TO lark;
+
+--
+-- Name: TABLE fs_type_bus; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.fs_type_bus IS 'Таблица с типами автобуса';
+
+
+--
+-- Name: fs_type_bus_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.fs_type_bus_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_bus_link_seq OWNER TO lark;
+
+--
+-- Name: fs_type_bus_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.fs_type_bus_link_seq OWNED BY public.fs_type_bus.link;
+
+
+--
+-- Name: fs_type_house; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_type_house (
+    link smallint NOT NULL,
+    c_name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.fs_type_house OWNER TO ivan;
+
+--
+-- Name: TABLE fs_type_house; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_type_house IS 'Справочная таблица с типами приборов';
+
+
+--
+-- Name: fs_type_house_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_type_house_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_house_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_type_house_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_type_house_link_seq OWNED BY public.fs_type_house.link;
+
+
+--
+-- Name: fs_type_of_estate; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_type_of_estate (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_type_of_estate OWNER TO ivan;
+
+--
+-- Name: fs_type_of_estate_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_type_of_estate_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_of_estate_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_type_of_estate_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_type_of_estate_link_seq OWNED BY public.fs_type_of_estate.link;
+
+
+--
+-- Name: fs_type_of_estate_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_type_of_estate_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_of_estate_seq OWNER TO ivan;
+
+--
+-- Name: fs_type_of_living; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_type_of_living (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_type_of_living OWNER TO ivan;
+
+--
+-- Name: fs_type_of_living_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_type_of_living_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_of_living_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_type_of_living_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_type_of_living_link_seq OWNED BY public.fs_type_of_living.link;
+
+
+--
+-- Name: fs_type_room; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_type_room (
+    link smallint NOT NULL,
+    c_name character varying(100)
+);
+
+
+ALTER TABLE public.fs_type_room OWNER TO ivan;
+
+--
+-- Name: fs_type_of_room_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_type_of_room_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_of_room_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_type_of_room_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_type_of_room_link_seq OWNED BY public.fs_type_room.link;
+
+
+--
+-- Name: fs_type_of_seller; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_type_of_seller (
+    link smallint NOT NULL,
+    c_name character varying(250)
+);
+
+
+ALTER TABLE public.fs_type_of_seller OWNER TO ivan;
+
+--
+-- Name: TABLE fs_type_of_seller; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.fs_type_of_seller IS ' Таблица с типами продавцев';
+
+
+--
+-- Name: fs_type_of_seller_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_type_of_seller_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_of_seller_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_type_of_seller_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_type_of_seller_link_seq OWNED BY public.fs_type_of_seller.link;
+
+
+--
+-- Name: fs_type_of_transaction; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_type_of_transaction (
+    link smallint NOT NULL,
+    c_name character varying(150) NOT NULL
+);
+
+
+ALTER TABLE public.fs_type_of_transaction OWNER TO ivan;
+
+--
+-- Name: fs_type_of_transaction_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_type_of_transaction_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_type_of_transaction_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_type_of_transaction_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_type_of_transaction_link_seq OWNED BY public.fs_type_of_transaction.link;
+
+
+--
+-- Name: fs_unit; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_unit (
+    link smallint NOT NULL,
+    c_name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.fs_unit OWNER TO ivan;
+
+--
+-- Name: fs_unit_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_unit_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_unit_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_unit_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_unit_link_seq OWNED BY public.fs_unit.link;
+
+
+--
+-- Name: fs_window; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_window (
+    link smallint NOT NULL,
+    c_name character varying(100) NOT NULL
+);
+
+
+ALTER TABLE public.fs_window OWNER TO ivan;
+
+--
+-- Name: fs_window_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_window_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_window_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_window_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_window_link_seq OWNED BY public.fs_window.link;
+
+
+--
+-- Name: fs_yard; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.fs_yard (
+    link smallint NOT NULL,
+    c_name character varying(500) NOT NULL
+);
+
+
+ALTER TABLE public.fs_yard OWNER TO ivan;
+
+--
+-- Name: fs_yard_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.fs_yard_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.fs_yard_link_seq OWNER TO ivan;
+
+--
+-- Name: fs_yard_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.fs_yard_link_seq OWNED BY public.fs_yard.link;
+
+
+--
+-- Name: inf_air_pollution; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.inf_air_pollution (
+    link integer NOT NULL,
+    f_city smallint NOT NULL,
+    f_index smallint NOT NULL,
+    n_co numeric(6,3) NOT NULL,
+    n_no numeric(6,3) NOT NULL,
+    n_no2 numeric(6,3) NOT NULL,
+    n_o3 numeric(6,3) NOT NULL,
+    n_so2 numeric(6,3) NOT NULL,
+    n_pm2_5 numeric(6,3) NOT NULL,
+    n_pm10 numeric(6,3) NOT NULL,
+    n_nh3 numeric(6,3) NOT NULL,
+    d_date timestamp without time zone NOT NULL,
+    json json
+);
+
+
+ALTER TABLE public.inf_air_pollution OWNER TO ivan;
+
+--
+-- Name: TABLE inf_air_pollution; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.inf_air_pollution IS 'Таблица с информации по общей оценке качества воздуха';
+
+
+--
+-- Name: inf_air_pollition_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.inf_air_pollition_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.inf_air_pollition_link_seq OWNER TO ivan;
+
+--
+-- Name: inf_air_pollition_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.inf_air_pollition_link_seq OWNED BY public.inf_air_pollution.link;
+
+
+--
+-- Name: inf_descriptions; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.inf_descriptions (
+    link integer NOT NULL,
+    f_flat integer,
+    f_ads_houses integer,
+    f_commercial integer,
+    c_name character varying NOT NULL,
+    d_date_create timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.inf_descriptions OWNER TO ivan;
+
+--
+-- Name: TABLE inf_descriptions; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.inf_descriptions IS 'Таблица которая содержит описание от объявлений ';
+
+
+--
+-- Name: inf_descriptions_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.inf_descriptions_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.inf_descriptions_link_seq OWNER TO ivan;
+
+--
+-- Name: inf_descriptions_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.inf_descriptions_link_seq OWNED BY public.inf_descriptions.link;
+
+
+--
+-- Name: mn_json_object; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_json_object (
+    link integer NOT NULL,
+    f_city integer,
+    f_object integer,
+    json json,
+    d_date timestamp without time zone,
+    latitude numeric,
+    longitude numeric,
+    object_id bigint,
+    name_obj character varying(150),
+    operator_obj character varying(150),
+    street character varying(250),
+    n_house character varying(30),
+    f_type_street smallint
+);
+
+
+ALTER TABLE public.mn_json_object OWNER TO ivan;
+
+--
+-- Name: TABLE mn_json_object; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.mn_json_object IS 'Таблица с Джисонами с Open Map Street';
+
+
+--
+-- Name: mn_json_object_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_json_object_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_json_object_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_json_object_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_json_object_link_seq OWNED BY public.mn_json_object.link;
+
+
+--
+-- Name: inf_factory; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.inf_factory (
+    link integer DEFAULT nextval('public.mn_json_object_link_seq'::regclass) NOT NULL,
+    f_city integer,
+    f_object integer,
+    d_date timestamp without time zone,
+    latitude numeric,
+    longitude numeric,
+    object_id bigint,
+    name_obj character varying(150),
+    operator_obj character varying(150),
+    street character varying(250),
+    n_house character varying(30),
+    f_type_street smallint,
+    json json
+);
+
+
+ALTER TABLE public.inf_factory OWNER TO ivan;
+
+--
+-- Name: inf_gis_ghk; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.inf_gis_ghk (
+    link integer NOT NULL,
+    f_city smallint NOT NULL,
+    post_index integer NOT NULL,
+    addres character varying(500),
+    id_gis character(36),
+    id_fias character(36),
+    total_area numeric,
+    living_area numeric,
+    n_flat_house numeric,
+    lot numeric,
+    lon numeric
+);
+
+
+ALTER TABLE public.inf_gis_ghk OWNER TO lark;
+
+--
+-- Name: inf_gis_ghk_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.inf_gis_ghk_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.inf_gis_ghk_link_seq OWNER TO lark;
+
+--
+-- Name: inf_gis_ghk_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.inf_gis_ghk_link_seq OWNED BY public.inf_gis_ghk.link;
+
+
+--
+-- Name: inf_gis_gkh; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.inf_gis_gkh (
+    addres character varying(1000),
+    id_gis character(36),
+    gl_id_fias character(36),
+    oktmo character varying(250),
+    control_method character varying(200),
+    ogrn character varying(200),
+    kpp character varying(200),
+    org_control_house character varying(1000),
+    type_house character varying(200),
+    condition character varying(200),
+    total_area numeric,
+    living_area character varying(250),
+    type_block character varying(150),
+    kadastr_number character varying(250),
+    global_id_hause character(36),
+    global_id_pom character(36)
+);
+
+
+ALTER TABLE public.inf_gis_gkh OWNER TO lark;
+
+--
+-- Name: inf_index_of_live; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.inf_index_of_live (
+    link integer NOT NULL,
+    f_city smallint NOT NULL,
+    n_year smallint NOT NULL,
+    n_rate numeric(3,2) NOT NULL,
+    d_create_date timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.inf_index_of_live OWNER TO ivan;
+
+--
+-- Name: TABLE inf_index_of_live; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.inf_index_of_live IS 'Таблица с индексами стоимости жизни';
+
+
+--
+-- Name: inf_index_of_live_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.inf_index_of_live_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.inf_index_of_live_link_seq OWNER TO ivan;
+
+--
+-- Name: inf_index_of_live_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.inf_index_of_live_link_seq OWNED BY public.inf_index_of_live.link;
+
+
+--
+-- Name: inf_miss_ads; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.inf_miss_ads (
+    link integer NOT NULL,
+    f_city integer NOT NULL,
+    site_id bigint NOT NULL,
+    f_source smallint NOT NULL,
+    d_date timestamp without time zone,
+    f_sell_status smallint
+);
+
+
+ALTER TABLE public.inf_miss_ads OWNER TO lark;
+
+--
+-- Name: TABLE inf_miss_ads; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.inf_miss_ads IS 'Таблица с айдишгиками сайтов не добавленных в БД основные таблицы из за ошибок в адрессе';
+
+
+--
+-- Name: inf_miss_ads_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.inf_miss_ads_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.inf_miss_ads_link_seq OWNER TO lark;
+
+--
+-- Name: inf_miss_ads_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.inf_miss_ads_link_seq OWNED BY public.inf_miss_ads.link;
+
+
+--
+-- Name: inf_sys; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.inf_sys (
+    link integer NOT NULL,
+    f_flat integer,
+    s_site_link character varying(250) NOT NULL,
+    f_source smallint NOT NULL,
+    d_date_create timestamp without time zone,
+    site_id bigint,
+    f_city smallint NOT NULL,
+    f_sell_status smallint,
+    d_date_sell timestamp without time zone,
+    t_delta interval day to minute
+);
+
+
+ALTER TABLE public.inf_sys OWNER TO ivan;
+
+--
+-- Name: TABLE inf_sys; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.inf_sys IS 'Таблица с системными данными об объявлении';
+
+
+--
+-- Name: inf_sys_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.inf_sys_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.inf_sys_link_seq OWNER TO ivan;
+
+--
+-- Name: inf_sys_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.inf_sys_link_seq OWNED BY public.inf_sys.link;
+
+
+--
+-- Name: inf_temperature; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.inf_temperature (
+    link smallint NOT NULL,
+    f_city smallint,
+    t_avg_year_temp numeric(3,1),
+    t_most_could numeric(3,1),
+    t_avg_could numeric(3,1),
+    t_most_hot numeric(3,1),
+    t_avg_hot numeric(3,1),
+    t_abs_min numeric(3,1),
+    t_abs_max numeric(3,1),
+    "р_rainfall" smallint,
+    weigth numeric(3,2)
+);
+
+
+ALTER TABLE public.inf_temperature OWNER TO ivan;
+
+--
+-- Name: inf_temperature_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.inf_temperature_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.inf_temperature_link_seq OWNER TO ivan;
+
+--
+-- Name: inf_temperature_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.inf_temperature_link_seq OWNED BY public.inf_temperature.link;
+
+
+--
+-- Name: inf_temperature_temp; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.inf_temperature_temp (
+    f_city integer,
+    t_avg_year_temp numeric(3,1),
+    t_most_could numeric(3,1),
+    t_avg_could numeric(3,1),
+    t_most_hot numeric(3,1),
+    t_avg_hot numeric(3,1),
+    t_abs_min numeric(3,1),
+    t_abs_max numeric(3,1),
+    "р_rainfall" smallint,
+    weigth numeric(3,2)
+);
+
+
+ALTER TABLE public.inf_temperature_temp OWNER TO ivan;
+
+--
+-- Name: lg_procedure_session; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.lg_procedure_session (
+    link integer NOT NULL,
+    f_session integer NOT NULL,
+    d_date_start timestamp without time zone NOT NULL,
+    d_date_end timestamp without time zone
+);
+
+
+ALTER TABLE public.lg_procedure_session OWNER TO ivan;
+
+--
+-- Name: lg_procedure_session_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.lg_procedure_session_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.lg_procedure_session_link_seq OWNER TO ivan;
+
+--
+-- Name: lg_procedure_session_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.lg_procedure_session_link_seq OWNED BY public.lg_procedure_session.link;
+
+
+--
+-- Name: lg_session_log; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.lg_session_log (
+    link integer NOT NULL,
+    f_procedure_session integer NOT NULL,
+    s_description character varying(250) NOT NULL,
+    s_status character varying(5) NOT NULL,
+    n_eroor smallint NOT NULL,
+    d_date timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.lg_session_log OWNER TO ivan;
+
+--
+-- Name: TABLE lg_session_log; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.lg_session_log IS 'Таблица с детальным логированием ';
+
+
+--
+-- Name: lg_session_log_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.lg_session_log_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.lg_session_log_link_seq OWNER TO ivan;
+
+--
+-- Name: lg_session_log_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.lg_session_log_link_seq OWNED BY public.lg_session_log.link;
+
+
+--
+-- Name: log_session_pars; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.log_session_pars (
+    g_sess uuid NOT NULL,
+    d_date_start timestamp without time zone,
+    n_total_count integer,
+    n_miss integer,
+    n_new integer,
+    d_date_end timestamp without time zone
+);
+
+
+ALTER TABLE public.log_session_pars OWNER TO lark;
+
+--
+-- Name: TABLE log_session_pars; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.log_session_pars IS 'Таблица с названием сессии и результатом ее работы';
+
+
+--
+-- Name: COLUMN log_session_pars.n_total_count; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON COLUMN public.log_session_pars.n_total_count IS 'Число активных квартир в продаже';
+
+
+--
+-- Name: COLUMN log_session_pars.n_miss; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON COLUMN public.log_session_pars.n_miss IS 'Число не загруженных квартир из за некорректного адреса';
+
+
+--
+-- Name: COLUMN log_session_pars.n_new; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON COLUMN public.log_session_pars.n_new IS 'Сколлько новых квартир было загруженно за сессию';
+
+
+--
+-- Name: mn_ads_houses; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_ads_houses (
+    link integer NOT NULL,
+    f_area smallint NOT NULL,
+    f_city smallint NOT NULL,
+    f_district smallint NOT NULL,
+    f_street integer NOT NULL,
+    n_qty_floor smallint NOT NULL,
+    f_qty_room smallint,
+    fs_ads_object_link smallint NOT NULL,
+    n_house_space smallint NOT NULL,
+    n_yard_space smallint NOT NULL,
+    n_ceiling_height numeric(6,2) NOT NULL,
+    f_category_ground smallint NOT NULL,
+    f_materrial_of_walls smallint,
+    f_parking smallint NOT NULL,
+    f_yard smallint,
+    f_tehnics smallint,
+    f_furniture smallint NOT NULL,
+    f_kind_of_repair smallint NOT NULL,
+    f_decorating_type smallint,
+    f_transport_accessibility smallint NOT NULL,
+    f_type_of_seller smallint NOT NULL,
+    s_name_company character varying(150) NOT NULL,
+    s_name_seller character varying(150) NOT NULL,
+    f_sourse smallint NOT NULL,
+    f_status_of_ads smallint NOT NULL,
+    d_date timestamp without time zone
+);
+
+
+ALTER TABLE public.mn_ads_houses OWNER TO ivan;
+
+--
+-- Name: mn_ads_houses_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_ads_houses_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_ads_houses_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_ads_houses_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_ads_houses_link_seq OWNED BY public.mn_ads_houses.link;
+
+
+--
+-- Name: mn_ads_price; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_ads_price (
+    link integer NOT NULL,
+    f_flat integer,
+    f_ads_houses integer,
+    f_commercial_real_estate integer,
+    d_date timestamp without time zone NOT NULL,
+    n_price money NOT NULL
+);
+
+
+ALTER TABLE public.mn_ads_price OWNER TO ivan;
+
+--
+-- Name: TABLE mn_ads_price; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.mn_ads_price IS 'Таблица с историей цен ';
+
+
+--
+-- Name: mn_apartments_ads; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_apartments_ads (
+    link integer NOT NULL,
+    f_house integer NOT NULL,
+    f_qty_room smallint,
+    n_qty_total_space numeric(6,2) NOT NULL,
+    n_qty_living_space numeric(6,2),
+    n_qty_kitchen_space numeric(6,2),
+    f_floor smallint NOT NULL,
+    f_decorating smallint,
+    b_loggia boolean NOT NULL,
+    b_balcony boolean NOT NULL,
+    f_ads_type smallint,
+    f_room_type smallint,
+    n_ceiling_height numeric(4,2),
+    f_bathroom_type smallint,
+    f_window smallint,
+    f_repair_type smallint,
+    b_heating boolean NOT NULL,
+    f_method_of_sale smallint,
+    f_transaction_type smallint,
+    f_seller character varying(150)
+);
+
+
+ALTER TABLE public.mn_apartments_ads OWNER TO ivan;
+
+--
+-- Name: TABLE mn_apartments_ads; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.mn_apartments_ads IS 'Основная таблица которая включает объявления квартир';
+
+
+--
+-- Name: mn_apartments_ads_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_apartments_ads_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_apartments_ads_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_apartments_ads_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_apartments_ads_link_seq OWNED BY public.mn_apartments_ads.link;
+
+
+--
+-- Name: mn_commercial; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_commercial (
+    link integer NOT NULL,
+    f_house integer NOT NULL,
+    f_kinde_of_repaire smallint NOT NULL,
+    f_floor smallint NOT NULL,
+    n_ceiling_height numeric(6,2) NOT NULL,
+    f_power_grid_capacity smallint NOT NULL,
+    f_type_of_transaction smallint NOT NULL,
+    f_readings smallint NOT NULL,
+    f_distance_from_road smallint NOT NULL,
+    n_qty_parking_place smallint NOT NULL,
+    f_type_of_seller smallint NOT NULL,
+    s_name_company character varying(150) NOT NULL,
+    s_name_seller character varying(150) NOT NULL,
+    f_sourse smallint NOT NULL,
+    f_status_of_ads smallint NOT NULL,
+    d_date timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.mn_commercial OWNER TO ivan;
+
+--
+-- Name: mn_commercial_real_estate_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_commercial_real_estate_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_commercial_real_estate_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_commercial_real_estate_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_commercial_real_estate_link_seq OWNED BY public.mn_commercial.link;
+
+
+--
+-- Name: mn_history_of_price_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_history_of_price_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_history_of_price_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_history_of_price_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_history_of_price_link_seq OWNED BY public.mn_ads_price.link;
+
+
+--
+-- Name: mn_history_of_status; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_history_of_status (
+    link integer NOT NULL,
+    f_apatments_ads integer NOT NULL,
+    f_ads_houses integer,
+    f_commercial_real_estate integer,
+    d_start_date timestamp without time zone NOT NULL,
+    d_end_date timestamp without time zone
+);
+
+
+ALTER TABLE public.mn_history_of_status OWNER TO ivan;
+
+--
+-- Name: TABLE mn_history_of_status; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.mn_history_of_status IS 'Табл с активностью объявления ';
+
+
+--
+-- Name: mn_history_of_status_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_history_of_status_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_history_of_status_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_history_of_status_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_history_of_status_link_seq OWNED BY public.mn_history_of_status.link;
+
+
+--
+-- Name: mn_house; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_house (
+    link integer NOT NULL,
+    f_street integer NOT NULL,
+    n_qty_floor smallint NOT NULL,
+    n_year_building integer,
+    b_passenger_elevator boolean,
+    b_freight_elevator boolean,
+    f_parking smallint,
+    f_yard smallint,
+    f_type_house smallint NOT NULL,
+    f_official_builder smallint,
+    s_name_new_building character varying(150),
+    d_date_create timestamp without time zone NOT NULL,
+    s_number character varying(30),
+    lat numeric,
+    lon numeric,
+    f_city smallint,
+    n_count_house smallint,
+    fias character(36),
+    CONSTRAINT not_empty_mn_house CHECK ((char_length((s_number)::text) > 0))
+);
+
+
+ALTER TABLE public.mn_house OWNER TO ivan;
+
+--
+-- Name: TABLE mn_house; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.mn_house IS 'Таьлица с сушностью домов';
+
+
+--
+-- Name: COLUMN mn_house.n_count_house; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON COLUMN public.mn_house.n_count_house IS 'Количество домов в радиусе 200 метров';
+
+
+--
+-- Name: mn_house_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_house_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_house_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_house_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_house_link_seq OWNED BY public.mn_house.link;
+
+
+--
+-- Name: mn_house_metrics; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.mn_house_metrics (
+    link integer NOT NULL,
+    f_city smallint NOT NULL,
+    f_house integer NOT NULL,
+    w_air numeric(3,2),
+    w_factory numeric(3,2),
+    w_temp numeric(3,2),
+    w_dist_park numeric(3,2),
+    w_dist_kinder numeric(3,2),
+    w_dist_entertime numeric(3,2),
+    w_dist_fuel numeric(3,2),
+    w_dist_market numeric(3,2),
+    w_dist_garag numeric(3,2),
+    w_dist_pipe numeric(3,2),
+    w_dist_scool numeric(3,2),
+    w_dist_mall numeric(3,2),
+    w_dist_bas numeric(3,2),
+    w_dist_farmacy numeric(3,2),
+    w_amount_ps numeric(3,2),
+    w_amount_prod numeric(3,2),
+    w_amount_sport numeric(3,2),
+    w_dist_sport numeric(3,2),
+    w_dist_ps numeric(3,2)
+);
+
+
+ALTER TABLE public.mn_house_metrics OWNER TO lark;
+
+--
+-- Name: TABLE mn_house_metrics; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.mn_house_metrics IS 'Таблица с метриками которые считаются исклбчительно на дома';
+
+
+--
+-- Name: COLUMN mn_house_metrics.w_dist_ps; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON COLUMN public.mn_house_metrics.w_dist_ps IS 'веса дистанции парков и скверов критерий "Спорт и отдых"';
+
+
+--
+-- Name: mn_house_metrics_link_seq1; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.mn_house_metrics_link_seq1
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_house_metrics_link_seq1 OWNER TO lark;
+
+--
+-- Name: mn_house_metrics_link_seq1; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.mn_house_metrics_link_seq1 OWNED BY public.mn_house_metrics.link;
+
+
+--
+-- Name: mn_json_building; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_json_building (
+    link integer DEFAULT nextval('public.mn_json_object_link_seq'::regclass) NOT NULL,
+    f_city integer,
+    f_object integer,
+    json json,
+    d_date timestamp without time zone,
+    latitude numeric,
+    longitude numeric,
+    object_id bigint,
+    name_obj character varying(150),
+    operator_obj character varying(150),
+    street character varying(250),
+    n_house character varying(30),
+    f_type_street smallint
+);
+
+
+ALTER TABLE public.mn_json_building OWNER TO ivan;
+
+--
+-- Name: mn_metrics; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_metrics (
+    link integer NOT NULL,
+    f_house integer,
+    f_flat integer,
+    f_city smallint,
+    w_floor numeric(3,2),
+    w_air_floor numeric(3,2),
+    w_factory_floor numeric(3,2),
+    b_active boolean
+);
+
+
+ALTER TABLE public.mn_metrics OWNER TO ivan;
+
+--
+-- Name: TABLE mn_metrics; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.mn_metrics IS 'Таблица с с метриками зависящими от квартиры';
+
+
+--
+-- Name: COLUMN mn_metrics.w_floor; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON COLUMN public.mn_metrics.w_floor IS 'Столбец с метрикой зависимость квартиры от этажа';
+
+
+--
+-- Name: COLUMN mn_metrics.w_air_floor; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON COLUMN public.mn_metrics.w_air_floor IS 'Столбец с метрикой зависимость загрязнения воздуха от этажа';
+
+
+--
+-- Name: COLUMN mn_metrics.w_factory_floor; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON COLUMN public.mn_metrics.w_factory_floor IS 'Столбец с метрикой зависимость загрязнения от фабрик от этажа от этажа';
+
+
+--
+-- Name: mn_metrics_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_metrics_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_metrics_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_metrics_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_metrics_link_seq OWNED BY public.mn_metrics.link;
+
+
+--
+-- Name: mn_official_builder; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_official_builder (
+    link integer NOT NULL,
+    c_name character varying(150) NOT NULL,
+    s_contact character varying(150),
+    d_date_create timestamp without time zone
+);
+
+
+ALTER TABLE public.mn_official_builder OWNER TO ivan;
+
+--
+-- Name: TABLE mn_official_builder; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.mn_official_builder IS 'Таблица застройщиков ';
+
+
+--
+-- Name: mn_official_builder_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_official_builder_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_official_builder_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_official_builder_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_official_builder_link_seq OWNED BY public.mn_official_builder.link;
+
+
+--
+-- Name: mn_period_deadline; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.mn_period_deadline (
+    link integer NOT NULL,
+    f_house integer NOT NULL,
+    d_date_start timestamp without time zone NOT NULL,
+    d_date_end timestamp without time zone NOT NULL,
+    d_date_create timestamp without time zone NOT NULL
+);
+
+
+ALTER TABLE public.mn_period_deadline OWNER TO ivan;
+
+--
+-- Name: TABLE mn_period_deadline; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.mn_period_deadline IS 'Таблица с диапазоном времени по вводу в эксплуатацию';
+
+
+--
+-- Name: mn_period_deadline_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.mn_period_deadline_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.mn_period_deadline_link_seq OWNER TO ivan;
+
+--
+-- Name: mn_period_deadline_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.mn_period_deadline_link_seq OWNED BY public.mn_period_deadline.link;
+
+
+--
+-- Name: ps_dist_house_to_object; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.ps_dist_house_to_object (
+    link integer NOT NULL,
+    f_city smallint NOT NULL,
+    f_house integer NOT NULL,
+    object_id character varying(150) NOT NULL,
+    f_type_object smallint NOT NULL,
+    n_short_dist integer NOT NULL,
+    n_foot_dist integer,
+    n_car_dist integer,
+    d_date_add timestamp without time zone
+);
+
+
+ALTER TABLE public.ps_dist_house_to_object OWNER TO lark;
+
+--
+-- Name: ps_dist_house_to_object_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.ps_dist_house_to_object_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ps_dist_house_to_object_link_seq OWNER TO lark;
+
+--
+-- Name: ps_dist_house_to_object_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.ps_dist_house_to_object_link_seq OWNED BY public.ps_dist_house_to_object.link;
+
+
+--
+-- Name: ps_object_position; Type: TABLE; Schema: public; Owner: ivan
+--
+
+CREATE TABLE public.ps_object_position (
+    link integer NOT NULL,
+    f_city smallint NOT NULL,
+    f_objects_type smallint NOT NULL,
+    latitude numeric(7,4),
+    longitude numeric(6,4),
+    d_date timestamp without time zone,
+    c_name character varying(150),
+    json json,
+    object_id character varying(200),
+    name_obj character varying(200),
+    street character varying(200)
+);
+
+
+ALTER TABLE public.ps_object_position OWNER TO ivan;
+
+--
+-- Name: TABLE ps_object_position; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON TABLE public.ps_object_position IS 'Таблица координат объектов рядом с недвижимостью';
+
+
+--
+-- Name: ps_object_position_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.ps_object_position_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ps_object_position_link_seq OWNER TO ivan;
+
+--
+-- Name: ps_object_position_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.ps_object_position_link_seq OWNED BY public.ps_object_position.link;
+
+
+--
+-- Name: ps_stop_bus; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.ps_stop_bus (
+    link uuid NOT NULL,
+    f_city smallint,
+    c_name character varying(200),
+    lon numeric,
+    lat numeric,
+    d_date_create timestamp without time zone
+);
+
+
+ALTER TABLE public.ps_stop_bus OWNER TO lark;
+
+--
+-- Name: TABLE ps_stop_bus; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.ps_stop_bus IS 'Таблица с остановками и их координатами';
+
+
+--
+-- Name: ref_stop_and_bus; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.ref_stop_and_bus (
+    link integer NOT NULL,
+    f_stop uuid,
+    f_bus smallint
+);
+
+
+ALTER TABLE public.ref_stop_and_bus OWNER TO lark;
+
+--
+-- Name: TABLE ref_stop_and_bus; Type: COMMENT; Schema: public; Owner: lark
+--
+
+COMMENT ON TABLE public.ref_stop_and_bus IS 'Таблица с связи между остановками и автобусами';
+
+
+--
+-- Name: ref_stop_and_bus_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.ref_stop_and_bus_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ref_stop_and_bus_link_seq OWNER TO lark;
+
+--
+-- Name: ref_stop_and_bus_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.ref_stop_and_bus_link_seq OWNED BY public.ref_stop_and_bus.link;
+
+
+--
+-- Name: s_kind_of_repair_link_seq; Type: SEQUENCE; Schema: public; Owner: ivan
+--
+
+CREATE SEQUENCE public.s_kind_of_repair_link_seq
+    AS smallint
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.s_kind_of_repair_link_seq OWNER TO ivan;
+
+--
+-- Name: s_kind_of_repair_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: ivan
+--
+
+ALTER SEQUENCE public.s_kind_of_repair_link_seq OWNED BY public.fs_repair_type.link;
+
+
+--
+-- Name: ts_dist_task; Type: TABLE; Schema: public; Owner: lark
+--
+
+CREATE TABLE public.ts_dist_task (
+    link integer NOT NULL,
+    f_status smallint,
+    query character varying(500),
+    d_date_add timestamp without time zone,
+    d_date_compl timestamp without time zone
+);
+
+
+ALTER TABLE public.ts_dist_task OWNER TO lark;
+
+--
+-- Name: ts_dist_task_link_seq; Type: SEQUENCE; Schema: public; Owner: lark
+--
+
+CREATE SEQUENCE public.ts_dist_task_link_seq
+    AS integer
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE public.ts_dist_task_link_seq OWNER TO lark;
+
+--
+-- Name: ts_dist_task_link_seq; Type: SEQUENCE OWNED BY; Schema: public; Owner: lark
+--
+
+ALTER SEQUENCE public.ts_dist_task_link_seq OWNED BY public.ts_dist_task.link;
+
+
+--
+-- Name: vw_ads_houses; Type: VIEW; Schema: public; Owner: ivan
+--
+
+CREATE VIEW public.vw_ads_houses AS
+ SELECT mn_ads_houses.link,
+    mn_ads_houses.f_area,
+    mn_ads_houses.f_city,
+    mn_ads_houses.f_district,
+    mn_ads_houses.f_street,
+    mn_ads_houses.n_qty_floor,
+    mn_ads_houses.f_qty_room,
+    mn_ads_houses.fs_ads_object_link,
+    mn_ads_houses.n_house_space,
+    mn_ads_houses.n_yard_space,
+    mn_ads_houses.n_ceiling_height,
+    mn_ads_houses.f_category_ground,
+    mn_ads_houses.f_materrial_of_walls,
+    mn_ads_houses.f_parking,
+    mn_ads_houses.f_yard,
+    mn_ads_houses.f_tehnics,
+    mn_ads_houses.f_furniture,
+    mn_ads_houses.f_kind_of_repair,
+    mn_ads_houses.f_decorating_type,
+    mn_ads_houses.f_transport_accessibility,
+    mn_ads_houses.f_type_of_seller,
+    mn_ads_houses.s_name_company,
+    mn_ads_houses.s_name_seller,
+    mn_ads_houses.f_sourse,
+    mn_ads_houses.f_status_of_ads,
+    mn_ads_houses.d_date
+   FROM public.mn_ads_houses;
+
+
+ALTER TABLE public.vw_ads_houses OWNER TO ivan;
+
+--
+-- Name: VIEW vw_ads_houses; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON VIEW public.vw_ads_houses IS 'Вьха для вывода обьявлений по домам';
+
+
+--
+-- Name: vw_commercial_real_estate; Type: VIEW; Schema: public; Owner: ivan
+--
+
+CREATE VIEW public.vw_commercial_real_estate AS
+ SELECT mn_commercial.link,
+    mn_commercial.f_house,
+    mn_commercial.f_kinde_of_repaire,
+    mn_commercial.f_floor,
+    mn_commercial.n_ceiling_height,
+    mn_commercial.f_power_grid_capacity,
+    mn_commercial.f_type_of_transaction,
+    mn_commercial.f_readings,
+    mn_commercial.f_distance_from_road,
+    mn_commercial.n_qty_parking_place,
+    mn_commercial.f_type_of_seller,
+    mn_commercial.s_name_company,
+    mn_commercial.s_name_seller,
+    mn_commercial.f_sourse,
+    mn_commercial.f_status_of_ads,
+    mn_commercial.d_date
+   FROM public.mn_commercial;
+
+
+ALTER TABLE public.vw_commercial_real_estate OWNER TO ivan;
+
+--
+-- Name: VIEW vw_commercial_real_estate; Type: COMMENT; Schema: public; Owner: ivan
+--
+
+COMMENT ON VIEW public.vw_commercial_real_estate IS 'Вьха по объявлению о продаже недвижимости ';
+
+
+--
+-- Name: fs_area link; Type: DEFAULT; Schema: minghk; Owner: lark
+--
+
+ALTER TABLE ONLY minghk.fs_area ALTER COLUMN link SET DEFAULT nextval('minghk.fs_area_link_seq'::regclass);
+
+
+--
+-- Name: fs_city link; Type: DEFAULT; Schema: minghk; Owner: lark
+--
+
+ALTER TABLE ONLY minghk.fs_city ALTER COLUMN link SET DEFAULT nextval('minghk.fs_city_link_seq'::regclass);
+
+
+--
+-- Name: bf_temp_ads_houses link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.bf_temp_ads_houses ALTER COLUMN link SET DEFAULT nextval('public.bf_temp_ads_houses_link_seq'::regclass);
+
+
+--
+-- Name: bf_temp_apartments_ads link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.bf_temp_apartments_ads ALTER COLUMN link SET DEFAULT nextval('public.bf_temp_apartments_ads_link_seq'::regclass);
+
+
+--
+-- Name: bf_temp_commercial_real_estate link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.bf_temp_commercial_real_estate ALTER COLUMN link SET DEFAULT nextval('public.bf_temp_commercial_real_estate_link_seq'::regclass);
+
+
+--
+-- Name: es_furniture link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.es_furniture ALTER COLUMN link SET DEFAULT nextval('public.es_furniture_link_seq'::regclass);
+
+
+--
+-- Name: es_technics link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.es_technics ALTER COLUMN link SET DEFAULT nextval('public.es_technics_link_seq'::regclass);
+
+
+--
+-- Name: fs_ads_type link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_ads_type ALTER COLUMN link SET DEFAULT nextval('public.fs_ads_object_link_seq'::regclass);
+
+
+--
+-- Name: fs_announcement link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_announcement ALTER COLUMN link SET DEFAULT nextval('public.fs_announcement_link_seq'::regclass);
+
+
+--
+-- Name: fs_area link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_area ALTER COLUMN link SET DEFAULT nextval('public.fs_area_link_seq'::regclass);
+
+
+--
+-- Name: fs_bathroom_type link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_bathroom_type ALTER COLUMN link SET DEFAULT nextval('public.fs_type_bathroom_link_seq'::regclass);
+
+
+--
+-- Name: fs_bus link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.fs_bus ALTER COLUMN link SET DEFAULT nextval('public.fs_bus_link_seq'::regclass);
+
+
+--
+-- Name: fs_category_ground link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_category_ground ALTER COLUMN link SET DEFAULT nextval('public.fs_category_ground_link_seq'::regclass);
+
+
+--
+-- Name: fs_city link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_city ALTER COLUMN link SET DEFAULT nextval('public.fs_city_link_seq'::regclass);
+
+
+--
+-- Name: fs_decoration_type link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_decoration_type ALTER COLUMN link SET DEFAULT nextval('public.fs_decorating_type_link_seq'::regclass);
+
+
+--
+-- Name: fs_distance_from_road link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_distance_from_road ALTER COLUMN link SET DEFAULT nextval('public.fs_distance_from_road_link_seq'::regclass);
+
+
+--
+-- Name: fs_district link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_district ALTER COLUMN link SET DEFAULT nextval('public.fs_district_link_seq'::regclass);
+
+
+--
+-- Name: fs_floor link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_floor ALTER COLUMN link SET DEFAULT nextval('public.fs_floor_link_seq'::regclass);
+
+
+--
+-- Name: fs_furniture link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_furniture ALTER COLUMN link SET DEFAULT nextval('public.fs_furniture_link_seq'::regclass);
+
+
+--
+-- Name: fs_furniture_types link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_furniture_types ALTER COLUMN link SET DEFAULT nextval('public.fs_furniture_types_link_seq'::regclass);
+
+
+--
+-- Name: fs_index_pollution link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_index_pollution ALTER COLUMN link SET DEFAULT nextval('public.fs_index_pollution_link_seq'::regclass);
+
+
+--
+-- Name: fs_materrial_of_walls link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_materrial_of_walls ALTER COLUMN link SET DEFAULT nextval('public.fs_materrial_of_walls_link_seq'::regclass);
+
+
+--
+-- Name: fs_method_of_sale link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_method_of_sale ALTER COLUMN link SET DEFAULT nextval('public.fs_method_of_sale_link_seq'::regclass);
+
+
+--
+-- Name: fs_objects_type link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_objects_type ALTER COLUMN link SET DEFAULT nextval('public.fs_objects_type_link_seq'::regclass);
+
+
+--
+-- Name: fs_optional_field link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_optional_field ALTER COLUMN link SET DEFAULT nextval('public.fs_optional_field_link_seq'::regclass);
+
+
+--
+-- Name: fs_options link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_options ALTER COLUMN link SET DEFAULT nextval('public.fs_options_link_seq'::regclass);
+
+
+--
+-- Name: fs_parking link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_parking ALTER COLUMN link SET DEFAULT nextval('public.fs_parking_link_seq'::regclass);
+
+
+--
+-- Name: fs_parking_space link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_parking_space ALTER COLUMN link SET DEFAULT nextval('public.fs_parking_space_link_seq'::regclass);
+
+
+--
+-- Name: fs_post_index link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.fs_post_index ALTER COLUMN link SET DEFAULT nextval('public.fs_post_index_link_seq'::regclass);
+
+
+--
+-- Name: fs_power_grid_capacity link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_power_grid_capacity ALTER COLUMN link SET DEFAULT nextval('public.fs_power_grid_capacity_link_seq'::regclass);
+
+
+--
+-- Name: fs_qty_room link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_qty_room ALTER COLUMN link SET DEFAULT nextval('public.fs_qty_room_link_seq'::regclass);
+
+
+--
+-- Name: fs_readings link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_readings ALTER COLUMN link SET DEFAULT nextval('public.fs_readings_link_seq'::regclass);
+
+
+--
+-- Name: fs_repair_type link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_repair_type ALTER COLUMN link SET DEFAULT nextval('public.s_kind_of_repair_link_seq'::regclass);
+
+
+--
+-- Name: fs_sell_status link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_sell_status ALTER COLUMN link SET DEFAULT nextval('public.fs_status_of_ads_link_seq'::regclass);
+
+
+--
+-- Name: fs_seller link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_seller ALTER COLUMN link SET DEFAULT nextval('public.fs_seller_link_seq'::regclass);
+
+
+--
+-- Name: fs_seller_type link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_seller_type ALTER COLUMN link SET DEFAULT nextval('public.fs_seller_type_link_seq'::regclass);
+
+
+--
+-- Name: fs_session link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_session ALTER COLUMN link SET DEFAULT nextval('public.fs_session_link_seq'::regclass);
+
+
+--
+-- Name: fs_source link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_source ALTER COLUMN link SET DEFAULT nextval('public.fs_source_link_seq'::regclass);
+
+
+--
+-- Name: fs_status_task link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.fs_status_task ALTER COLUMN link SET DEFAULT nextval('public.fs_status_task_link_seq'::regclass);
+
+
+--
+-- Name: fs_street link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_street ALTER COLUMN link SET DEFAULT nextval('public.fs_street_link_seq'::regclass);
+
+
+--
+-- Name: fs_street_type link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_street_type ALTER COLUMN link SET DEFAULT nextval('public.fs_streets_type_link_seq'::regclass);
+
+
+--
+-- Name: fs_technic_types link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_technic_types ALTER COLUMN link SET DEFAULT nextval('public.fs_technics_type_link_seq'::regclass);
+
+
+--
+-- Name: fs_transport_accessibility link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_transport_accessibility ALTER COLUMN link SET DEFAULT nextval('public.fs_transport_accessibility_link_seq'::regclass);
+
+
+--
+-- Name: fs_type_bus link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.fs_type_bus ALTER COLUMN link SET DEFAULT nextval('public.fs_type_bus_link_seq'::regclass);
+
+
+--
+-- Name: fs_type_house link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_type_house ALTER COLUMN link SET DEFAULT nextval('public.fs_type_house_link_seq'::regclass);
+
+
+--
+-- Name: fs_type_of_estate link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_type_of_estate ALTER COLUMN link SET DEFAULT nextval('public.fs_type_of_estate_link_seq'::regclass);
+
+
+--
+-- Name: fs_type_of_living link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_type_of_living ALTER COLUMN link SET DEFAULT nextval('public.fs_type_of_living_link_seq'::regclass);
+
+
+--
+-- Name: fs_type_of_seller link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_type_of_seller ALTER COLUMN link SET DEFAULT nextval('public.fs_type_of_seller_link_seq'::regclass);
+
+
+--
+-- Name: fs_type_of_transaction link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_type_of_transaction ALTER COLUMN link SET DEFAULT nextval('public.fs_type_of_transaction_link_seq'::regclass);
+
+
+--
+-- Name: fs_type_room link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_type_room ALTER COLUMN link SET DEFAULT nextval('public.fs_type_of_room_link_seq'::regclass);
+
+
+--
+-- Name: fs_unit link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_unit ALTER COLUMN link SET DEFAULT nextval('public.fs_unit_link_seq'::regclass);
+
+
+--
+-- Name: fs_window link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_window ALTER COLUMN link SET DEFAULT nextval('public.fs_window_link_seq'::regclass);
+
+
+--
+-- Name: fs_yard link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.fs_yard ALTER COLUMN link SET DEFAULT nextval('public.fs_yard_link_seq'::regclass);
+
+
+--
+-- Name: inf_air_pollution link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.inf_air_pollution ALTER COLUMN link SET DEFAULT nextval('public.inf_air_pollition_link_seq'::regclass);
+
+
+--
+-- Name: inf_descriptions link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.inf_descriptions ALTER COLUMN link SET DEFAULT nextval('public.inf_descriptions_link_seq'::regclass);
+
+
+--
+-- Name: inf_gis_ghk link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.inf_gis_ghk ALTER COLUMN link SET DEFAULT nextval('public.inf_gis_ghk_link_seq'::regclass);
+
+
+--
+-- Name: inf_index_of_live link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.inf_index_of_live ALTER COLUMN link SET DEFAULT nextval('public.inf_index_of_live_link_seq'::regclass);
+
+
+--
+-- Name: inf_miss_ads link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.inf_miss_ads ALTER COLUMN link SET DEFAULT nextval('public.inf_miss_ads_link_seq'::regclass);
+
+
+--
+-- Name: inf_sys link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.inf_sys ALTER COLUMN link SET DEFAULT nextval('public.inf_sys_link_seq'::regclass);
+
+
+--
+-- Name: inf_temperature link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.inf_temperature ALTER COLUMN link SET DEFAULT nextval('public.inf_temperature_link_seq'::regclass);
+
+
+--
+-- Name: lg_procedure_session link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.lg_procedure_session ALTER COLUMN link SET DEFAULT nextval('public.lg_procedure_session_link_seq'::regclass);
+
+
+--
+-- Name: lg_session_log link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.lg_session_log ALTER COLUMN link SET DEFAULT nextval('public.lg_session_log_link_seq'::regclass);
+
+
+--
+-- Name: mn_ads_houses link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_ads_houses ALTER COLUMN link SET DEFAULT nextval('public.mn_ads_houses_link_seq'::regclass);
+
+
+--
+-- Name: mn_ads_price link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_ads_price ALTER COLUMN link SET DEFAULT nextval('public.mn_history_of_price_link_seq'::regclass);
+
+
+--
+-- Name: mn_apartments_ads link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_apartments_ads ALTER COLUMN link SET DEFAULT nextval('public.mn_apartments_ads_link_seq'::regclass);
+
+
+--
+-- Name: mn_commercial link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_commercial ALTER COLUMN link SET DEFAULT nextval('public.mn_commercial_real_estate_link_seq'::regclass);
+
+
+--
+-- Name: mn_history_of_status link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_history_of_status ALTER COLUMN link SET DEFAULT nextval('public.mn_history_of_status_link_seq'::regclass);
+
+
+--
+-- Name: mn_house link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_house ALTER COLUMN link SET DEFAULT nextval('public.mn_house_link_seq'::regclass);
+
+
+--
+-- Name: mn_house_metrics link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.mn_house_metrics ALTER COLUMN link SET DEFAULT nextval('public.mn_house_metrics_link_seq1'::regclass);
+
+
+--
+-- Name: mn_json_object link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_json_object ALTER COLUMN link SET DEFAULT nextval('public.mn_json_object_link_seq'::regclass);
+
+
+--
+-- Name: mn_metrics link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_metrics ALTER COLUMN link SET DEFAULT nextval('public.mn_metrics_link_seq'::regclass);
+
+
+--
+-- Name: mn_official_builder link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_official_builder ALTER COLUMN link SET DEFAULT nextval('public.mn_official_builder_link_seq'::regclass);
+
+
+--
+-- Name: mn_period_deadline link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.mn_period_deadline ALTER COLUMN link SET DEFAULT nextval('public.mn_period_deadline_link_seq'::regclass);
+
+
+--
+-- Name: ps_dist_house_to_object link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.ps_dist_house_to_object ALTER COLUMN link SET DEFAULT nextval('public.ps_dist_house_to_object_link_seq'::regclass);
+
+
+--
+-- Name: ps_object_position link; Type: DEFAULT; Schema: public; Owner: ivan
+--
+
+ALTER TABLE ONLY public.ps_object_position ALTER COLUMN link SET DEFAULT nextval('public.ps_object_position_link_seq'::regclass);
+
+
+--
+-- Name: ref_stop_and_bus link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.ref_stop_and_bus ALTER COLUMN link SET DEFAULT nextval('public.ref_stop_and_bus_link_seq'::regclass);
+
+
+--
+-- Name: ts_dist_task link; Type: DEFAULT; Schema: public; Owner: lark
+--
+
+ALTER TABLE ONLY public.ts_dist_task ALTER COLUMN link SET DEFAULT nextval('public.ts_dist_task_link_seq'::regclass);
+
+
