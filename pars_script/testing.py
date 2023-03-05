@@ -1,5 +1,5 @@
-from main import CITY_ID, CITY
 from def_list import *
+from main import CITY_ID, CITY
 from avito_pars import parsAvitoFlat
 from urllib.error import HTTPError
 from transliterate import translit
@@ -12,7 +12,7 @@ def load_test_file(city=CITY) -> None:
     save_html(html, 'test_main.html')
     links = getting_links(html)
     save_html(getting_html(links[2][2]), 'test_one_ads.html')
-    print('Сохранены тустовые страницы')
+    print('Сохранены тестовые страницы')
 
 
 def test_update_sell_status():
@@ -25,5 +25,3 @@ def test_update_sell_status():
 
 if __name__ == "__main__":
     test_update_sell_status()
-
-#Тест 
