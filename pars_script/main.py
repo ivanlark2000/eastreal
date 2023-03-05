@@ -31,6 +31,7 @@ def pars(g_sess: str) -> tuple[int, int, int]:
     count_new = 0
     count_miss = 0
     lst_id_in_base = get_id_in_base(CITY_ID)
+    tpl_siteid_base = tuple([int(i[0]) for i in lst_id_in_base])
     for url in getting_url(city=CITY):
         try:
             html = getting_html_sel(url)  # Получаем html стартовой страницы
@@ -41,10 +42,10 @@ def pars(g_sess: str) -> tuple[int, int, int]:
         if not len(lst_links):
             continue
         rendom_link = getting_rendom_link(lst_links)
-        for ids_site in next(rendom_link):       # проверяем есть ли квартира в базе
+        for ids_site in next(rendom_link): 
             AKTIVE_SITE_ID.append(int(ids_site[0]))
             for ids_base in lst_id_in_base:
-                if int(ids_site[0]) == ids_base[0]:
+                if int(ids_site[0]) == int(ids_base[0]):
                     if int(ids_site[1]) == ids_base[1]:
                         logger.info(f'В БД есть квартира № {ids_site[0]} с такой же ценой')
                     elif ids_base[2] is not None and ids_base[1] is None:

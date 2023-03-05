@@ -59,7 +59,8 @@ def get_id_in_base(city_id: int) -> tuple[tuple[str, int]]:
         with conn.cursor() as cursor:
             cursor.execute(f"SELECT * FROM get_siteid_price('{city_id}', '1');")
             logger.info('Получили айдишники квартир сайта с БД')
-            return tuple([tuple([i[0], i[1], (i[2])]) for i in cursor.fetchall()])
+            rez = cursor.fetchall()
+            return tuple([tuple([i[0], i[1], (i[2])]) for i in rez])
     except Exception as e:
         msg = 'Не удалось получить айдишники кватир сайта с бд' + str(e)
         logger.critical(msg, exc_info=True)
@@ -253,7 +254,7 @@ def mark_start_sess(g_sess: str, d_date_start: object) -> None:
                 VALUES ('{g_sess}', '{d_date_start}')             
     """)
             conn.commit()
-            logger.info(f'Добаили запись о начале {g_sess} в БД')
+            logger.info(f'Добаили запись в БД о начале сессии {g_sess} в БД')
     except Exception as e:
         logger.critica(f'Не удалось отправить данные в БД о начале сессии {g_sess}')
     finally:

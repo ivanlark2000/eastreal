@@ -54,8 +54,7 @@ def getting_links(html:str) -> list[str]:
 def getting_rendom_link(list_links: list):
     """Получаем рандомную ссылку и фильтруем список"""
     link = random.choice(list_links)
-    list_links.remove(link)  # Удаляем из списка выбранную ссылку.
-    time.sleep(3)
+    list_links.remove(link) 
     yield list_links
 
 
