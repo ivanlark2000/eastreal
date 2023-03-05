@@ -1,7 +1,7 @@
 -- Процедура по загрузке автобусов и маршрутов к ним 
 -- CREATE DATE 2023.02.15
 -- ALTER DATE 
-    --2023.02.15 заменили тип Link на uuid 
+    --2023.02.15 заменили тип атрибута Link на uuid 
 
 CREATE OR REPLACE PROCEDURE public.load_bus_station(
 	IN city_id smallint,
