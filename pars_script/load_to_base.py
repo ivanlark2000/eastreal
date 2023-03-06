@@ -174,7 +174,7 @@ def update_sell_status(sessid: str, city_id: int, siteids:list) -> None:
         with conn.cursor() as cursor:
             cursor.execute(f"SELECT update_sell_status('{sessid}', '{city_id}',VARIADIC ARRAY{siteids});")
             conn.commit()
-            logger.info('Айдишники проданых квартир успешно переведенны в статус проданны')
+            logger.info('Айдишники проданных квартир успешно переведены в статус проданы')
     except Exception as e:
         logger.warning('Статусы проданыных квартир не были переведены в историчность ', exc_info=True)
     finally:
@@ -254,7 +254,7 @@ def mark_start_sess(g_sess: str, d_date_start: object) -> None:
                 VALUES ('{g_sess}', '{d_date_start}')             
     """)
             conn.commit()
-            logger.info(f'Добаили запись в БД о начале сессии {g_sess} в БД')
+            logger.info(f'Добавили запись в БД о начале сессии {g_sess}')
     except Exception as e:
         logger.critica(f'Не удалось отправить данные в БД о начале сессии {g_sess}')
     finally:
@@ -275,7 +275,7 @@ def update_end_sess(g_sess: str, n_total_count: int, n_miss: int, n_new: int, d_
                 WHERE g_sess = '{g_sess}'             
             """)
             conn.commit()
-            logger.info(f'Добаили запись об окончании работы сессии {g_sess}')
+            logger.info(f'Добавили запись об окончании работы сессии {g_sess}')
     except Exception as e:
         logger.critica(f'Не удалось обновить даные об окончании сессии {g_sess}')
     finally:
