@@ -11,19 +11,6 @@ from load_to_base import load_buildings_to_base
 MAIN_URL = 'https://dom.mingkh.ru'
 
 
-def make_conn() -> object:
-    try:
-        return psycopg2.connect(
-            dbname='eastreal',
-            user='lark',
-            password='Local321',
-            host='194.67.105.197',
-            port='5432'
-        )
-    except Exception as e:
-        print(f'Не удалось установить соединение с БД ошибка {e}')
-
-
 def get_gis_html(url: str) -> str:
     try:
         response = requests.get(url)
