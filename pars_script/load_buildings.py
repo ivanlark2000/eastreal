@@ -11,15 +11,6 @@ from load_to_base import load_buildings_to_base
 MAIN_URL = 'https://dom.mingkh.ru'
 
 
-def save_html(html: str) -> None:
-    with open('html.txt', 'w') as file:
-        file.write(html)
-
-
-def load_html() -> str:
-    return open('html.txt', 'r').read()
-
-
 def make_conn() -> object:
     try:
         return psycopg2.connect(
