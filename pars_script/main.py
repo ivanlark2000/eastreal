@@ -25,6 +25,7 @@ def sess_uuid() -> None:
             g_sess=G_SESS, d_date_end=time_end,
             n_total_count=total_ads, n_miss=miss_load, n_new=new_load
             )
+    add_coord()
 
 
 def pars(g_sess: str) -> tuple[int, int, int]:
