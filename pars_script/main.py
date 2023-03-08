@@ -39,6 +39,8 @@ def pars(g_sess: str) -> tuple[int, int, int]:
         except HTTPError as e:
             logger.warning(f'{url} \n ', exc_info=True)
             continue
+        if not html:
+            continue
         lst_links = getting_links(html) # получаем список ссылок квартир
         if not len(lst_links):
             continue

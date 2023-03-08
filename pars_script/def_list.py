@@ -71,17 +71,18 @@ def getting_html(url:str):
     
 def getting_html_sel(url: str) -> str:
     """Возвращает html посредством виртуально браузера """
-    from main import logger 
-    try:
-        driver.get(url)
-        time.sleep(3)
-        return driver.page_source   
-    except selenium.common.exceptions.TimeoutException as e:
-        driver.refresh()
-        logger.warnin('Слишком долгое ожидвение по поводу страницы, перезагрузка страницы ')
-        return driver.page_source   
-    except Exception as e:
-        logger.warning(f'Произошла ошибка при загрузке страницы {url}', exc_info=True)
+    from main import logger
+    count = 0
+    while count < 5: 
+        try:
+            driver.get(url)
+            time.sleep(3)
+            return driver.page_source   
+        except Exception as e:
+            logger.warnin('Oшибка при загрузке страницы селениумом', exc_info=True)
+            time.sleep(10)
+            count += 1
+            continue
 
 
 def get_right_street(street: str):
