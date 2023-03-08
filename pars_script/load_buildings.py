@@ -11,14 +11,6 @@ from load_to_base import load_buildings_to_base
 MAIN_URL = 'https://dom.mingkh.ru'
 
 
-def get_gis_html(url: str) -> str:
-    try:
-        response = requests.get(url)
-        return response.text
-    except Exception as e:
-        print(f'не удалось получить данные с сайта {e}')
-
-
 def load_area(lst):
     conn = make_conn()
     try:

@@ -88,7 +88,7 @@ def err_to_base(dct: dict, city_id: str) -> None:
     from main import logger 
     msg = f"квартира с айдишником {dct['site_id']} c адресом {dct['S_Street']} не была закачена"
     logger.critical(msg)
-    load_miss_number(site_id=dct['site_id'], city_id=city_id)
+    load_miss_number(site_id=dct['site_id'], city_id=city_id, guid=dct['G_Sess'])
 
 
 def load_to_base(dct: dict, count_new: int, count_miss: int) -> tuple[int, int]:
@@ -150,13 +150,13 @@ def update_sold_id(siteid: str) -> None:
         conn.close()
 
 
-def load_miss_number(site_id: str, city_id: int) -> None:
+def load_miss_number(guid: str, site_id: str, city_id: int) -> None:
     conn = config.make_con()
     try:
         with conn.cursor() as cursor:
             cursor.execute(f"""
-                        INSERT INTO inf_miss_ads (f_city, site_id, f_source, f_sell_status)
-                        VALUES ({city_id}, {int(site_id)}, 1, 1);
+                        INSERT INTO inf_miss_ads (f_city, site_id, f_source, f_sell_status, g_sess_create)
+                        VALUES ({city_id}, {int(site_id)}, 1, 1, '{guid}');
                            """)
             conn.commit()
             logger.info(f'Добавили в БД айдишник {site_id} ошибочного объявления')
