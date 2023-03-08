@@ -226,11 +226,11 @@ def add_coord_to_base(id: int, lat: float, lon: float):
         conn.close()
 
 
-def add_full_address(streetid: int, full_adress: str):
+def add_full_address(streetid: int, full_address: str):
     conn = config.make_con()
     sql = f"""
             UPDATE fs_street 
-            SET full_address = '{full_adress}'
+            SET full_address = '{full_address}'
             WHERE link = {streetid}"""
     try:
         with conn.cursor() as cursor:
@@ -239,7 +239,7 @@ def add_full_address(streetid: int, full_adress: str):
     except Exception:
         logger.warning(f'''Не удалось загрузить в БД название полной улицы
                            streetid     = {streetid},
-                           full_address = {full_adress}''',
+                           full_address = {full_address}''',
                        exc_info=True)
     finally:
         conn.close()
