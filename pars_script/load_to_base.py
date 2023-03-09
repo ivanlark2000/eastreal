@@ -297,3 +297,66 @@ def load_buildings_to_base(guid: str, f_city: int, address: str, n_year_build: i
         logger.warning(f'Не удалось данные о доме {address} в табл. minghk.mn_buildings', exc_info=True)
     finally:
         conn.close()
+
+
+def load_area(lst):
+    conn = config.make_con()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(f'''
+                INSERT INTO minghk.fs_area (c_name, t_href)
+                VALUES {', '.join([str(i) for i in lst])};
+            ''')
+            conn.commit()
+    except Exception as e:
+        logger.warning(f'Не удалось загрузить в БД города {e}')
+    finally:
+        conn.close()
+
+
+def load_city(lst):
+    conn = config.make_con()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(f'''
+                INSERT INTO minghk.fs_city (f_area, c_name, t_href)
+                VALUES {', '.join([str(i) for i in lst])};
+            ''')
+            conn.commit()
+    except Exception as e:
+        logger.warning(f'Не удалось загрузить в БД города {e}')
+    finally:
+        conn.close()
+
+
+def get_links_area() -> list[tuple[int, str]]:
+    conn = config.make_con()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute("""
+                SELECT link, t_href
+                FROM minghk.fs_area
+            """)
+            resp = cursor.fetchall()
+            return resp
+    except Exception as e:
+        logger.warning(f'Не удалось получить данные с БД по поводу районов {e}')
+    finally:
+        conn.close()
+
+
+
+def get_city_url(city: str) -> str:
+    conn = config.make_con()
+    try:
+        with conn.cursor() as cursor:
+            cursor.execute(f"""
+                SELECT link, t_href
+                FROM minghk.fs_city
+                WHERE c_name LIKE '{city}'
+            """)
+            return cursor.fetchall()[0]
+    except Exception as e:
+        logger.warning(f'Не удалось получить данные с БД по ссылки по городу  {e}')
+    finally:
+        conn.close()

@@ -79,7 +79,7 @@ def getting_html_sel(url: str) -> str:
             time.sleep(3)
             return driver.page_source   
         except Exception as e:
-            logger.warnin('Oшибка при загрузке страницы селениумом', exc_info=True)
+            logger.warning('Oшибка при загрузке страницы селениумом', exc_info=True)
             time.sleep(10)
             count += 1
             continue
