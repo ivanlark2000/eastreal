@@ -124,7 +124,6 @@ def add_coord():
     count = len(data)
     logger.info(f'к обновлению {count} домов')
     for row in data:
-        print(row)
         try:
             if not row[5]:
                 street = get_right_street(row[2] + " " + row[3].strip())
