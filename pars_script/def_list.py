@@ -79,7 +79,7 @@ def getting_html_sel(url: str) -> str:
             time.sleep(3)
             return driver.page_source   
         except Exception as e:
-            logger.warning('Oшибка при загрузке страницы селениумом', exc_info=True)
+            logger.warning(f'Oшибка при загрузке страницы {url} селениумом')
             time.sleep(10)
             count += 1
             continue
@@ -122,22 +122,23 @@ def add_coord():
     from main import logger
     data = get_all_street_without_coord()
     count = len(data)
-    print(f'к обновлению {count} домов')
+    logger.info(f'к обновлению {count} домов')
     for row in data:
+        print(row)
         try:
             if not row[5]:
                 street = get_right_street(row[2] + " " + row[3].strip())
                 if not street:
                     street = row[2] + " " + row[3].strip()
                 else:
-                    add_full_address(streetid=row[1], full_adress=street)
+                    add_full_address(streetid=row[1], full_address=street)
                 street = street + ' ' + row[4].strip()
                 position = get_position_ya(street)
                 if position:
                     lat, lon = position
                     add_coord_to_base(row[0], lat, lon)
             else:
-                street = row[2] + ' ' + row[5] + ' ' + row[4].strip()
+                street = row[5] + ' ' + row[4].strip()
                 position = get_position_ya(street)
                 if position:
                     lat, lon = position

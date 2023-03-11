@@ -217,6 +217,7 @@ def add_coord_to_base(id: int, lat: float, lon: float):
         with conn.cursor() as cursor:
             cursor.execute(sql)
             conn.commit()
+            logger.info(f'Координаты по id_house {id} успешно загруженны')
     except Exception:
         logger.warning(f'''Не удалось добавить координаты в БД
                             id_house = {id}
@@ -235,7 +236,6 @@ def add_full_address(streetid: int, full_address: str):
     try:
         with conn.cursor() as cursor:
             cursor.execute(sql)
-            logger.info(f'Данные по координатам по адресу {full_address} успешно загруженны')
     except Exception:
         logger.warning(f'''Не удалось загрузить в БД название полной улицы
                            streetid     = {streetid},

@@ -52,7 +52,7 @@ class Config:
 
 parser = argparse.ArgumentParser()
 parser.add_argument('-d', '--debug', action='store_const', const='d', help='Запуск в режиме дебаг')
-parser.add_argument('-c', '--coord', help='Запуск скрипта только парсинг домов с ян-са')
+parser.add_argument('-c', '--coord',action='store_const', const='c', help='Запуск скрипта только парсинг домов с ян-са')
 parser.add_argument('-f', '--file', help='Запуск скрипта с выводом логов в фаил')
 args = parser.parse_args()
 
