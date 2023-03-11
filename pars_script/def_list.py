@@ -76,7 +76,7 @@ def getting_html_sel(url: str) -> str:
     while count < 5: 
         try:
             driver.get(url)
-            time.sleep(3)
+            time.sleep(4)
             return driver.page_source   
         except Exception as e:
             logger.warning(f'Oшибка при загрузке страницы {url} селениумом')
