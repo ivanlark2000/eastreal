@@ -1,6 +1,7 @@
 # coding=utf-8
 import time
 import random
+import urllib
 import selenium
 import http.client
 from dadata import Dadata
@@ -65,6 +66,8 @@ def getting_html(url:str):
         return respose
     except http.client.IncompleteRead as e:
         return e.partial.decode("utf-8")
+    except urllib.error.HTTPError:
+        logger.warning(f'Ошибка при загрузке дынных со страницы {url}')
     finally:
         time.sleep(5)
 

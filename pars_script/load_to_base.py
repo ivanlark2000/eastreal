@@ -282,14 +282,14 @@ def update_end_sess(g_sess: str, n_total_count: int, n_miss: int, n_new: int, d_
         conn.close()
 
 
-def load_buildings_to_base(guid: str, f_city: int, address: str, n_year_build: int, 
+def load_buildings_to_base(guid: str, f_city: int, address: str, n_year_build: str, flat: int,
                            floor: int, square: float, lat: float, lon: float) -> None:
     conn = config.make_con()
     try:
         with conn.cursor() as cursor:
             cursor.execute(f"""
-                INSERT INTO minghk.mn_buildings (link, f_city, c_address, n_year_build, n_floor, n_square, lat, lon)
-                VALUES ('{guid}', '{f_city}', '{address}', '{n_year_build}', '{floor}', '{square}', '{lat}', '{lon}' )             
+     INSERT INTO minghk.mn_buildings (link, f_city, c_address, n_year_build, n_floor, n_square, lat, lon, q_flat)
+     VALUES ('{guid}', '{f_city}', '{address}', '{n_year_build}', '{floor}', '{square}', '{lat}', '{lon}', {flat})            
     """)
             conn.commit()
             logger.info(f'добавили данные о доме {address} в табл. minghk.mn_buildings')
