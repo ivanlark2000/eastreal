@@ -13,7 +13,7 @@ class Config:
     LOG_DIR = os.path.join(PROJECT_DIR, 'pars_script', 'log')
     NAME_DB = os.environ.get('name_db')
     USERNAME_DB = os.environ.get('user_DB')
-    PASSWORD_DB = os.environ.get('password_DB')
+    PASSWORD_DB = os.environ.get('pasword_DB')
     PORT = os.environ.get('port')
     HOST = os.environ.get('host')
     API_KEY_DADATA = os.environ.get('API_KEY_DADATA')
@@ -29,11 +29,10 @@ class Config:
 
     def make_con(self):
         return psycopg2.connect(dbname=self.NAME_DB,
-                                user=self.USERNAME_DB)
-                                #,
-                                #password=self.PASSWORD_DB,
-                                #host=self.HOST,
-                                #port=self.PORT)
+                                user=self.USERNAME_DB,
+                                password=self.PASSWORD_DB,
+                                host=self.HOST,
+                                port=self.PORT)
 
     def make_logger_term(self):
         handler = logging.StreamHandler(stream=sys.stdout)
