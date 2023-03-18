@@ -39,7 +39,7 @@ def get_flat(url: str) -> str:
         soup = bs(html, 'lxml')
         return (soup.find(string='Жилых помещений').next.next).text
     except:
-        return 'NULL'
+        return 
 
 
 def get_lst_load_to_base(soup: object, city_id: int) -> None:
@@ -52,8 +52,6 @@ def get_lst_load_to_base(soup: object, city_id: int) -> None:
         if n_flat:
             if n_flat.isdigit():
                 n_flat = int(n_flat)
-            else:
-                n_flat = 'NULL'
         square, year, floor = lst_row[3:6]
         if  not floor.isdigit():
             floor = 0
@@ -62,7 +60,7 @@ def get_lst_load_to_base(soup: object, city_id: int) -> None:
         if position:
             lat, lon = position
         else:
-            lat = lon = 'NULL'
+            continue
         load_buildings_to_base(
                 guid=guid, f_city=city_id, address=address, n_year_build=year,
                 floor=floor, square=square, lat=lat, lon=lon, flat=n_flat
