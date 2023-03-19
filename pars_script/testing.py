@@ -12,9 +12,12 @@ from config import Config
 class TestBase(TestCase):
 
     def setUp(self):
-        self.config = Config()
+        self.config = Config(b_test=False)
     
     def test_db_connection(self):
+        """
+        Тестирование соединения к базе 
+        """
         con = self.config.make_con()
         self.assertTrue(con.status == 1)
 
