@@ -15,6 +15,7 @@ neovim = "*"
 black = "*"
 lxml = "*"
 datetime = "*"
+openai = "*"
 
 [dev-packages]
 

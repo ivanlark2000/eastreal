@@ -3,7 +3,6 @@ import re
 import sys
 import time
 import openai
-from PIL import Image
 
 
 openai.api_key = os.environ.get("OPENAI_API_KEY")
@@ -21,21 +20,10 @@ def lst_des(conn: object) -> list:
 
 
 def get_api_resp(text) -> str:
-    question = """
-                Дай характеристику из текста по пунктам, если описание в тексте пункта нет, оставь пункт пустым
-                Тип квартиры
-                Тип отопления
-                Место расположения
-                Тип дома
-                Тип ремонта
-                Наличие кухни
-                Шумоизоляция
-                Наличие прописанных людей
-                Наличие холодильника"""
     try:
         res = openai.Completion.create(
-            engine="text-davinci-002",
-            prompt=f"{question} {text}",
+            engine="text-davinci-003",
+            prompt=f"{text}",
             max_tokens=2048
             )["choices"][0]["text"]
         print(res)
@@ -67,7 +55,26 @@ def foto():
 
 
 def main():
-    foto()
+    get_api_resp('''Дан список пересекающихся периодов, написать запрос, который выведет объединенные
+пересекающиеся периоды. решить на постгресс
+                 CREATE TEMP TABLE temp_periods
+(
+d0 date,
+d1 date
+);
+INSERT INTO temp_periods
+(
+d0,
+d1
+)
+values (&#39;20220101&#39;, &#39;20220301&#39;),
+(&#39;20220201&#39;, &#39;20220401&#39;),
+(&#39;20220110&#39;, &#39;20220310&#39;),
+(&#39;20220501&#39;, &#39;20220511&#39;),
+(&#39;20220511&#39;, &#39;20220601&#39;),
+(&#39;20221101&#39;, &#39;20221201&#39;),
+(&#39;20221111&#39;, &#39;20221115&#39;);''')
+    #foto()
 
 if __name__ == "__main__":
     main()
