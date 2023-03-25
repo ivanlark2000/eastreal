@@ -28,11 +28,9 @@ class Config:
                 self.logger.setLevel(logging.DEBUG)
             else:
                 self.logger.setLevel(logging.INFO)
-
-            if self.args.file:
-                self.make_logger(self.args.file)
-            else:
-                self.make_logger_term()
+            self.make_logger(self.args.file)
+        else:
+            self.make_logger()
 
     def make_con(self):
         return psycopg2.connect(dbname=self.NAME_DB,
@@ -41,14 +39,11 @@ class Config:
                                 host=self.HOST,
                                 port=self.PORT)
 
-    def make_logger_term(self):
-        handler = logging.StreamHandler(stream=sys.stdout)
-        formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
-        handler.setFormatter(formatter)
-        self.logger.addHandler(handler)
-
-    def make_logger(self, logfile: str):
-        handler = logging.FileHandler(self.LOG_DIR + '//' + logfile, 'w')
+    def make_logger(self, logfile: str = None):
+        if logfile:
+            handler = logging.FileHandler(self.LOG_DIR + '//' + logfile, 'w')
+        else:
+            handler = logging.StreamHandler(stream=sys.stdout)
         formatter = logging.Formatter("%(name)s %(asctime)s %(levelname)s %(message)s")
         handler.setFormatter(formatter)
         self.logger.addHandler(handler)
