@@ -16,6 +16,7 @@ black = "*"
 lxml = "*"
 datetime = "*"
 openai = "*"
+psutil = "*"
 
 [dev-packages]
 

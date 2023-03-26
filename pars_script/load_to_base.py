@@ -4,7 +4,10 @@ import psycopg2
 
 sys.path.insert(1, '/home/lark/project/eastreal/settings')
 
-from config import config, logger
+from config import Config
+
+config = Config()
+logger = config.logger
 
 
 lst_arg = [

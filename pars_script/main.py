@@ -1,18 +1,37 @@
-import uuid
+import time 
+import uuid, psutil
 from def_list import *
+from pathlib import Path
 from datetime import datetime
 from urllib.error import HTTPError
 from transliterate import translit
 from avito_pars import parsAvitoFlat
-from load_to_base import load_to_base, get_id_in_base
-from load_to_base import mark_start_sess, update_end_sess
-from load_to_base import load_price_to_base, update_sell_status, logger
+from load_to_base import (
+        logger,
+        load_to_base, 
+        get_id_in_base,
+        mark_start_sess, 
+        update_end_sess,
+        load_price_to_base, 
+        update_sell_status 
+        )
 
 
 CITY_ID = 24741 
 CITY_RUS = 'Калининград'
 CITY = translit(CITY_RUS.lower(), language_code='ru', reversed=True)
 AKTIVE_SITE_ID = []
+FILEPATH = Path(__file__).absolute()
+
+def check_last_proc() -> None:
+    """
+    Функция которая останавливает запущенные аналогичные процессы
+    """
+    for proc in psutil.process_iter():
+        for atr in proc.cmdline():
+            if str(FILEPATH) == atr and time.time() - proc.__dict__['_create_time'] > 2:
+                proc.kill()
+                logger.warning(f'В фоне работал aналогичный процесс №{proc.pid} проивели удаление')
 
 
 def sess_uuid() -> None:
@@ -88,8 +107,8 @@ def pars(g_sess: str) -> tuple[int, int, int]:
 
 
 def main():
-    from config import args
-    if args.coord:
+    check_last_proc()
+    if config.args.coord:
         add_coord()
     else:
         sess_uuid()
@@ -97,3 +116,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+    
