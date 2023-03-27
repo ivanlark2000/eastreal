@@ -14,7 +14,7 @@ LOG_DIR=$PATH_DIR/job/log/main_script.log
 echo '-------------------------------------------------' >> $LOG_DIR
 echo 'Активация скрипта - '`date` >> $LOG_DIR
 
-$PATH_PYTHON_INTERPRETATOR $PATH_SCRIPT -f avitoPars.log
+$PATH_PYTHON_INTERPRETATOR $PATH_SCRIPT -f avitoPars.log >> $LOG_DIR
 
 echo 'Скрипт закончил выполнение - '`date` >> $LOG_DIR
    
