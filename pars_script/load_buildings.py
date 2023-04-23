@@ -1,13 +1,13 @@
-#coding=utf-8
+# coding=utf-8
 import time
 import uuid
 import requests
 import psycopg2
 from bs4 import BeautifulSoup as bs
+from typing import Any
 from load_to_base import load_buildings_to_base, get_city_url
 from load_to_base import load_area, load_city, get_links_area
-from def_list import get_position_ya, getting_html, save_html, load_html
-    
+from def_list import get_position_ya, getting_html, load_html
 
 MAIN_URL = 'https://dom.mingkh.ru'
 
@@ -15,7 +15,7 @@ MAIN_URL = 'https://dom.mingkh.ru'
 def load_area_gis():
     html = load_html()
     soup = bs(html, 'lxml')
-    tags = soup.find('ul', {'class':'list-unstyled list-columns'})
+    tags = soup.find('ul', {'class': 'list-unstyled list-columns'})
     lst_city = [(tag.text, tag['href']) for tag in tags.findAll('a')]
     load_area(lst_city)
 
@@ -26,20 +26,20 @@ def get_city_and_load_to_base() -> None:
         html = getting_html(url)
         if html:
             soup = bs(html, 'lxml')
-            tags = soup.find('ul', {'class':'list-unstyled list-columns'})
+            tags = soup.find('ul', {'class': 'list-unstyled list-columns'})
             lst_city = [(i[0], tag.text, tag['href']) for tag in tags.findAll('a')]
             load_city(lst_city)
             print(url)
             time.sleep(10)
 
 
-def get_flat(url: str) -> str:
+def get_flat(url: str) -> Any | None:
     try:
         html = getting_html(MAIN_URL + url)
         soup = bs(html, 'lxml')
-        return (soup.find(string='Жилых помещений').next.next).text
+        return soup.find(string='Жилых помещений').next.next.text
     except:
-        return 
+        return
 
 
 def get_lst_load_to_base(soup: object, city_id: int) -> None:
@@ -53,7 +53,7 @@ def get_lst_load_to_base(soup: object, city_id: int) -> None:
             if n_flat.isdigit():
                 n_flat = int(n_flat)
         square, year, floor = lst_row[3:6]
-        if  not floor.isdigit():
+        if not floor.isdigit():
             floor = 0
         guid = uuid.uuid3(uuid.NAMESPACE_DNS, lst_row[1] + address)
         position = get_position_ya(lst_row[1] + ' ' + address)
@@ -62,9 +62,9 @@ def get_lst_load_to_base(soup: object, city_id: int) -> None:
         else:
             continue
         load_buildings_to_base(
-                guid=guid, f_city=city_id, address=address, n_year_build=year,
-                floor=floor, square=square, lat=lat, lon=lon, flat=n_flat
-                ) 
+            guid=guid, f_city=city_id, address=address, n_year_build=year,
+            floor=floor, square=square, lat=lat, lon=lon, flat=n_flat
+        )
 
 
 def get_and_load_houses(city: str) -> None:
@@ -73,7 +73,7 @@ def get_and_load_houses(city: str) -> None:
     html = getting_html(url)
     if html:
         soup = bs(html, 'lxml')
-        page_end = soup.find('ul', {'class':'pagination'}).find_all('a')[-1].get('data-ci-pagination-page')
+        page_end = soup.find('ul', {'class': 'pagination'}).find_all('a')[-1].get('data-ci-pagination-page')
         get_lst_load_to_base(soup=soup, city_id=f_city)
         for p in range(2, int(page_end) + 1):
             url_page = url + f'?page={p}'
@@ -81,7 +81,6 @@ def get_and_load_houses(city: str) -> None:
             if html:
                 soup = bs(html, 'lxml')
                 get_lst_load_to_base(soup=soup, city_id=f_city)
-
 
 
 if __name__ == "__main__":

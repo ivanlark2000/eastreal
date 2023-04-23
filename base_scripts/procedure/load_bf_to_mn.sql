@@ -777,11 +777,5 @@ BEGIN
 		SELECT F_flat FROM mn_ads_price
 		);
 
-
-
-
-
-
-
 END; $$;
 LANGUAGE plpgsql
